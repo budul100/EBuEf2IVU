@@ -1,0 +1,22 @@
+﻿{
+  "ProviderId": "Microsoft.VisualStudio.ConnectedService.Wcf",
+  "Version": "15.0.30423.811",
+  "GettingStartedDocument": {
+    "Uri": "https://go.microsoft.com/fwlink/?linkid=858517"
+  },
+  "ExtendedData": {
+    "inputs": [
+      "D:/Users/mgr/OneDrive/Entwicklung/NET/EBuEf2IVUCore/.additionals/IVU.rail/RealTimeInformationImportFacade.wsdl"
+    ],
+    "collectionTypes": [
+      "System.Array",
+      "System.Collections.Hashtable"
+    ],
+    "internalTypeAccess": true,
+    "namespaceMappings": [
+      "*, RealtimeSender"
+    ],
+    "targetFramework": "netstandard2.0",
+    "typeReuseMode": "All"
+  }
+}

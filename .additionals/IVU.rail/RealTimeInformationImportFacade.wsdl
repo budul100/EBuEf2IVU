@@ -1,0 +1,141 @@
+<definitions name="RealTimeInformationImportFacadeService" targetNamespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://web.facade.ejb.fzd.mb.ivu.de/jaws" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <schema elementFormDefault="qualified" targetNamespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:soap11-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://web.facade.ejb.fzd.mb.ivu.de/jaws" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <complexType name="importDelayInfo">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="delayInfoTO" type="tns:DelayInfoTO"/>
+        </sequence>
+      </complexType>
+      <complexType name="importDelayInfoResponse">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="result" type="tns:ValidationErrorTO"/>
+        </sequence>
+      </complexType>
+      <complexType name="importRealTimeInfo">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="realTimeInfoTO" type="tns:RealTimeInfoTO"/>
+        </sequence>
+      </complexType>
+      <complexType name="importRealTimeInfoResponse">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="result" type="tns:ValidationErrorTO"/>
+        </sequence>
+      </complexType>
+      <complexType name="AbstractRealTimeInfoTO">
+        <sequence>
+          <element name="eventCode" type="int" maxOccurs="1" minOccurs="1"/>
+          <element name="division" type="string" maxOccurs="1" minOccurs="1"/>
+          <element name="stopArea" type="string" maxOccurs="1" minOccurs="1"/>
+          <element name="timeStamp" type="long" maxOccurs="1" minOccurs="1"/>
+          <element name="delta" type="int" maxOccurs="1" minOccurs="0"/>
+          <element name="vehicles" type="tns:VehicleTO" maxOccurs="unbounded" minOccurs="0"/>
+          <element name="trainCombinationComplete" type="long" maxOccurs="1" minOccurs="0"/>
+          <element name="tripIdentificationDate" type="long" maxOccurs="1" minOccurs="0"/>
+          <element name="tripNumber" type="string" maxOccurs="1" minOccurs="0"/>
+          <element name="tripStartLocation" type="string" maxOccurs="1" minOccurs="0"/>
+          <element name="track" type="string" maxOccurs="1" minOccurs="0"/>
+          <element name="tracksection" type="string" maxOccurs="1" minOccurs="0"/>
+          <element name="trackposition" type="int" maxOccurs="1" minOccurs="0"/>
+          <element name="vehicleNumber" type="string" maxOccurs="1" minOccurs="0"/>
+          <element name="employeeId" type="string" maxOccurs="1" minOccurs="0"/>
+          <element name="deviceId" type="string" maxOccurs="1" minOccurs="0"/>
+          <element name="plannedTripNumber" type="string" maxOccurs="1" minOccurs="0"/>
+          <element name="plannedTripIdentificationDate" type="long" maxOccurs="1" minOccurs="0"/>
+          <element name="version" type="string" maxOccurs="1" minOccurs="0"/>
+          <element name="shuntingTrip" type="int" maxOccurs="1" minOccurs="0"/>
+        </sequence>
+      </complexType>
+      <complexType name="DelayInfoTO">
+        <complexContent>
+          <extension base="tns:AbstractRealTimeInfoTO">
+            <sequence>
+              <element maxOccurs="unbounded" minOccurs="0" name="delays" type="tns:DelayTO"/>
+            </sequence>
+          </extension>
+        </complexContent>
+      </complexType>
+      <complexType name="DelayTO">
+        <sequence>
+          <element name="cause" type="int" maxOccurs="1" minOccurs="1"/>
+          <element name="details" type="string" maxOccurs="1" minOccurs="1"/>
+        </sequence>
+      </complexType>
+      <complexType name="RealTimeInfoTO">
+        <complexContent>
+          <extension base="tns:AbstractRealTimeInfoTO">
+            <sequence/>
+          </extension>
+        </complexContent>
+      </complexType>
+      <complexType name="ValidationErrorTO">
+        <sequence>
+          <element name="code" type="int" maxOccurs="1" minOccurs="1"/>
+          <element name="message" type="string" maxOccurs="1" minOccurs="1"/>
+        </sequence>
+      </complexType>
+      <element name="importDelayInfo" type="tns:importDelayInfo"/>
+      <element name="importDelayInfoResponse" type="tns:importDelayInfoResponse"/>
+      <element name="importRealTimeInfo" type="tns:importRealTimeInfo"/>
+      <element name="importRealTimeInfoResponse" type="tns:importRealTimeInfoResponse"/>
+      
+      <complexType name="VehicleTO">
+        <sequence>
+          <element name="deviceId" type="string" maxOccurs="1" minOccurs="0"/>
+          <element name="number" type="string" maxOccurs="1" minOccurs="1"/>
+          <element name="position" type="int" maxOccurs="1" minOccurs="0"/>
+          <element name="orientation" type="int" maxOccurs="1" minOccurs="0"/>
+        </sequence>
+      </complexType>
+    </schema>
+  </types>
+  <message name="RealTimeInformationImportFacade_importDelayInfo">
+    <part element="tns:importDelayInfo" name="parameters"/>
+  </message>
+  <message name="RealTimeInformationImportFacade_importRealTimeInfo">
+    <part element="tns:importRealTimeInfo" name="parameters"/>
+  </message>
+  <message name="RealTimeInformationImportFacade_importDelayInfoResponse">
+    <part element="tns:importDelayInfoResponse" name="result"/>
+  </message>
+  <message name="RealTimeInformationImportFacade_importRealTimeInfoResponse">
+    <part element="tns:importRealTimeInfoResponse" name="result"/>
+  </message>
+  <portType name="RealTimeInformationImportFacade">
+    <operation name="importDelayInfo">
+      <input message="tns:RealTimeInformationImportFacade_importDelayInfo"/>
+      <output message="tns:RealTimeInformationImportFacade_importDelayInfoResponse"/>
+    </operation>
+    <operation name="importRealTimeInfo">
+      <input message="tns:RealTimeInformationImportFacade_importRealTimeInfo"/>
+      <output message="tns:RealTimeInformationImportFacade_importRealTimeInfoResponse"/>
+    </operation>
+  </portType>
+  <binding name="RealTimeInformationImportFacadeBinding"
+           type="tns:RealTimeInformationImportFacade">
+    <soap:binding style="document"
+                  transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="importDelayInfo">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="importRealTimeInfo">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="RealTimeInformationImportFacadeService">
+    <port binding="tns:RealTimeInformationImportFacadeBinding" name="RealTimeInformationImportFacadePort">
+      <soap:address location="http://localhost/de/RealTimeInformationImportFacadeBean"/>
+    </port>
+  </service>
+</definitions>
