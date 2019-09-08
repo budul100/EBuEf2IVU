@@ -1,8 +1,0 @@
-cd /mnt/d/Users/mgr/Entwicklung/NET/EBuEf2IVUCore/EBuEf2IVUCore
-
-cd bin/Release/netcoreapp2.2/linux-x64/publish
-dotnet ebuef2ivucore.dll
-cd ../../../../..
-
-sudo apt install /mnt/d/Users/mgr/Entwicklung/NET/EBuEf2IVUCore/EBuEf2IVUCore/bin/Release/netcoreapp2.2/linux-x64/EBuEf2IVUCore.0.1.linux-x64.deb
-/usr/share/EBuEf2IVUCore/EBuEf2IVUCore
