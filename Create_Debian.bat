@@ -6,7 +6,6 @@ SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 del /q %TARGETDIR%\%FILENAME%
 del /q %DROPBOXDIR%\%FILENAME%
 
-dotnet publish -c Release -r linux-x64 -f netcoreapp2.2 --self-contained true
 dotnet deb -c Release -r linux-x64 -f netcoreapp2.2
 
 xcopy /y %SOURCEDIR%\%FILENAME% %TARGETDIR%
