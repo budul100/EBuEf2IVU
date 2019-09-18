@@ -100,6 +100,10 @@ namespace MessageReceiver
                     sender: this,
                     e: null);
             }
+            else
+            {
+                logger.Debug($"Unknown session start command received: '{e.Content}'.");
+            }
         }
 
         private void RunAllocationsListener(string ipAdress, int port, int retryTime)
