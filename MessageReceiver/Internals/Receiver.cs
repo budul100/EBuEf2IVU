@@ -25,8 +25,8 @@ namespace MessageReceiver.Internals
 
         #region Public Constructors
 
-        public Receiver(string ipAdress, int port, int reconnectionTime, 
-            ILogger logger, string messageType = default(string))
+        public Receiver(string ipAdress, int port, int reconnectionTime,
+            ILogger logger, string messageType = default)
         {
             this.ipAdress = ipAdress;
             this.port = port;
@@ -97,7 +97,7 @@ namespace MessageReceiver.Internals
                 client.Client.Bind(localEp);
                 client.JoinMulticastGroup(multicastAddress);
 
-                logger.Debug($"Lausche auf {ipAdress}:{port} nach Nachrichten" + 
+                logger.Debug($"Lausche auf {ipAdress}:{port} nach Nachrichten" +
                     (!string.IsNullOrWhiteSpace(messageType) ? $" vom Typ {messageType}." : "."));
 
                 while (!cancellationToken.IsCancellationRequested)

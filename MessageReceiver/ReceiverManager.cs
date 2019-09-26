@@ -13,9 +13,10 @@ namespace MessageReceiver
 {
     public class ReceiverManager : IReceiverManager
     {
-        private const string MessageTypeMessages = "Echtzeit-Positionen";
-        private const string MessageTypeAllocations = "Sessionstart";
         #region Private Fields
+
+        private const string MessageTypeAllocations = "Sessionstart";
+        private const string MessageTypeMessages = "Echtzeit-Positionen";
 
         private readonly CancellationToken cancellationToken;
         private readonly ILogger logger;
