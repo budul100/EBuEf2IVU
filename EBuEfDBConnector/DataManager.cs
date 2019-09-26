@@ -39,7 +39,8 @@ namespace EBuEfDBConnector
         public Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync()
         {
             return retryPolicy.ExecuteAsync(
-                action: (t) => Task.Run<IEnumerable<VehicleAllocation>>(() => GetVehicleAllocations(t).ToArray()),
+                action: (cancellationToken) =>
+                    Task.Run<IEnumerable<VehicleAllocation>>(() => GetVehicleAllocations(cancellationToken).ToArray()),
                 cancellationToken: cancellationToken);
         }
 
@@ -84,7 +85,7 @@ namespace EBuEfDBConnector
 
                     var aufstellungen = context.Aufstellungen
                         .Include(a => a.Feld.AbschnittZuFeld.Abschnitt)
-                        .ToArrayAsync().Result;
+                        .ToArray();
 
                     if (context.Aufstellungen.Any())
                     {
@@ -119,8 +120,12 @@ namespace EBuEfDBConnector
         {
             using (var context = new HalteContext(connectionString))
             {
+                var betriebsstelle = istVon
+                    ? position.EBuEfBetriebsstelleVon
+                    : position.EBuEfBetriebsstelleNach;
+
                 var halt = context.Halte
-                    .Where(h => h.Betriebsstelle == (istVon ? position.EBuEfBetriebsstelleVon : position.EBuEfBetriebsstelleNach))
+                    .Where(h => h.Betriebsstelle == betriebsstelle)
                     .Include(h => h.Zug)
                     .FirstOrDefault(h => h.Zug.Zugnummer.ToString() == position.Zugnummer);
 
