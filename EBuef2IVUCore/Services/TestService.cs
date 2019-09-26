@@ -19,16 +19,27 @@ namespace EBuEf2IVUCore.Services
 
             for (var index = 0; index < rounds; index++)
             {
-                var position = new TrainPosition
+                var vonPosition = new TrainPosition
                 {
                     Zugnummer = settings.PerformanceTestZugnummer,
-                    EBuEfBetriebsstelleVon = settings.PerformanceTestBetriebsstelleVon,
+                    EBuEfBetriebsstelleVon = settings.PerformanceTestBetriebsstelle,
                     EBuEfZeitpunktVon = DateTime.Now.TimeOfDay,
                 };
 
-                dataManager.SetTrainPosition(position);
+                dataManager.SetTrainPosition(vonPosition);
 
-                Thread.Sleep(100);
+                Thread.Sleep(settings.PerformanceTestSleep);
+
+                var nachPosition = new TrainPosition
+                {
+                    Zugnummer = settings.PerformanceTestZugnummer,
+                    EBuEfBetriebsstelleNach = settings.PerformanceTestBetriebsstelle,
+                    EBuEfZeitpunktVon = DateTime.Now.TimeOfDay,
+                };
+
+                dataManager.SetTrainPosition(nachPosition);
+
+                Thread.Sleep(settings.PerformanceTestSleep);
 
                 logger.Debug($"{index}. Runde durchgeführt.");
             }

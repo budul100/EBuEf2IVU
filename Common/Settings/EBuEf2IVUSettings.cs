@@ -30,7 +30,9 @@ namespace Common.Settings
 
         public int MessagesRetryTime { get; set; }
 
-        public string PerformanceTestBetriebsstelleVon { get; set; }
+        public string PerformanceTestBetriebsstelle { get; set; }
+
+        public int PerformanceTestSleep { get; set; } = 100;
 
         public string PerformanceTestZugnummer { get; set; }
 
