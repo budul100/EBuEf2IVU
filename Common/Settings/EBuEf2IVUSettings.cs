@@ -30,6 +30,10 @@ namespace Common.Settings
 
         public int MessagesRetryTime { get; set; }
 
+        public string PerformanceTestBetriebsstelleVon { get; set; }
+
+        public string PerformanceTestZugnummer { get; set; }
+
         public string SenderDivision { get; set; }
 
         public string SenderEndpoint { get; set; }

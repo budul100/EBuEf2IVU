@@ -126,7 +126,18 @@ namespace EBuEf2IVUCore
 
             using (var scope = container.OpenScope())
             {
-                if (options.RunStandAlone || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                if (options.RunPerformanceTestRounds > 0)
+                {
+                    logger.Information($"Führe mit {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) " +
+                        $"einem Performance-Test über {options.RunPerformanceTestRounds} Runden aus.");
+
+                    TestService.RunPerformanceTest(
+                        logger: scope.Resolve<ILogger>(),
+                        dataManager: scope.Resolve<IDataManager>(),
+                        settings: scope.Resolve<EBuEf2IVUSettings>(),
+                        rounds: options.RunPerformanceTestRounds);
+                }
+                else if (options.RunStandAlone || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     logger.Information($"Starte {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) im Stand-Alone-Modus.");
 
