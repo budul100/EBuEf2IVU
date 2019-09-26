@@ -32,8 +32,8 @@ namespace EBuEf2IVUCore.Converters
 
             var mapping = infrastructureMappings
                 .Where(m => m.MessageBetriebsstelle.IsMatch(message.Betriebsstelle))
-                .Where(m => m.MessageStartGleis.IsMatch(message.StartGleis)
-                    && m.MessageEndGleis.IsMatch(message.EndGleis))
+                .Where(m => m.MessageStartGleis.IsMatchOrEmptyOrDefault(message.StartGleis)
+                    && m.MessageEndGleis.IsMatchOrEmptyOrDefault(message.EndGleis))
                 .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
                 .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis))
                 .FirstOrDefault();
