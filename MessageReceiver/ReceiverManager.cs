@@ -70,6 +70,8 @@ namespace MessageReceiver
 
             try
             {
+                logger.Debug($"Message received: {e.Content}");
+
                 message = JsonConvert.DeserializeObject<RealTimeMessage>(
                     value: e.Content,
                     settings: realTimeMessageSettings);
@@ -102,7 +104,7 @@ namespace MessageReceiver
             }
             else
             {
-                logger.Debug($"Unknown session start command received: '{e.Content}'.");
+                logger.Error($"Unknown session start command received: '{e.Content}'.");
             }
         }
 
