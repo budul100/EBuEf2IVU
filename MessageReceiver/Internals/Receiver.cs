@@ -17,6 +17,7 @@ namespace MessageReceiver.Internals
 
         private readonly string ipAdress;
         private readonly ILogger logger;
+        private readonly string messageType;
         private readonly int port;
         private readonly RetryPolicy retryPolicy;
 
@@ -24,11 +25,13 @@ namespace MessageReceiver.Internals
 
         #region Public Constructors
 
-        public Receiver(string ipAdress, int port, int reconnectionTime, ILogger logger)
+        public Receiver(string ipAdress, int port, int reconnectionTime, 
+            ILogger logger, string messageType = default(string))
         {
             this.ipAdress = ipAdress;
             this.port = port;
             this.logger = logger;
+            this.messageType = messageType;
 
             retryPolicy = Policy
                 .Handle<Exception>()
@@ -94,7 +97,8 @@ namespace MessageReceiver.Internals
                 client.Client.Bind(localEp);
                 client.JoinMulticastGroup(multicastAddress);
 
-                logger.Debug($"Lausche auf {ipAdress}:{port} nach Nachrichten.");
+                logger.Debug($"Lausche auf {ipAdress}:{port} nach Nachrichten" + 
+                    (!string.IsNullOrWhiteSpace(messageType) ? $" vom Typ {messageType}." : "."));
 
                 while (!cancellationToken.IsCancellationRequested)
                 {

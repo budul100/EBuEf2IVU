@@ -13,6 +13,8 @@ namespace MessageReceiver
 {
     public class ReceiverManager : IReceiverManager
     {
+        private const string MessageTypeMessages = "Echtzeit-Positionen";
+        private const string MessageTypeAllocations = "Sessionstart";
         #region Private Fields
 
         private readonly CancellationToken cancellationToken;
@@ -114,7 +116,8 @@ namespace MessageReceiver
                 ipAdress: ipAdress,
                 port: port,
                 reconnectionTime: retryTime,
-                logger: logger);
+                logger: logger,
+                messageType: MessageTypeAllocations);
 
             receiver.MessageReceivedEvent += OnSessionStartReceived;
 
@@ -127,7 +130,8 @@ namespace MessageReceiver
                 ipAdress: ipAdress,
                 port: port,
                 reconnectionTime: retryTime,
-                logger: logger);
+                logger: logger,
+                messageType: MessageTypeMessages);
 
             receiver.MessageReceivedEvent += OnRealTimeReceived;
 
