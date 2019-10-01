@@ -112,7 +112,7 @@ namespace RealtimeSender
                 {
                     var result = new VehicleTO
                     {
-                        orientationSpecified = false,
+                        orientation = 0,
                         position = ++position,
                         positionSpecified = true,
                         number = vehicle
