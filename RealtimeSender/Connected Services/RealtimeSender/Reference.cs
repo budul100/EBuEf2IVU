@@ -7,37 +7,39 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Linq;
+
 namespace RealtimeSender
 {
-    
-    
+
+
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", ConfigurationName="RealtimeSender.RealTimeInformationImportFacade")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws", ConfigurationName = "RealtimeSender.RealTimeInformationImportFacade")]
     internal interface RealTimeInformationImportFacade
     {
-        
-        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+
+        [System.ServiceModel.OperationContractAttribute(Action = "", ReplyAction = "*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults = true)]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(AbstractRealTimeInfoTO))]
         System.Threading.Tasks.Task<RealtimeSender.importDelayInfoResponse> importDelayInfoAsync(RealtimeSender.importDelayInfoRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+
+        [System.ServiceModel.OperationContractAttribute(Action = "", ReplyAction = "*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults = true)]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(AbstractRealTimeInfoTO))]
         System.Threading.Tasks.Task<RealtimeSender.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender.importRealTimeInfoRequest request);
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class DelayInfoTO : AbstractRealTimeInfoTO
     {
-        
+
         private DelayTO[] delaysField;
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("delays", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("delays", Order = 0)]
         public DelayTO[] delays
         {
             get
@@ -50,20 +52,20 @@ namespace RealtimeSender
             }
         }
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class DelayTO
     {
-        
+
         private int causeField;
-        
+
         private string detailsField;
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
         public int cause
         {
             get
@@ -75,9 +77,9 @@ namespace RealtimeSender
                 this.causeField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
         public string details
         {
             get
@@ -90,20 +92,20 @@ namespace RealtimeSender
             }
         }
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class ValidationErrorTO
     {
-        
+
         private int codeField;
-        
+
         private string messageField;
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
         public int code
         {
             get
@@ -115,9 +117,9 @@ namespace RealtimeSender
                 this.codeField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
         public string message
         {
             get
@@ -130,28 +132,28 @@ namespace RealtimeSender
             }
         }
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class VehicleTO
     {
-        
+
         private string deviceIdField;
-        
+
         private string numberField;
-        
+
         private int positionField;
-        
+
         private bool positionFieldSpecified;
-        
+
         private int orientationField;
-        
+
         private bool orientationFieldSpecified;
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
         public string deviceId
         {
             get
@@ -163,9 +165,9 @@ namespace RealtimeSender
                 this.deviceIdField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
         public string number
         {
             get
@@ -177,9 +179,9 @@ namespace RealtimeSender
                 this.numberField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 2)]
         public int position
         {
             get
@@ -191,7 +193,7 @@ namespace RealtimeSender
                 this.positionField = value;
             }
         }
-        
+
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         public bool positionSpecified
@@ -205,9 +207,9 @@ namespace RealtimeSender
                 this.positionFieldSpecified = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 3)]
         public int orientation
         {
             get
@@ -219,7 +221,7 @@ namespace RealtimeSender
                 this.orientationField = value;
             }
         }
-        
+
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         public bool orientationSpecified
@@ -234,70 +236,70 @@ namespace RealtimeSender
             }
         }
     }
-    
+
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RealTimeInfoTO))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(DelayInfoTO))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class AbstractRealTimeInfoTO
     {
-        
+
         private int eventCodeField;
-        
+
         private string divisionField;
-        
+
         private string stopAreaField;
-        
+
         private long timeStampField;
-        
+
         private int deltaField;
-        
+
         private bool deltaFieldSpecified;
-        
+
         private VehicleTO[] vehiclesField;
-        
+
         private long trainCombinationCompleteField;
-        
+
         private bool trainCombinationCompleteFieldSpecified;
-        
+
         private long tripIdentificationDateField;
-        
+
         private bool tripIdentificationDateFieldSpecified;
-        
+
         private string tripNumberField;
-        
+
         private string tripStartLocationField;
-        
+
         private string trackField;
-        
+
         private string tracksectionField;
-        
+
         private int trackpositionField;
-        
+
         private bool trackpositionFieldSpecified;
-        
+
         private string vehicleNumberField;
-        
+
         private string employeeIdField;
-        
+
         private string deviceIdField;
-        
+
         private string plannedTripNumberField;
-        
+
         private long plannedTripIdentificationDateField;
-        
+
         private bool plannedTripIdentificationDateFieldSpecified;
-        
+
         private string versionField;
-        
+
         private int shuntingTripField;
-        
+
         private bool shuntingTripFieldSpecified;
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 0)]
         public int eventCode
         {
             get
@@ -309,9 +311,9 @@ namespace RealtimeSender
                 this.eventCodeField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 1)]
         public string division
         {
             get
@@ -323,9 +325,9 @@ namespace RealtimeSender
                 this.divisionField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 2)]
         public string stopArea
         {
             get
@@ -337,9 +339,9 @@ namespace RealtimeSender
                 this.stopAreaField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 3)]
         public long timeStamp
         {
             get
@@ -351,9 +353,9 @@ namespace RealtimeSender
                 this.timeStampField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=4)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 4)]
         public int delta
         {
             get
@@ -365,7 +367,7 @@ namespace RealtimeSender
                 this.deltaField = value;
             }
         }
-        
+
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         public bool deltaSpecified
@@ -379,9 +381,13 @@ namespace RealtimeSender
                 this.deltaFieldSpecified = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("vehicles", Order=5)]
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool vehiclesSpecified => vehicles?.Any() ?? false;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("vehicles", Order = 5)]
         public VehicleTO[] vehicles
         {
             get
@@ -393,9 +399,9 @@ namespace RealtimeSender
                 this.vehiclesField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=6)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 6)]
         public long trainCombinationComplete
         {
             get
@@ -407,7 +413,7 @@ namespace RealtimeSender
                 this.trainCombinationCompleteField = value;
             }
         }
-        
+
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         public bool trainCombinationCompleteSpecified
@@ -421,9 +427,9 @@ namespace RealtimeSender
                 this.trainCombinationCompleteFieldSpecified = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=7)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 7)]
         public long tripIdentificationDate
         {
             get
@@ -435,7 +441,7 @@ namespace RealtimeSender
                 this.tripIdentificationDateField = value;
             }
         }
-        
+
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         public bool tripIdentificationDateSpecified
@@ -449,9 +455,9 @@ namespace RealtimeSender
                 this.tripIdentificationDateFieldSpecified = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=8)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 8)]
         public string tripNumber
         {
             get
@@ -463,9 +469,9 @@ namespace RealtimeSender
                 this.tripNumberField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=9)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 9)]
         public string tripStartLocation
         {
             get
@@ -477,9 +483,9 @@ namespace RealtimeSender
                 this.tripStartLocationField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=10)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 10)]
         public string track
         {
             get
@@ -491,9 +497,9 @@ namespace RealtimeSender
                 this.trackField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=11)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 11)]
         public string tracksection
         {
             get
@@ -505,9 +511,9 @@ namespace RealtimeSender
                 this.tracksectionField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=12)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 12)]
         public int trackposition
         {
             get
@@ -519,7 +525,7 @@ namespace RealtimeSender
                 this.trackpositionField = value;
             }
         }
-        
+
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         public bool trackpositionSpecified
@@ -533,9 +539,9 @@ namespace RealtimeSender
                 this.trackpositionFieldSpecified = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=13)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 13)]
         public string vehicleNumber
         {
             get
@@ -547,9 +553,9 @@ namespace RealtimeSender
                 this.vehicleNumberField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=14)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 14)]
         public string employeeId
         {
             get
@@ -561,9 +567,9 @@ namespace RealtimeSender
                 this.employeeIdField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=15)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 15)]
         public string deviceId
         {
             get
@@ -575,9 +581,9 @@ namespace RealtimeSender
                 this.deviceIdField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=16)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 16)]
         public string plannedTripNumber
         {
             get
@@ -589,9 +595,9 @@ namespace RealtimeSender
                 this.plannedTripNumberField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=17)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 17)]
         public long plannedTripIdentificationDate
         {
             get
@@ -603,7 +609,7 @@ namespace RealtimeSender
                 this.plannedTripIdentificationDateField = value;
             }
         }
-        
+
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         public bool plannedTripIdentificationDateSpecified
@@ -617,9 +623,9 @@ namespace RealtimeSender
                 this.plannedTripIdentificationDateFieldSpecified = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=18)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 18)]
         public string version
         {
             get
@@ -631,9 +637,9 @@ namespace RealtimeSender
                 this.versionField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=19)]
+        [System.Xml.Serialization.XmlElementAttribute(Order = 19)]
         public int shuntingTrip
         {
             get
@@ -645,7 +651,7 @@ namespace RealtimeSender
                 this.shuntingTripField = value;
             }
         }
-        
+
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         public bool shuntingTripSpecified
@@ -660,185 +666,185 @@ namespace RealtimeSender
             }
         }
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class RealTimeInfoTO : AbstractRealTimeInfoTO
     {
     }
-    
+
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped = false)]
     internal partial class importDelayInfoRequest
     {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("delayInfoTO", IsNullable=false)]
+
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order = 0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("delayInfoTO", IsNullable = false)]
         public RealtimeSender.DelayInfoTO[] importDelayInfo;
-        
+
         public importDelayInfoRequest()
         {
         }
-        
+
         public importDelayInfoRequest(RealtimeSender.DelayInfoTO[] importDelayInfo)
         {
             this.importDelayInfo = importDelayInfo;
         }
     }
-    
+
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped = false)]
     internal partial class importDelayInfoResponse
     {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="importDelayInfoResponse", Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("result", IsNullable=false)]
+
+        [System.ServiceModel.MessageBodyMemberAttribute(Name = "importDelayInfoResponse", Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order = 0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("result", IsNullable = false)]
         public RealtimeSender.ValidationErrorTO[] importDelayInfoResponse1;
-        
+
         public importDelayInfoResponse()
         {
         }
-        
+
         public importDelayInfoResponse(RealtimeSender.ValidationErrorTO[] importDelayInfoResponse1)
         {
             this.importDelayInfoResponse1 = importDelayInfoResponse1;
         }
     }
-    
+
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped = false)]
     internal partial class importRealTimeInfoRequest
     {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("realTimeInfoTO", IsNullable=false)]
+
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order = 0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("realTimeInfoTO", IsNullable = false)]
         public RealtimeSender.RealTimeInfoTO[] importRealTimeInfo;
-        
+
         public importRealTimeInfoRequest()
         {
         }
-        
+
         public importRealTimeInfoRequest(RealtimeSender.RealTimeInfoTO[] importRealTimeInfo)
         {
             this.importRealTimeInfo = importRealTimeInfo;
         }
     }
-    
+
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped = false)]
     internal partial class importRealTimeInfoResponse
     {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="importRealTimeInfoResponse", Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("result", IsNullable=false)]
+
+        [System.ServiceModel.MessageBodyMemberAttribute(Name = "importRealTimeInfoResponse", Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order = 0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("result", IsNullable = false)]
         public RealtimeSender.ValidationErrorTO[] importRealTimeInfoResponse1;
-        
+
         public importRealTimeInfoResponse()
         {
         }
-        
+
         public importRealTimeInfoResponse(RealtimeSender.ValidationErrorTO[] importRealTimeInfoResponse1)
         {
             this.importRealTimeInfoResponse1 = importRealTimeInfoResponse1;
         }
     }
-    
+
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     internal interface RealTimeInformationImportFacadeChannel : RealtimeSender.RealTimeInformationImportFacade, System.ServiceModel.IClientChannel
     {
     }
-    
+
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
     internal partial class RealTimeInformationImportFacadeClient : System.ServiceModel.ClientBase<RealtimeSender.RealTimeInformationImportFacade>, RealtimeSender.RealTimeInformationImportFacade
     {
-        
+
         /// <summary>
         /// Implementieren Sie diese partielle Methode, um den Dienstendpunkt zu konfigurieren.
         /// </summary>
         /// <param name="serviceEndpoint">Der zu konfigurierende Endpunkt</param>
         /// <param name="clientCredentials">Die Clientanmeldeinformationen</param>
         static partial void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials);
-        
-        public RealTimeInformationImportFacadeClient() : 
+
+        public RealTimeInformationImportFacadeClient() :
                 base(RealTimeInformationImportFacadeClient.GetDefaultBinding(), RealTimeInformationImportFacadeClient.GetDefaultEndpointAddress())
         {
             this.Endpoint.Name = EndpointConfiguration.RealTimeInformationImportFacadePort.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-        
-        public RealTimeInformationImportFacadeClient(EndpointConfiguration endpointConfiguration) : 
+
+        public RealTimeInformationImportFacadeClient(EndpointConfiguration endpointConfiguration) :
                 base(RealTimeInformationImportFacadeClient.GetBindingForEndpoint(endpointConfiguration), RealTimeInformationImportFacadeClient.GetEndpointAddress(endpointConfiguration))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-        
-        public RealTimeInformationImportFacadeClient(EndpointConfiguration endpointConfiguration, string remoteAddress) : 
+
+        public RealTimeInformationImportFacadeClient(EndpointConfiguration endpointConfiguration, string remoteAddress) :
                 base(RealTimeInformationImportFacadeClient.GetBindingForEndpoint(endpointConfiguration), new System.ServiceModel.EndpointAddress(remoteAddress))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-        
-        public RealTimeInformationImportFacadeClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) : 
+
+        public RealTimeInformationImportFacadeClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) :
                 base(RealTimeInformationImportFacadeClient.GetBindingForEndpoint(endpointConfiguration), remoteAddress)
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-        
-        public RealTimeInformationImportFacadeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+
+        public RealTimeInformationImportFacadeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
                 base(binding, remoteAddress)
         {
         }
-        
+
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         System.Threading.Tasks.Task<RealtimeSender.importDelayInfoResponse> RealtimeSender.RealTimeInformationImportFacade.importDelayInfoAsync(RealtimeSender.importDelayInfoRequest request)
         {
             return base.Channel.importDelayInfoAsync(request);
         }
-        
+
         public System.Threading.Tasks.Task<RealtimeSender.importDelayInfoResponse> importDelayInfoAsync(RealtimeSender.DelayInfoTO[] importDelayInfo)
         {
             RealtimeSender.importDelayInfoRequest inValue = new RealtimeSender.importDelayInfoRequest();
             inValue.importDelayInfo = importDelayInfo;
             return ((RealtimeSender.RealTimeInformationImportFacade)(this)).importDelayInfoAsync(inValue);
         }
-        
+
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         System.Threading.Tasks.Task<RealtimeSender.importRealTimeInfoResponse> RealtimeSender.RealTimeInformationImportFacade.importRealTimeInfoAsync(RealtimeSender.importRealTimeInfoRequest request)
         {
             return base.Channel.importRealTimeInfoAsync(request);
         }
-        
+
         public System.Threading.Tasks.Task<RealtimeSender.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender.RealTimeInfoTO[] importRealTimeInfo)
         {
             RealtimeSender.importRealTimeInfoRequest inValue = new RealtimeSender.importRealTimeInfoRequest();
             inValue.importRealTimeInfo = importRealTimeInfo;
             return ((RealtimeSender.RealTimeInformationImportFacade)(this)).importRealTimeInfoAsync(inValue);
         }
-        
+
         public virtual System.Threading.Tasks.Task OpenAsync()
         {
             return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginOpen(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndOpen));
         }
-        
+
         public virtual System.Threading.Tasks.Task CloseAsync()
         {
             return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginClose(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndClose));
         }
-        
+
         private static System.ServiceModel.Channels.Binding GetBindingForEndpoint(EndpointConfiguration endpointConfiguration)
         {
             if ((endpointConfiguration == EndpointConfiguration.RealTimeInformationImportFacadePort))
@@ -852,7 +858,7 @@ namespace RealtimeSender
             }
             throw new System.InvalidOperationException(string.Format("Es wurde kein Endpunkt mit dem Namen \"{0}\" gefunden.", endpointConfiguration));
         }
-        
+
         private static System.ServiceModel.EndpointAddress GetEndpointAddress(EndpointConfiguration endpointConfiguration)
         {
             if ((endpointConfiguration == EndpointConfiguration.RealTimeInformationImportFacadePort))
@@ -861,20 +867,20 @@ namespace RealtimeSender
             }
             throw new System.InvalidOperationException(string.Format("Es wurde kein Endpunkt mit dem Namen \"{0}\" gefunden.", endpointConfiguration));
         }
-        
+
         private static System.ServiceModel.Channels.Binding GetDefaultBinding()
         {
             return RealTimeInformationImportFacadeClient.GetBindingForEndpoint(EndpointConfiguration.RealTimeInformationImportFacadePort);
         }
-        
+
         private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress()
         {
             return RealTimeInformationImportFacadeClient.GetEndpointAddress(EndpointConfiguration.RealTimeInformationImportFacadePort);
         }
-        
+
         public enum EndpointConfiguration
         {
-            
+
             RealTimeInformationImportFacadePort,
         }
     }
