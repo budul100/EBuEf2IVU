@@ -1,5 +1,5 @@
-SET FRAMEWORK=linux-x64
-REM SET FRAMEWORK=linux-arm
+REM SET FRAMEWORK=linux-x64
+SET FRAMEWORK=linux-arm
 
 SET FILENAME=EBuEf2IVUCore.*.*.*.%FRAMEWORK%.deb
 SET SOURCEDIR=.\EBuef2IVUCore\bin\Release\netcoreapp2.2\%FRAMEWORK%
@@ -9,7 +9,7 @@ SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 del /q %TARGETDIR%\%FILENAME%
 del /q %DROPBOXDIR%\%FILENAME%
 
-REM dotnet publish -c Release -r %FRAMEWORK% -f netcoreapp2.2 --self-contained
+dotnet publish -c Release -r %FRAMEWORK% -f netcoreapp2.2 --self-contained
 dotnet deb -c Release -r %FRAMEWORK% -f netcoreapp2.2
 
 xcopy /y %SOURCEDIR%\%FILENAME% %TARGETDIR%
