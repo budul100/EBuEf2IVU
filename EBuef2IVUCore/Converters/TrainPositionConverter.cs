@@ -12,14 +12,16 @@ namespace EBuEf2IVUCore.Converters
         #region Private Fields
 
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
+        private readonly DateTime sessionDateIVU;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public TrainPositionConverter(IEnumerable<InfrastructureMapping> infrastructureMappings)
+        public TrainPositionConverter(IEnumerable<InfrastructureMapping> infrastructureMappings, DateTime sessionDateIVU)
         {
             this.infrastructureMappings = infrastructureMappings;
+            this.sessionDateIVU = sessionDateIVU;
         }
 
         #endregion Public Constructors
@@ -44,6 +46,8 @@ namespace EBuEf2IVUCore.Converters
                 var ebuefNachZeit = TimeSpan.FromSeconds(mapping.EBuEfNachVerschiebungSekunden.ToInt());
                 var ivuZeit = TimeSpan.FromSeconds(mapping.IVUVerschiebungSekunden.ToInt());
 
+                var ivuZeitpunkt = sessionDateIVU.Add(message.SimulationsZeit.Add(ivuZeit).TimeOfDay);
+
                 result = new TrainPosition
                 {
                     EBuEfBetriebsstelleNach = mapping.EBuEfNachBetriebsstelle,
@@ -56,7 +60,7 @@ namespace EBuEf2IVUCore.Converters
                     IVUGleis = mapping.IVUGleis,
                     IVUNetzpunkt = mapping.IVUNetzpunkt,
                     IVUTrainPositionTyp = mapping.IVUTrainPositionType,
-                    IVUZeitpunkt = message.SimulationsZeit.Add(ivuZeit),
+                    IVUZeitpunkt = ivuZeitpunkt,
                     Zugnummer = message.Zugnummer,
                 };
             }

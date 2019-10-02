@@ -17,8 +17,7 @@ namespace EBuEf2IVUCore.Services
 
         #region Public Methods
 
-        public void Run(IReceiverManager receiverManager, IDataManager dataManager, ISenderManager senderManager,
-            EBuEf2IVUSettings settings)
+        public void Run(IReceiverManager receiverManager, IDataManager dataManager, ISenderManager senderManager, EBuEf2IVUSettings settings)
         {
             this.dataManager = dataManager;
             this.senderManager = senderManager;
@@ -26,7 +25,9 @@ namespace EBuEf2IVUCore.Services
             receiverManager.RealTimeReceivedEvent += OnRealTimeReceived;
             receiverManager.SessionStartedEvent += OnSessionStarted;
 
-            trainPositionConverter = new TrainPositionConverter(settings.InfrastructureMappings);
+            trainPositionConverter = new TrainPositionConverter(
+                settings.InfrastructureMappings,
+                settings.SessionDateIVU);
 
             dataManager.Run(
                 connectionString: settings.DatabaseConnectionString,

@@ -1,4 +1,6 @@
 using Serilog.Events;
+using System;
+using System.Xml.Serialization;
 
 namespace Common.Settings
 {
@@ -41,6 +43,9 @@ namespace Common.Settings
         public string SenderEndpoint { get; set; }
 
         public int SenderRetryTime { get; set; }
+
+        [XmlIgnore]
+        public DateTime SessionDateIVU { get; set; }
 
         #endregion Public Properties
     }

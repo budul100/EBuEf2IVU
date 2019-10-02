@@ -116,52 +116,59 @@ namespace EBuEf2IVUCore
 
         private static void RunWithOptions(CommandLineOptions options)
         {
-            var settings = GetSettings(options);
-            var cancellationTokenSource = new CancellationTokenSource();
-            var container = GetContainer(
-                settings: settings,
-                cancellationTokenSource: cancellationTokenSource);
+            var commandLineSettings = GetSettings(options);
 
-            var logger = container.Resolve<ILogger>();
-
-            using (var scope = container.OpenScope())
+            using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                if (options.RunPerformanceTestRounds > 0)
+                var container = GetContainer(
+                    settings: commandLineSettings,
+                    cancellationTokenSource: cancellationTokenSource);
+
+                using (var scope = container.OpenScope())
                 {
-                    logger.Information($"Führe mit {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) " +
-                        $"einem Performance-Test über {options.RunPerformanceTestRounds} Runden aus.");
+                    var logger = scope.Resolve<ILogger>();
+                    var appSettings = scope.Resolve<EBuEf2IVUSettings>();
 
-                    TestService.RunPerformanceTest(
-                        logger: scope.Resolve<ILogger>(),
-                        dataManager: scope.Resolve<IDataManager>(),
-                        settings: scope.Resolve<EBuEf2IVUSettings>(),
-                        rounds: options.RunPerformanceTestRounds);
-                }
-                else if (options.RunStandAlone || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    logger.Information($"Starte {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) im Stand-Alone-Modus.");
+                    appSettings.SessionDateIVU = options.SessionDateIVU ?? DateTime.Today;
+                    logger.Information($"Die Daten werden nach IVU für den {appSettings.SessionDateIVU:yyyy-MM-dd} gesendet.");
 
-                    var conversionService = new ConversionService();
-                    Task.Run(() => conversionService.Run(
-                        receiverManager: scope.Resolve<IReceiverManager>(),
-                        dataManager: scope.Resolve<IDataManager>(),
-                        senderManager: scope.Resolve<ISenderManager>(),
-                        settings: scope.Resolve<EBuEf2IVUSettings>()));
+                    if (options.RunPerformanceTestRounds > 0)
+                    {
+                        logger.Information($"Führe mit {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) " +
+                            $"einem Performance-Test über {options.RunPerformanceTestRounds} Runden aus.");
 
-                    Console.ReadLine();
-                }
-                else
-                {
-                    logger.Information($"Starte {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) als Windows Service.");
+                        TestService.RunPerformanceTest(
+                            logger: scope.Resolve<ILogger>(),
+                            dataManager: scope.Resolve<IDataManager>(),
+                            settings: scope.Resolve<EBuEf2IVUSettings>(),
+                            rounds: options.RunPerformanceTestRounds);
+                    }
+                    else if (options.RunStandAlone || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        logger.Information($"Starte {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) im Stand-Alone-Modus.");
 
-                    var exitCode = HostFactory.Run(callback => ConfigureService(
-                        callback: callback,
-                        scope: scope,
-                        cancellationTokenSource: cancellationTokenSource));
-                    var environmentExitCode = (int)Convert.ChangeType(
-                        value: exitCode,
-                        typeCode: exitCode.GetTypeCode());
-                    Environment.ExitCode = environmentExitCode;
+                        var conversionService = new ConversionService();
+                        Task.Run(() => conversionService.Run(
+                            receiverManager: scope.Resolve<IReceiverManager>(),
+                            dataManager: scope.Resolve<IDataManager>(),
+                            senderManager: scope.Resolve<ISenderManager>(),
+                            settings: scope.Resolve<EBuEf2IVUSettings>()));
+
+                        Console.ReadLine();
+                    }
+                    else
+                    {
+                        logger.Information($"Starte {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) als Windows Service.");
+
+                        var exitCode = HostFactory.Run(callback => ConfigureService(
+                            callback: callback,
+                            scope: scope,
+                            cancellationTokenSource: cancellationTokenSource));
+                        var environmentExitCode = (int)Convert.ChangeType(
+                            value: exitCode,
+                            typeCode: exitCode.GetTypeCode());
+                        Environment.ExitCode = environmentExitCode;
+                    }
                 }
             }
         }
