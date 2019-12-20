@@ -138,7 +138,14 @@ namespace EBuEfDBConnector
                         halt.GleisIst = istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach;
                     }
 
-                    halt.AbfahrtIst = istVon ? position.EBuEfZeitpunktVon : position.EBuEfZeitpunktNach;
+                    if (istVon)
+                    {
+                        halt.AbfahrtIst = position.EBuEfZeitpunktVon;
+                    }
+                    else
+                    {
+                        halt.AnkunftIst = position.EBuEfZeitpunktNach;
+                    }
 
                     context.SaveChanges();
                 }
