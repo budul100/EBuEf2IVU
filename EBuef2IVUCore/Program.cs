@@ -10,6 +10,7 @@ using RealtimeSender;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.IO;
 using System.Reflection;
@@ -72,7 +73,8 @@ namespace EBuEf2IVUCore
 
             return new LoggerConfiguration()
                 .MinimumLevel.ControlledBy(levelSwitch)
-                .WriteTo.Console()
+                .WriteTo.Console(
+                    theme: ConsoleTheme.None)
                 .WriteTo.File(
                     path: settings.LogFilePath,
                     rollingInterval: RollingInterval.Day)
