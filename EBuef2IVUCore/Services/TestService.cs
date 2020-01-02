@@ -26,7 +26,7 @@ namespace EBuEf2IVUCore.Services
                     EBuEfZeitpunktVon = DateTime.Now.TimeOfDay,
                 };
 
-                dataManager.SetTrainPosition(vonPosition);
+                dataManager.AddRealtime(vonPosition);
 
                 Thread.Sleep(settings.PerformanceTestSleep);
 
@@ -37,7 +37,7 @@ namespace EBuEf2IVUCore.Services
                     EBuEfZeitpunktVon = DateTime.Now.TimeOfDay,
                 };
 
-                dataManager.SetTrainPosition(nachPosition);
+                dataManager.AddRealtime(nachPosition);
 
                 Thread.Sleep(settings.PerformanceTestSleep);
 

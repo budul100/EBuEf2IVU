@@ -58,7 +58,7 @@ namespace EBuEf2IVUCore.Services
 
             if (position != null)
             {
-                dataManager.SetTrainPosition(position);
+                dataManager.AddRealtime(position);
                 senderManager.AddRealtime(position);
             }
         }

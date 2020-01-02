@@ -57,7 +57,7 @@ namespace EBuEfDBConnector
                         reconnection: reconnection));
         }
 
-        public void SetTrainPosition(TrainPosition position)
+        public void AddRealtime(TrainPosition position)
         {
             retryPolicy.ExecuteAsync(
                 action: (t) => Task.Run(() => SetTrainPosition(
@@ -124,34 +124,37 @@ namespace EBuEfDBConnector
                     ? position.EBuEfBetriebsstelleVon
                     : position.EBuEfBetriebsstelleNach;
 
-                var halt = context.Halte
-                    .Where(h => h.Betriebsstelle == betriebsstelle)
-                    .Include(h => h.Zug)
-                    .FirstOrDefault(h => h.Zug.Zugnummer.ToString() == position.Zugnummer);
-
-                if (halt != null)
+                if (string.IsNullOrWhiteSpace(betriebsstelle))
                 {
-                    logger.Debug($@"Schreibe {(istVon ? "Von" : "Nach")}-Position in Session-Fahrplan.");
+                    var halt = context.Halte
+                        .Where(h => h.Betriebsstelle == betriebsstelle)
+                        .Include(h => h.Zug)
+                        .FirstOrDefault(h => h.Zug.Zugnummer.ToString() == position.Zugnummer);
 
-                    if (!string.IsNullOrWhiteSpace(istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach))
+                    if (halt != null)
                     {
-                        halt.GleisIst = istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach;
-                    }
+                        logger.Debug($@"Schreibe {(istVon ? "Von" : "Nach")}-Position in Session-Fahrplan.");
 
-                    if (istVon)
-                    {
-                        halt.AbfahrtIst = position.EBuEfZeitpunktVon;
+                        if (!string.IsNullOrWhiteSpace(istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach))
+                        {
+                            halt.GleisIst = istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach;
+                        }
+
+                        if (istVon)
+                        {
+                            halt.AbfahrtIst = position.EBuEfZeitpunktVon;
+                        }
+                        else
+                        {
+                            halt.AnkunftIst = position.EBuEfZeitpunktNach;
+                        }
+
+                        context.SaveChanges();
                     }
                     else
                     {
-                        halt.AnkunftIst = position.EBuEfZeitpunktNach;
+                        logger.Debug($"In Session-Fahrplan wurde {(istVon ? "Von" : "Nach")}-Position nicht gefunden.");
                     }
-
-                    context.SaveChanges();
-                }
-                else
-                {
-                    logger.Debug($"In Session-Fahrplan wurde {(istVon ? "Von" : "Nach")}-Position nicht gefunden.");
                 }
             }
         }

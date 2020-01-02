@@ -8,11 +8,11 @@ namespace Common.Interfaces
     {
         #region Public Methods
 
+        void AddRealtime(TrainPosition position);
+
         Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync();
 
         void Run(string connectionString, int retryTime);
-
-        void SetTrainPosition(TrainPosition position);
 
         #endregion Public Methods
     }
