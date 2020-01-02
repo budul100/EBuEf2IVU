@@ -2,7 +2,7 @@
   "profiles": {
     "EBuEf2IVUCore": {
       "commandName": "Project",
-      "commandLineArgs": "-a -d 2019-01-01"
+      "commandLineArgs": "-a"
     }
   }
 }
