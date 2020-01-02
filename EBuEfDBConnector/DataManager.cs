@@ -36,6 +36,15 @@ namespace EBuEfDBConnector
 
         #region Public Methods
 
+        public void AddRealtime(TrainPosition position)
+        {
+            retryPolicy.ExecuteAsync(
+                action: (t) => Task.Run(() => SetTrainPosition(
+                    position: position,
+                    cancellationToken: t)),
+                cancellationToken: cancellationToken);
+        }
+
         public Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync()
         {
             return retryPolicy.ExecuteAsync(
@@ -55,15 +64,6 @@ namespace EBuEfDBConnector
                     onRetry: (exception, reconnection) => OnRetry(
                         exception: exception,
                         reconnection: reconnection));
-        }
-
-        public void AddRealtime(TrainPosition position)
-        {
-            retryPolicy.ExecuteAsync(
-                action: (t) => Task.Run(() => SetTrainPosition(
-                    position: position,
-                    cancellationToken: t)),
-                cancellationToken: cancellationToken);
         }
 
         #endregion Public Methods
@@ -124,7 +124,7 @@ namespace EBuEfDBConnector
                     ? position.EBuEfBetriebsstelleVon
                     : position.EBuEfBetriebsstelleNach;
 
-                if (string.IsNullOrWhiteSpace(betriebsstelle))
+                if (!string.IsNullOrWhiteSpace(betriebsstelle))
                 {
                     var halt = context.Halte
                         .Where(h => h.Betriebsstelle == betriebsstelle)

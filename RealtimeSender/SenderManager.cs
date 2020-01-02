@@ -60,14 +60,14 @@ namespace RealtimeSender
                     track: allocation.Gleis,
                     vehicles: allocation.Fahrzeuge);
 
-                if (info != null)
+                if (info != default)
                     infosQueue.Enqueue(info);
             }
         }
 
         public void AddRealtime(TrainPosition position)
         {
-            if (position != null)
+            if (position != default)
             {
                 var info = GetRealtimeInfo(
                     eventCode: position.GetEventcode(),
@@ -77,7 +77,7 @@ namespace RealtimeSender
                     track: position.IVUGleis,
                     vehicles: position.Fahrzeuge);
 
-                if (info != null)
+                if (info != default)
                     infosQueue.Enqueue(info);
             }
         }
@@ -139,41 +139,45 @@ namespace RealtimeSender
         {
             var result = default(RealTimeInfoTO);
 
-            try
+            if (!string.IsNullOrWhiteSpace(stopArea))
             {
-                result = new RealTimeInfoTO
+                try
                 {
-                    deviceId = deviceID,
-                    division = division,
-                    //employeeId = this.config.User,
-                    eventCode = eventCode,
-                    stopArea = stopArea,
-                    timeStamp = timeStamp.ToUnixTimestamp(),
-                    trainCombinationCompleteSpecified = true,
-                    tripIdentificationDate = timeStamp.ToUnixTimestamp(),
-                    tripIdentificationDateSpecified = true,
-                    tripNumber = tripNumber,
-                };
+                    result = new RealTimeInfoTO
+                    {
+                        deviceId = deviceID,
+                        division = division,
+                        //employeeId = this.config.User,
+                        eventCode = eventCode,
+                        stopArea = stopArea,
+                        timeStamp = timeStamp.ToUnixTimestamp(),
+                        trainCombinationCompleteSpecified = true,
+                        tripIdentificationDate = timeStamp.ToUnixTimestamp(),
+                        tripIdentificationDateSpecified = true,
+                        tripNumber = tripNumber,
+                    };
 
-                if (!string.IsNullOrEmpty(track))
-                {
-                    result.track = track;
-                    result.trackposition = RT2IVUTrackPosition;
-                    result.trackpositionSpecified = true;
-                    result.shuntingTrip = RT2IVUShuntingTrip;
-                    result.shuntingTripSpecified = true;
+                    if (!string.IsNullOrEmpty(track))
+                    {
+                        result.track = track;
+                        result.trackposition = RT2IVUTrackPosition;
+                        result.trackpositionSpecified = true;
+                        result.shuntingTrip = RT2IVUShuntingTrip;
+                        result.shuntingTripSpecified = true;
+                    }
+
+                    result.vehicles = GetVehicleTOs(vehicles).ToArray();
+                    result.trainCombinationComplete = result.vehicles.GetTrainCombinationComplete();
+
+                    return result;
                 }
-
-                result.vehicles = GetVehicleTOs(vehicles).ToArray();
-                result.trainCombinationComplete = result.vehicles.GetTrainCombinationComplete();
-
-                return result;
+                catch (Exception ex)
+                {
+                    logger.Error(
+                        $"Fehler beim Erzeugen einer Ist-Zeit-Nachrichten für IVU.rail: {ex.Message}");
+                }
             }
-            catch (Exception ex)
-            {
-                logger.Error(
-                    $"Fehler beim Erzeugen einer Ist-Zeit-Nachrichten für IVU.rail: {ex.Message}");
-            }
+
             return result;
         }
 
