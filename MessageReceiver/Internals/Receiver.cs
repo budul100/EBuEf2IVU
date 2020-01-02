@@ -1,3 +1,4 @@
+using MessageReceiver.Models;
 using Polly;
 using Polly.Retry;
 using Serilog;

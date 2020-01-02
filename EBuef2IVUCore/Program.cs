@@ -2,7 +2,7 @@
 using Common.Interfaces;
 using Common.Settings;
 using DryIoc;
-using EBuEf2IVUCore.Internals;
+using EBuEf2IVUCore.Models;
 using EBuEf2IVUCore.Services;
 using EBuEfDBConnector;
 using MessageReceiver;

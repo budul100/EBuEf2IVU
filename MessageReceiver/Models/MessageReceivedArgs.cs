@@ -1,6 +1,6 @@
 using System;
 
-namespace MessageReceiver.Internals
+namespace MessageReceiver.Models
 {
     internal class MessageReceivedArgs : EventArgs
     {

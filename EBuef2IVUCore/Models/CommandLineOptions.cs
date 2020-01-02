@@ -1,7 +1,7 @@
 using CommandLine;
 using System;
 
-namespace EBuEf2IVUCore.Internals
+namespace EBuEf2IVUCore.Models
 {
     internal class CommandLineOptions
     {
