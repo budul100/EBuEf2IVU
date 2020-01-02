@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Common.BusinessObjects
+namespace Common.Models
 {
     public class VehicleAllocation
     {

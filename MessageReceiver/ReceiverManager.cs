@@ -1,4 +1,4 @@
-﻿using Common.BusinessObjects;
+﻿using Common.Models;
 using Common.EventsArgs;
 using Common.Interfaces;
 using MessageReceiver.Internals;

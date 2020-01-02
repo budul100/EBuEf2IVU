@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Common.BusinessObjects
+namespace Common.Models
 {
     public class RealTimeMessage
     {

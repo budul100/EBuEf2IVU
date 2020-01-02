@@ -1,4 +1,4 @@
-using Common.BusinessObjects;
+using Common.Models;
 
 namespace Common.Settings
 {

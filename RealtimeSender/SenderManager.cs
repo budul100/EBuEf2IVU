@@ -1,4 +1,4 @@
-﻿using Common.BusinessObjects;
+﻿using Common.Models;
 using Common.Interfaces;
 using Polly;
 using Polly.Retry;
