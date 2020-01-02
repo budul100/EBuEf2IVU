@@ -2,6 +2,7 @@
 using Common.EventsArgs;
 using Common.Interfaces;
 using MessageReceiver.Internals;
+using MessageReceiver.Models;
 using Newtonsoft.Json;
 using Serilog;
 using System;
