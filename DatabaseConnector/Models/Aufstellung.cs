@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EBuEfDBConnector.Models
+namespace DatabaseConnector.Models
 {
     [Table("fahrplan_grundaufstellung")]
     internal class Aufstellung

@@ -1,9 +1,11 @@
 using Common.Models;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Common.Interfaces
 {
-    public interface ISenderManager
+    public interface ISender
     {
         #region Public Methods
 
@@ -11,7 +13,7 @@ namespace Common.Interfaces
 
         void AddRealtime(TrainPosition position);
 
-        void Run(int retryTime, string ivuEndpoint, string ivuDivision);
+        Task RunAsnc(CancellationToken cancellationToken);
 
         #endregion Public Methods
     }

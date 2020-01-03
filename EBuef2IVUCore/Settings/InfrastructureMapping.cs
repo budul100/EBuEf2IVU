@@ -1,8 +1,8 @@
 using Common.Models;
 
-namespace Common.Settings
+namespace EBuEf2IVUCore.Settings
 {
-    public class InfrastructureMapping
+    internal class InfrastructureMapping
     {
         #region Public Properties
 

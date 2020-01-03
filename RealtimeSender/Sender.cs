@@ -1,9 +1,9 @@
-﻿using Common.Models;
-using Common.Interfaces;
+﻿using Common.Interfaces;
+using Common.Models;
+using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
 using RealtimeSender.Extensions;
-using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,7 +14,8 @@ using System.Threading.Tasks;
 
 namespace RealtimeSender
 {
-    public class SenderManager : ISenderManager
+    public class Sender
+        : ISender
     {
         #region Private Fields
 
@@ -23,25 +24,33 @@ namespace RealtimeSender
         private const int RT2IVUEventCodeAllocation = 9;
         private const int RT2IVUShuntingTrip = 0;
         private const int RT2IVUTrackPosition = 0;
-        private readonly CancellationToken cancellationToken;
+
         private readonly string deviceID;
+        private readonly string division;
+        private readonly EndpointAddress endpointAddress;
         private readonly ConcurrentQueue<RealTimeInfoTO> infosQueue = new ConcurrentQueue<RealTimeInfoTO>();
         private readonly ILogger logger;
-
-        private string division;
-        private string endpoint;
-        private AsyncRetryPolicy retryPolicy;
+        private readonly AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public SenderManager(ILogger logger, CancellationToken cancellationToken)
+        public Sender(ILogger logger, string division, string endpoint, int retryTime)
         {
             this.logger = logger;
-            this.cancellationToken = cancellationToken;
+            this.division = division;
 
+            endpointAddress = new EndpointAddress(endpoint ?? string.Empty);
             deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
+
+            retryPolicy = Policy
+                .Handle<Exception>()
+                .WaitAndRetryForeverAsync(
+                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
+                    onRetry: (exception, reconnection) => OnRetry(
+                        exception: exception,
+                        reconnection: reconnection));
         }
 
         #endregion Public Constructors
@@ -82,28 +91,20 @@ namespace RealtimeSender
             }
         }
 
-        public void Run(int retryTime, string endpoint, string division)
+        public Task RunAsnc(CancellationToken cancellationToken)
         {
-            this.endpoint = endpoint;
-            this.division = division;
-
-            retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
-                    onRetry: (exception, reconnection) => OnRetry(exception, reconnection));
-
-            retryPolicy.ExecuteAsync(
-                action: (t) => Task.Run(() => RunSender(t)),
+            var result = retryPolicy.ExecuteAsync(
+                action: (t) => RunSenderAsync(t),
                 cancellationToken: cancellationToken);
+
+            return result;
         }
 
         #endregion Public Methods
 
         #region Private Methods
 
-        private static IEnumerable<VehicleTO> GetVehicleTOs
-            (IEnumerable<string> vehicles)
+        private static IEnumerable<VehicleTO> GetVehicleTOs(IEnumerable<string> vehicles)
         {
             var position = 0;
             foreach (string vehicle in vehicles)
@@ -134,8 +135,8 @@ namespace RealtimeSender
             }
         }
 
-        private RealTimeInfoTO GetRealtimeInfo(int eventCode, string tripNumber, DateTime timeStamp, string stopArea,
-            string track, IEnumerable<string> vehicles)
+        private RealTimeInfoTO GetRealtimeInfo(int eventCode, string tripNumber, DateTime timeStamp,
+            string stopArea, string track, IEnumerable<string> vehicles)
         {
             var result = default(RealTimeInfoTO);
 
@@ -173,8 +174,7 @@ namespace RealtimeSender
                 }
                 catch (Exception ex)
                 {
-                    logger.Error(
-                        $"Fehler beim Erzeugen einer Ist-Zeit-Nachrichten für IVU.rail: {ex.Message}");
+                    logger.LogError($"Fehler beim Erzeugen einer Ist-Zeit-Nachrichten für IVU.rail: {ex.Message}");
                 }
             }
 
@@ -183,11 +183,12 @@ namespace RealtimeSender
 
         private void OnRetry(Exception exception, TimeSpan reconnection)
         {
-            logger.Error($"Fehler beim Senden der Ist-Zeiten an IVU.rail: {exception.Message}\r\n" +
+            logger.LogError(
+                $"Fehler beim Senden der Ist-Zeiten an IVU.rail: {exception.Message}\r\n" +
                 $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
         }
 
-        private void RunSender(CancellationToken cancellationToken)
+        private async Task RunSenderAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -197,21 +198,18 @@ namespace RealtimeSender
 
                     using (var client = new RealTimeInformationImportFacadeClient())
                     {
-                        client.Endpoint.Address = new EndpointAddress(endpoint ?? string.Empty);
+                        client.Endpoint.Address = endpointAddress;
 
-                        var response = Task.Run(() => client.importRealTimeInfoAsync(current));
-                        var validation = response.Result.importRealTimeInfoResponse1;
+                        var response = await client.importRealTimeInfoAsync(current);
+                        var result = response.importRealTimeInfoResponse1;
 
-                        if (validation.GetLength(0) > 0)
+                        if (result.Any() && result.First().code == 0)
                         {
-                            if (validation[0].code == 0)
-                            {
-                                logger.Debug("Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet.");
-                            }
-                            else
-                            {
-                                logger.Error($"Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen: {validation[0].message}");
-                            }
+                            logger.LogDebug("Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet.");
+                        }
+                        else if (result.Any())
+                        {
+                            logger.LogError($"Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen: {result[0].message}");
                         }
 
                         infosQueue.TryDequeue(out RealTimeInfoTO info);

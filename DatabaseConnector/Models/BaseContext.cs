@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace EBuEfDBConnector.Models
+namespace DatabaseConnector.Models
 {
     internal abstract class BaseContext : DbContext
     {

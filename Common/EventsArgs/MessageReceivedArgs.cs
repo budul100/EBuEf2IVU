@@ -1,8 +1,9 @@
 using System;
 
-namespace MessageReceiver.Models
+namespace Common.EventsArgs
 {
-    internal class MessageReceivedArgs : EventArgs
+    public class MessageReceivedArgs
+        : EventArgs
     {
         #region Public Properties
 

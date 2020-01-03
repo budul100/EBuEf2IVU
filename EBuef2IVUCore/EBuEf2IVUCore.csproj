@@ -3,10 +3,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <RuntimeFrameworkVersion>2.2.6</RuntimeFrameworkVersion>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!--<RuntimeFrameworkVersion>2.2.6</RuntimeFrameworkVersion>-->
     <RuntimeIdentifiers>win10-x64;linux-arm;linux-x64</RuntimeIdentifiers>
-    <Version>0.23.0</Version>
+    <Version>0.16.0-dev0037</Version>
     <StartupObject>EBuEf2IVUCore.Program</StartupObject>
   </PropertyGroup>
 
@@ -50,12 +50,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.6.0" />
-    <PackageReference Include="DryIoc.dll" Version="4.0.7" />
-    <PackageReference Include="Serilog" Version="2.9.0" />
+    <PackageReference Include="CommandLineParser" Version="2.7.82" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-    <PackageReference Include="Topshelf" Version="4.2.1" />
     <PackageReference Include="Packaging.Targets" Version="0.1.155" />
     <PackageReference Include="MSBump" Version="2.3.2">
       <PrivateAssets>all</PrivateAssets>
@@ -67,7 +68,7 @@
     <ProjectReference Include="..\..\Extensions\ConverterExtensions\ConverterExtensions.csproj" />
     <ProjectReference Include="..\..\Extensions\RegexExtensions\RegexExtensions.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\EBuEfDBConnector\EBuEfDBConnector.csproj" />
+    <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
     <ProjectReference Include="..\MessageReceiver\MessageReceiver.csproj" />
     <ProjectReference Include="..\RealtimeSender\RealtimeSender.csproj" />
   </ItemGroup>

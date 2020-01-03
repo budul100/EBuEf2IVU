@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EBuEfDBConnector.Models
+namespace DatabaseConnector.Models
 {
     [Table("fma")]
     internal class Abschnitt

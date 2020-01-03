@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBuEf2IVUCore", "EBuEf2IVUCore\EBuEf2IVUCore.csproj", "{76530AC2-D9B7-46C5-B140-4FB7068C78E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBuEfDBConnector", "EBuEfDBConnector\EBuEfDBConnector.csproj", "{6CDC3AAE-48BF-408E-A554-028916847682}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnector", "DatabaseConnector\DatabaseConnector.csproj", "{6CDC3AAE-48BF-408E-A554-028916847682}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{9B60D84D-DA2D-4487-85EE-FA259EB80403}"
 EndProject

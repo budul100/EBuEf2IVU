@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace EBuEfDBConnector.Models
+namespace DatabaseConnector.Models
 {
     internal class AufstellungenContext : BaseContext
     {

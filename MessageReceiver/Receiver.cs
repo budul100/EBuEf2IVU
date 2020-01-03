@@ -1,16 +1,20 @@
-using MessageReceiver.Models;
+using Common.EventsArgs;
+using Common.Interfaces;
+using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
-using Serilog;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace MessageReceiver.Internals
+namespace MessageReceiver
 {
-    internal class Receiver
+    public class Receiver
+        : IReceiver
     {
         #region Private Fields
 
@@ -20,14 +24,13 @@ namespace MessageReceiver.Internals
         private readonly ILogger logger;
         private readonly string messageType;
         private readonly int port;
-        private readonly RetryPolicy retryPolicy;
+        private readonly AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Receiver(string ipAdress, int port, int reconnectionTime,
-            ILogger logger, string messageType = default)
+        public Receiver(ILogger logger, string ipAdress, int port, int retryTime, string messageType = default)
         {
             this.ipAdress = ipAdress;
             this.port = port;
@@ -36,9 +39,11 @@ namespace MessageReceiver.Internals
 
             retryPolicy = Policy
                 .Handle<Exception>()
-                .WaitAndRetryForever(
-                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(reconnectionTime),
-                    onRetry: (exception, reconnection) => OnRetry(exception, reconnection));
+                .WaitAndRetryForeverAsync(
+                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
+                    onRetry: (exception, reconnection) => OnRetry(
+                        exception: exception,
+                        reconnection: reconnection));
         }
 
         #endregion Public Constructors
@@ -51,11 +56,13 @@ namespace MessageReceiver.Internals
 
         #region Public Methods
 
-        public void Run(CancellationToken cancellationToken)
+        public Task RunAsync(CancellationToken cancellationToken)
         {
-            retryPolicy.Execute(
-                action: (t) => RunReceiver(t),
+            var result = retryPolicy.ExecuteAsync(
+                action: (t) => RunReceiverAsync(t),
                 cancellationToken: cancellationToken);
+
+            return result;
         }
 
         #endregion Public Methods
@@ -68,59 +75,68 @@ namespace MessageReceiver.Internals
             {
                 var socketException = exception as SocketException;
 
-                logger.Error(
+                logger.LogError(
                     $"Fehler beim Nachrichtenempfänger an {ipAdress}:{port} " +
                     $"(Code: {socketException.SocketErrorCode}): {exception.Message}\r\n" +
                     $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
             }
             else
             {
-                logger.Error(
+                logger.LogError(
                     $"Fehler beim Nachrichtenempfänger an {ipAdress}:{port}: {exception.Message}\r\n" +
                     $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
             }
         }
 
-        private void RunReceiver(CancellationToken cancellationToken)
+        private async Task RunReceiverAsync(CancellationToken cancellationToken)
         {
             var multicastAddress = IPAddress.Parse(ipAdress);
             var localEp = new IPEndPoint(
                 address: IPAddress.Any,
                 port: port);
 
-            using (var client = new UdpClient())
+            using (var udpClient = new UdpClient())
             {
-                client.ExclusiveAddressUse = false;
-                client.Client.SetSocketOption(
+                udpClient.ExclusiveAddressUse = false;
+                udpClient.Client.SetSocketOption(
                     optionLevel: SocketOptionLevel.Socket,
                     optionName: SocketOptionName.ReuseAddress,
                     optionValue: true);
-                client.Client.Bind(localEp);
-                client.JoinMulticastGroup(multicastAddress);
+                udpClient.Client.Bind(localEp);
+                udpClient.JoinMulticastGroup(multicastAddress);
 
-                logger.Debug($"Lausche auf {ipAdress}:{port} nach Nachrichten" +
+                logger.LogDebug($"Lausche auf {ipAdress}:{port} nach Nachrichten" +
                     (!string.IsNullOrWhiteSpace(messageType) ? $" vom Typ {messageType}." : "."));
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var result = client.Receive(ref localEp);
+                    var result = await udpClient.ReceiveAsync();
+                    SendMessageReceived(result);
+                }
+            }
+        }
 
-                    var content = Encoding.ASCII.GetString(
-                        bytes: result,
-                        index: 0,
-                        count: result.Length).TrimEnd(EndChar);
+        private void SendMessageReceived(UdpReceiveResult result)
+        {
+            var bytes = result.Buffer;
 
-                    if (!string.IsNullOrWhiteSpace(content))
+            if (bytes?.Any() ?? false)
+            {
+                var content = Encoding.ASCII.GetString(
+                    bytes: bytes.ToArray(),
+                    index: 0,
+                    count: bytes.Count()).TrimEnd(EndChar);
+
+                if (!string.IsNullOrWhiteSpace(content))
+                {
+                    var messageReceivedArgs = new MessageReceivedArgs
                     {
-                        var messageReceivedArgs = new MessageReceivedArgs
-                        {
-                            Content = content,
-                        };
+                        Content = content,
+                    };
 
-                        MessageReceivedEvent?.Invoke(
-                            sender: this,
-                            e: messageReceivedArgs);
-                    }
+                    MessageReceivedEvent?.Invoke(
+                        sender: this,
+                        e: messageReceivedArgs);
                 }
             }
         }

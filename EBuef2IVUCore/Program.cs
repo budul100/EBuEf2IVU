@@ -1,29 +1,15 @@
 ﻿using CommandLine;
-using Common.Interfaces;
-using Common.Settings;
-using DryIoc;
 using EBuEf2IVUCore.Models;
-using EBuEf2IVUCore.Services;
-using EBuEfDBConnector;
-using MessageReceiver;
-using RealtimeSender;
-using Serilog;
-using Serilog.Core;
-using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
-using System;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-using Topshelf;
-using Topshelf.HostConfigurators;
-using Topshelf.ServiceConfigurators;
 
 namespace EBuEf2IVUCore
 {
-    internal class Program
+    public class Program
     {
         #region Private Fields
 
@@ -31,148 +17,81 @@ namespace EBuEf2IVUCore
 
         #endregion Private Fields
 
-        #region Private Methods
+        #region Public Methods
 
-        private static void ConfigureService(
-            HostConfigurator callback, IResolverContext scope, CancellationTokenSource cancellationTokenSource)
+        public static void Main(string[] args)
         {
-            callback.Service<ConversionService>(hostSettings => RunService(
-                hostSettings: hostSettings,
-                scope: scope,
-                cancellationTokenSource: cancellationTokenSource));
-
-            callback.SetDescription(AppInfoService.Description);
-            callback.SetDisplayName(AppInfoService.Product);
-            callback.SetServiceName(AppInfoService.Product);
-
-            callback.RunAsLocalService();
+            Parser.Default.ParseArguments<CommandLineOptions>(args)
+                .WithParsed(options => RunWorker(
+                    args: args,
+                    options: options));
         }
 
-        private static Container GetContainer(
-            EBuEf2IVUSettings settings, CancellationTokenSource cancellationTokenSource)
+        #endregion Public Methods
+
+        #region Private Methods
+
+        private static void ConfigureAppConfiguration(IConfigurationBuilder config, CommandLineOptions options)
         {
-            var result = new Container();
+            config.AddXmlFile(
+                path: GetSettingsPath(options),
+                optional: false,
+                reloadOnChange: true);
+        }
 
-            result.UseInstance(settings);
-            result.UseInstance(cancellationTokenSource.Token);
-            result.UseInstance<ILogger>(GetLogger(settings));
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            services.AddHostedService<Worker>();
+        }
 
-            result.Register<IDataManager, DataManager>(Reuse.Singleton);
-            result.Register<IReceiverManager, ReceiverManager>(Reuse.Singleton);
-            result.Register<ISenderManager, SenderManager>(Reuse.Singleton);
+        private static IHostBuilder GetHostBuilderLinux(string[] args, CommandLineOptions options)
+        {
+            var result = Host
+                .CreateDefaultBuilder(args)
+                .UseSystemd()
+                .ConfigureAppConfiguration((hostingContext, config) => ConfigureAppConfiguration(
+                    config: config,
+                    options: options))
+                .ConfigureServices((hostContext, services) => ConfigureServices(services));
 
             return result;
         }
 
-        private static Logger GetLogger(EBuEf2IVUSettings settings)
+        private static IHostBuilder GetHostBuilderWindows(string[] args, CommandLineOptions options)
         {
-            var levelSwitch = new LoggingLevelSwitch
-            {
-                MinimumLevel = settings.LogLevel ?? LogEventLevel.Information,
-            };
+            var result = Host
+                .CreateDefaultBuilder(args)
+                .UseWindowsService()
+                .ConfigureAppConfiguration((hostingContext, config) => ConfigureAppConfiguration(
+                    config: config,
+                    options: options))
+                .ConfigureServices((hostContext, services) => ConfigureServices(services));
 
-            return new LoggerConfiguration()
-                .MinimumLevel.ControlledBy(levelSwitch)
-                .WriteTo.Console(
-                    theme: ConsoleTheme.None)
-                .WriteTo.File(
-                    path: settings.LogFilePath,
-                    rollingInterval: RollingInterval.Day)
-                .CreateLogger();
-        }
-
-        private static EBuEf2IVUSettings GetSettings(CommandLineOptions options)
-        {
-            var settingsPath = GetSettingsPath(options);
-
-            var settingsService = new SettingsService<EBuEf2IVUSettings>(settingsPath);
-            return settingsService.Settings;
+            return result;
         }
 
         private static string GetSettingsPath(CommandLineOptions options)
         {
-            return !string.IsNullOrWhiteSpace(options.SettingsPath)
+            var result = !string.IsNullOrWhiteSpace(options.SettingsPath)
                 ? options.SettingsPath
                 : Path.Combine(
                     path1: Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                     path2: SettingsFileName);
+
+            return result;
         }
 
-        private static void Main(string[] args)
+        private static void RunWorker(string[] args, CommandLineOptions options)
         {
-            Parser.Default.ParseArguments<CommandLineOptions>(args)
-                .WithParsed(options => RunWithOptions(options));
-        }
+            var hostBuilder = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? GetHostBuilderWindows(
+                    args: args,
+                    options: options)
+                : GetHostBuilderLinux(
+                    args: args,
+                    options: options);
 
-        private static void RunService(
-            ServiceConfigurator<ConversionService> hostSettings, IResolverContext scope, CancellationTokenSource cancellationTokenSource)
-        {
-            hostSettings.ConstructUsing(name => new ConversionService());
-            hostSettings.WhenStarted(conversionService => Task.Run(() => conversionService.Run(
-                receiverManager: scope.Resolve<IReceiverManager>(),
-                dataManager: scope.Resolve<IDataManager>(),
-                senderManager: scope.Resolve<ISenderManager>(),
-                settings: scope.Resolve<EBuEf2IVUSettings>())));
-            hostSettings.WhenStopped(conversionService => cancellationTokenSource.Cancel());
-        }
-
-        private static void RunWithOptions(CommandLineOptions options)
-        {
-            var commandLineSettings = GetSettings(options);
-
-            using (var cancellationTokenSource = new CancellationTokenSource())
-            {
-                var container = GetContainer(
-                    settings: commandLineSettings,
-                    cancellationTokenSource: cancellationTokenSource);
-
-                using (var scope = container.OpenScope())
-                {
-                    var logger = scope.Resolve<ILogger>();
-                    var appSettings = scope.Resolve<EBuEf2IVUSettings>();
-
-                    appSettings.SessionDateIVU = options.SessionDateIVU ?? DateTime.Today;
-                    logger.Information($"Die Daten werden nach IVU für den {appSettings.SessionDateIVU:yyyy-MM-dd} gesendet.");
-
-                    if (options.RunPerformanceTestRounds > 0)
-                    {
-                        logger.Information($"Führe mit {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) " +
-                            $"einem Performance-Test über {options.RunPerformanceTestRounds} Runden aus.");
-
-                        TestService.RunPerformanceTest(
-                            logger: scope.Resolve<ILogger>(),
-                            dataManager: scope.Resolve<IDataManager>(),
-                            settings: scope.Resolve<EBuEf2IVUSettings>(),
-                            rounds: options.RunPerformanceTestRounds);
-                    }
-                    else if (options.RunStandAlone || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        logger.Information($"Starte {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) im Stand-Alone-Modus.");
-
-                        var conversionService = new ConversionService();
-                        Task.Run(() => conversionService.Run(
-                            receiverManager: scope.Resolve<IReceiverManager>(),
-                            dataManager: scope.Resolve<IDataManager>(),
-                            senderManager: scope.Resolve<ISenderManager>(),
-                            settings: scope.Resolve<EBuEf2IVUSettings>()));
-
-                        Console.ReadLine();
-                    }
-                    else
-                    {
-                        logger.Information($"Starte {AppInfoService.ProductTitle} ({AppInfoService.VersionMajorMinor}) als Windows Service.");
-
-                        var exitCode = HostFactory.Run(callback => ConfigureService(
-                            callback: callback,
-                            scope: scope,
-                            cancellationTokenSource: cancellationTokenSource));
-                        var environmentExitCode = (int)Convert.ChangeType(
-                            value: exitCode,
-                            typeCode: exitCode.GetTypeCode());
-                        Environment.ExitCode = environmentExitCode;
-                    }
-                }
-            }
+            hostBuilder.Build().Run();
         }
 
         #endregion Private Methods
