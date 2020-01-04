@@ -49,32 +49,11 @@ namespace EBuEf2IVUCore
             services.AddHostedService<Worker>();
         }
 
-        private static IHostBuilder GetHostBuilderLinux(string[] args, CommandLineOptions options)
+        private static IHostBuilder GetHostBuilder(this IHostBuilder defaultBuilder)
         {
-            var result = Host
-                .CreateDefaultBuilder(args)
-                .UseSystemd()
-                .ConfigureAppConfiguration((hostingContext, config) => ConfigureAppConfiguration(
-                    configBuilder: config,
-                    options: options))
-                .ConfigureServices((hostContext, services) => ConfigureServices(services))
-                .UseSerilog((hostingContext, loggerConfiguration) => GetLoggerConfiguration(hostingContext, loggerConfiguration));
-
-            return result;
-        }
-
-        private static IHostBuilder GetHostBuilderWindows(string[] args, CommandLineOptions options)
-        {
-            var result = Host
-                .CreateDefaultBuilder(args)
-                .UseWindowsService()
-                .ConfigureAppConfiguration((hostingContext, config) => ConfigureAppConfiguration(
-                    configBuilder: config,
-                    options: options))
-                .ConfigureServices((hostContext, services) => ConfigureServices(services))
-                .UseSerilog((hostingContext, loggerConfiguration) => GetLoggerConfiguration(hostingContext, loggerConfiguration));
-
-            return result;
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? SystemdHostBuilderExtensions.UseSystemd(defaultBuilder)
+                : WindowsServiceLifetimeHostBuilderExtensions.UseWindowsService(defaultBuilder);
         }
 
         private static string GetLogFilePath(IConfiguration config)
@@ -117,13 +96,14 @@ namespace EBuEf2IVUCore
 
         private static void RunWorker(string[] args, CommandLineOptions options)
         {
-            var hostBuilder = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? GetHostBuilderWindows(
-                    args: args,
-                    options: options)
-                : GetHostBuilderLinux(
-                    args: args,
-                    options: options);
+            var hostBuilder = Host
+                .CreateDefaultBuilder(args)
+                .GetHostBuilder()
+                .ConfigureAppConfiguration((hostingContext, config) => ConfigureAppConfiguration(
+                    configBuilder: config,
+                    options: options))
+                .ConfigureServices((hostContext, services) => ConfigureServices(services))
+                .UseSerilog((hostingContext, loggerConfiguration) => GetLoggerConfiguration(hostingContext, loggerConfiguration));
 
             hostBuilder.Build().Run();
         }
