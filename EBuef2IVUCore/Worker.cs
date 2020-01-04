@@ -45,8 +45,8 @@ namespace EBuEf2IVUCore
 
         public Worker(IConfiguration config, ILogger<Worker> logger)
         {
-            this.logger = logger;
             this.config = config;
+            this.logger = logger;
 
             ivuSender = GetSender();
             infrastructureMappings = GetInfrastructureMappings();

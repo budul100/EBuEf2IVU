@@ -7,6 +7,9 @@ namespace EBuEf2IVUCore.Models
     {
         #region Public Properties
 
+        [Option(shortName: 'l', longName: "log-path", Required = false, HelpText = "File path to the log file.")]
+        public string LogPath { get; set; }
+
         [Option(shortName: 'c', longName: "console-application", Required = false, HelpText = "Run service as console aplication.")]
         public bool RunStamosndAlone { get; set; }
 
