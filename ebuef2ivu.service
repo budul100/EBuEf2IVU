@@ -1,0 +1,10 @@
+[Unit]
+Description=ebuef2ivu
+
+[Service]
+Type=notify
+ExecStart=/PFAD/ZU/ebuef2ivu
+
+[Install]
+WantedBy=multi-user.target
+Alias=ebuef2ivu
