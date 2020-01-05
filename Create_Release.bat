@@ -17,6 +17,6 @@ pushd D:\Users\mgr\Entwicklung\NET\EBuEf2IVUCore\Common
 dotnet build -c release -f netstandard2.0
 
 pushd D:\Users\mgr\Entwicklung\NET\EBuEf2IVUCore\EBuef2IVUCore
-dotnet build -c release -f netstandard2.0
+dotnet build -c release -f netcore3.1
 
 pause
