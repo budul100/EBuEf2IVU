@@ -9,7 +9,7 @@ namespace DatabaseConnector.Models
         #region Public Properties
 
         [Column("fahrzeug_adresse")]
-        public string Decoder { get; set; }
+        public int Decoder { get; set; }
 
         [ForeignKey(nameof(FeldID))]
         public Feld Feld { get; set; }
@@ -19,8 +19,17 @@ namespace DatabaseConnector.Models
         public int FeldID { get; set; }
 
         [Column("zugnummer")]
-        public int Zugnummer { get; set; }
+        public int? Zugnummer { get; set; }
 
         #endregion Public Properties
+
+        #region Public Methods
+
+        public override string ToString()
+        {
+            return $"{Feld.Betriebsstelle} ({Feld.Gleis}): Zug {Zugnummer} / Fahrzeug {Decoder}";
+        }
+
+        #endregion Public Methods
     }
 }

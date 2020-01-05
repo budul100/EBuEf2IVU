@@ -12,7 +12,7 @@ namespace DatabaseConnector.Models
         public Abschnitt Abschnitt { get; set; }
 
         [Column("fma_id")]
-        public int AbschnittID { get; set; }
+        public int? AbschnittID { get; set; }
 
         [Key]
         [Column("gbt_id")]

@@ -10,7 +10,7 @@ namespace DatabaseConnector.Models
         #region Public Properties
 
         [Column("decoder_adresse")]
-        public string Decoder { get; set; }
+        public int Decoder { get; set; }
 
         [Key]
         [Column("fma_id")]

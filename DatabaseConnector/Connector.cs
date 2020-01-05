@@ -1,5 +1,6 @@
 using Common.Interfaces;
 using Common.Models;
+using DatabaseConnector.Contexts;
 using DatabaseConnector.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -81,41 +82,54 @@ namespace DatabaseConnector
 
         private IEnumerable<string> GetFahrzeuge(Aufstellung aufstellung)
         {
-            yield return aufstellung.Decoder;
+            yield return aufstellung.Decoder.ToString();
         }
 
-        private DateTime GetSessionDate(CancellationToken cancellationToken)
+        private async Task<DateTime> GetSessionDateAsync(CancellationToken cancellationToken)
         {
             var result = DateTime.Today;
 
             if (!cancellationToken.IsCancellationRequested)
             {
-                result = DateTime.Today;
+                using (var context = new SitzungContext(connectionString))
+                {
+                    logger.LogDebug($"Suche nach der aktuellen Fahrplan-Session.");
+
+                    var sitzung = await context.Sitzungen
+                        .OrderByDescending(s => s.Id)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    result = sitzung?.IvuDate ?? DateTime.Today;
+                }
             }
 
-            return result;
-        }
+            logger.LogDebug($"Das IVU-Datum der aktuellen Fahrplan-Session ist {result:yyyy-MM-dd}");
 
-        private Task<DateTime> GetSessionDateAsync(CancellationToken cancellationToken)
-        {
-            return Task.Run<DateTime>(() => GetSessionDate(cancellationToken));
+            return result;
         }
 
         private IEnumerable<VehicleAllocation> GetVehicleAllocations(IEnumerable<Aufstellung> aufstellungen)
         {
             if (aufstellungen.Any())
             {
-                foreach (var aufstellung in aufstellungen)
-                {
-                    logger.LogDebug($"Zug in Grundaufstellung gefunden: {aufstellung.ToString()}");
+                var aufstellungenGroups = aufstellungen
+                    .GroupBy(a => new { a.Feld.Betriebsstelle, a.Feld.Gleis, a.Decoder, a.Zugnummer }).ToArray();
 
-                    yield return new VehicleAllocation
+                foreach (var aufstellungenGroup in aufstellungenGroups)
+                {
+                    var relevant = aufstellungenGroup.First();
+
+                    var result = new VehicleAllocation
                     {
-                        Betriebsstelle = aufstellung.Feld.Betriebsstelle,
-                        Fahrzeuge = GetFahrzeuge(aufstellung).ToArray(),
-                        Gleis = aufstellung.Feld.Gleis,
-                        Zugnummer = aufstellung.Zugnummer.ToString(),
+                        Betriebsstelle = relevant.Feld?.Betriebsstelle,
+                        Fahrzeuge = GetFahrzeuge(relevant).ToArray(),
+                        Gleis = relevant.Feld?.Gleis.ToString(),
+                        Zugnummer = relevant.Zugnummer?.ToString(),
                     };
+
+                    logger.LogDebug($"Zug in Grundaufstellung gefunden: {aufstellungenGroup.ToString()}");
+
+                    yield return result;
                 }
             }
             else
