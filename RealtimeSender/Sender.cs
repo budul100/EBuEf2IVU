@@ -57,14 +57,14 @@ namespace RealtimeSender
 
         #region Public Methods
 
-        public void AddAllocations(IEnumerable<VehicleAllocation> allocations)
+        public void AddAllocations(IEnumerable<VehicleAllocation> allocations, DateTime sessionDate)
         {
             foreach (var allocation in allocations)
             {
                 var info = GetRealtimeInfo(
                     eventCode: RT2IVUEventCodeAllocation,
                     tripNumber: allocation.Zugnummer,
-                    timeStamp: DateTime.Now,
+                    timeStamp: sessionDate,
                     stopArea: allocation.Betriebsstelle,
                     track: allocation.Gleis,
                     vehicles: allocation.Fahrzeuge);
@@ -144,6 +144,8 @@ namespace RealtimeSender
             {
                 try
                 {
+                    var unixTimeStamp = timeStamp.ToUnixTimestamp();
+
                     result = new RealTimeInfoTO
                     {
                         deviceId = deviceID,
@@ -151,9 +153,9 @@ namespace RealtimeSender
                         //employeeId = this.config.User,
                         eventCode = eventCode,
                         stopArea = stopArea,
-                        timeStamp = timeStamp.ToUnixTimestamp(),
+                        timeStamp = unixTimeStamp,
                         trainCombinationCompleteSpecified = true,
-                        tripIdentificationDate = timeStamp.ToUnixTimestamp(),
+                        tripIdentificationDate = unixTimeStamp,
                         tripIdentificationDateSpecified = true,
                         tripNumber = tripNumber,
                     };

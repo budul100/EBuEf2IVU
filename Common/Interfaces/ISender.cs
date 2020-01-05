@@ -1,4 +1,5 @@
 using Common.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace Common.Interfaces
     {
         #region Public Methods
 
-        void AddAllocations(IEnumerable<VehicleAllocation> allocations);
+        void AddAllocations(IEnumerable<VehicleAllocation> allocations, DateTime startTime);
 
         void AddRealtime(TrainPosition position);
 

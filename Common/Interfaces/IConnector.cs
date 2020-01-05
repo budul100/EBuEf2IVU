@@ -1,5 +1,4 @@
 using Common.Models;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,7 +10,7 @@ namespace Common.Interfaces
 
         Task AddRealtimeAsync(TrainPosition position);
 
-        Task<DateTime> GetSessionDateAsync();
+        Task<EBuEfSession> GetEBuEfSessionAsync();
 
         Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync();
 

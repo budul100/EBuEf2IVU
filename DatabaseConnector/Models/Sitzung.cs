@@ -14,6 +14,9 @@ namespace DatabaseConnector.Models
         [Column("sim_ivutag")]
         public DateTime? IvuDate { get; set; }
 
+        [Column("sim_startzeit")]
+        public long SimulationStartzeit { get; set; }
+
         #endregion Public Properties
     }
 }

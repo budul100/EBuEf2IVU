@@ -1,6 +1,7 @@
 using Common.Interfaces;
 using Common.Models;
 using DatabaseConnector.Contexts;
+using DatabaseConnector.Extensions;
 using DatabaseConnector.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -58,7 +59,7 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<DateTime> GetSessionDateAsync()
+        public Task<EBuEfSession> GetEBuEfSessionAsync()
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (t) => GetSessionDateAsync(t),
@@ -85,9 +86,9 @@ namespace DatabaseConnector
             yield return aufstellung.Decoder.ToString();
         }
 
-        private async Task<DateTime> GetSessionDateAsync(CancellationToken cancellationToken)
+        private async Task<EBuEfSession> GetSessionDateAsync(CancellationToken cancellationToken)
         {
-            var result = DateTime.Today;
+            var result = default(EBuEfSession);
 
             if (!cancellationToken.IsCancellationRequested)
             {
@@ -99,11 +100,22 @@ namespace DatabaseConnector
                         .OrderByDescending(s => s.Id)
                         .FirstOrDefaultAsync(cancellationToken);
 
-                    result = sitzung?.IvuDate ?? DateTime.Today;
+                    if (sitzung != default)
+                    {
+                        result = new EBuEfSession
+                        {
+                            IVUDate = sitzung.IvuDate ?? DateTime.Today,
+                            SessionStart = sitzung.SimulationStartzeit.ToDateTime(),
+                        };
+
+                        logger.LogDebug($"EBuEf-Session gefunden: {result}");
+                    }
+                    else
+                    {
+                        logger.LogError($"Es wurde keine EBuEf-Session gefunden.");
+                    }
                 }
             }
-
-            logger.LogDebug($"Das IVU-Datum der aktuellen Fahrplan-Session ist {result:yyyy-MM-dd}");
 
             return result;
         }
@@ -117,17 +129,17 @@ namespace DatabaseConnector
 
                 foreach (var aufstellungenGroup in aufstellungenGroups)
                 {
-                    var relevant = aufstellungenGroup.First();
+                    var relevantAufstellung = aufstellungenGroup.First();
 
                     var result = new VehicleAllocation
                     {
-                        Betriebsstelle = relevant.Feld?.Betriebsstelle,
-                        Fahrzeuge = GetFahrzeuge(relevant).ToArray(),
-                        Gleis = relevant.Feld?.Gleis.ToString(),
-                        Zugnummer = relevant.Zugnummer?.ToString(),
+                        Betriebsstelle = relevantAufstellung.Feld?.Betriebsstelle,
+                        Fahrzeuge = GetFahrzeuge(relevantAufstellung).ToArray(),
+                        Gleis = relevantAufstellung.Feld?.Gleis.ToString(),
+                        Zugnummer = relevantAufstellung.Zugnummer?.ToString(),
                     };
 
-                    logger.LogDebug($"Zug in Grundaufstellung gefunden: {aufstellungenGroup.ToString()}");
+                    logger.LogDebug($"Zug in Grundaufstellung gefunden: {relevantAufstellung.ToString()}");
 
                     yield return result;
                 }

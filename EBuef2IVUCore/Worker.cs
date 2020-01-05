@@ -262,11 +262,15 @@ namespace EBuEf2IVUCore
             {
                 try
                 {
-                    sessionDate = await databaseConnector.GetSessionDateAsync();
-                    logger.LogInformation($"Die Daten werden nach IVU für den {sessionDate:yyyy-MM-dd} gesendet.");
+                    var currentSession = await databaseConnector.GetEBuEfSessionAsync();
+
+                    sessionDate = currentSession.IVUDate;
+                    var startTime = sessionDate.Add(currentSession.SessionStart.TimeOfDay);
 
                     var allocations = await databaseConnector.GetVehicleAllocationsAsync();
-                    ivuSender.AddAllocations(allocations);
+                    ivuSender.AddAllocations(
+                        allocations: allocations,
+                        startTime: startTime);
                 }
                 catch (TaskCanceledException)
                 {
