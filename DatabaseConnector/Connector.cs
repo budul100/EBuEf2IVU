@@ -136,7 +136,7 @@ namespace DatabaseConnector
 
                     var aufstellungen = await context.Aufstellungen
                         .Include(a => a.Feld.AbschnittZuFeld.Abschnitt)
-                        .ToArrayAsync();
+                        .ToArrayAsync(cancellationToken);
 
                     result = GetVehicleAllocations(aufstellungen).ToArray();
                 }
@@ -151,7 +151,7 @@ namespace DatabaseConnector
                 $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
         }
 
-        private async Task SaveTrainPositionAsync(TrainPosition position, bool istVon)
+        private async Task SaveTrainPositionAsync(TrainPosition position, bool istVon, CancellationToken cancellationToken)
         {
             using (var context = new HalteContext(connectionString))
             {
@@ -184,7 +184,7 @@ namespace DatabaseConnector
                             halt.AnkunftIst = position.EBuEfZeitpunktNach;
                         }
 
-                        await context.SaveChangesAsync();
+                        await context.SaveChangesAsync(cancellationToken);
                     }
                     else
                     {
@@ -202,11 +202,13 @@ namespace DatabaseConnector
 
                 await SaveTrainPositionAsync(
                     position: position,
-                    istVon: true);
+                    istVon: true,
+                    cancellationToken: cancellationToken);
 
                 await SaveTrainPositionAsync(
                     position: position,
-                    istVon: false);
+                    istVon: false,
+                    cancellationToken: cancellationToken);
             }
         }
 

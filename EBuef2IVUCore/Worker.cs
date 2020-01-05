@@ -243,8 +243,15 @@ namespace EBuEf2IVUCore
 
                 if (position != null)
                 {
-                    databaseConnector.AddRealtimeAsync(position);
-                    ivuSender.AddRealtime(position);
+                    try
+                    {
+                        databaseConnector.AddRealtimeAsync(position);
+                        ivuSender.AddRealtime(position);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        logger.LogDebug("Session is closed.");
+                    }
                 }
             }
         }
@@ -253,11 +260,18 @@ namespace EBuEf2IVUCore
         {
             if (allocationsRegex.IsMatch(e.Content))
             {
-                sessionDate = await databaseConnector.GetSessionDateAsync();
-                logger.LogInformation($"Die Daten werden nach IVU für den {sessionDate:yyyy-MM-dd} gesendet.");
+                try
+                {
+                    sessionDate = await databaseConnector.GetSessionDateAsync();
+                    logger.LogInformation($"Die Daten werden nach IVU für den {sessionDate:yyyy-MM-dd} gesendet.");
 
-                var allocations = await databaseConnector.GetVehicleAllocationsAsync();
-                ivuSender.AddAllocations(allocations);
+                    var allocations = await databaseConnector.GetVehicleAllocationsAsync();
+                    ivuSender.AddAllocations(allocations);
+                }
+                catch (TaskCanceledException)
+                {
+                    logger.LogDebug("Session is closed.");
+                }
             }
             else
             {
