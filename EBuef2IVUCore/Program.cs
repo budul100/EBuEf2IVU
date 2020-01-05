@@ -1,6 +1,5 @@
 ﻿using CommandLine;
 using EBuEf2IVUCore.Models;
-using EBuEf2IVUCore.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,7 +15,6 @@ namespace EBuEf2IVUCore
     {
         #region Private Fields
 
-        private const string LogFileName = "ebuef2ivu.log";
         private const string SettingsFileName = "settings.xml";
 
         #endregion Private Fields
@@ -56,36 +54,19 @@ namespace EBuEf2IVUCore
                 : WindowsServiceLifetimeHostBuilderExtensions.UseWindowsService(defaultBuilder);
         }
 
-        private static string GetLogFilePath(IConfiguration config)
-        {
-            var settings = config
-                .GetSection(nameof(Logging))
-                .Get<Logging>();
-
-            return !string.IsNullOrWhiteSpace(settings.LogFilePath)
-                ? settings.LogFilePath.Trim()
-                : Path.Combine(
-                    path1: Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    path2: LogFileName);
-        }
-
-        private static LoggerConfiguration GetLoggerConfiguration(HostBuilderContext hostingContext,
+        private static LoggerConfiguration GetSerilogConfiguration(HostBuilderContext hostingContext,
             LoggerConfiguration loggerConfiguration)
         {
             var result = loggerConfiguration
                 .ReadFrom.Configuration(hostingContext.Configuration)
-                .WriteTo.Console(
-                    theme: ConsoleTheme.None)
-                .WriteTo.File(
-                    path: GetLogFilePath(hostingContext.Configuration),
-                    rollingInterval: RollingInterval.Day);
+                .WriteTo.Console(theme: SystemConsoleTheme.Literate);
 
             return result;
         }
 
         private static string GetSettingsPath(CommandLineOptions options)
         {
-            var result = !string.IsNullOrWhiteSpace(options.SettingsPath)
+            var result = !string.IsNullOrWhiteSpace(options?.SettingsPath)
                 ? options.SettingsPath
                 : Path.Combine(
                     path1: Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
@@ -103,7 +84,9 @@ namespace EBuEf2IVUCore
                     configBuilder: config,
                     options: options))
                 .ConfigureServices((hostContext, services) => ConfigureServices(services))
-                .UseSerilog((hostingContext, loggerConfiguration) => GetLoggerConfiguration(hostingContext, loggerConfiguration));
+                .UseSerilog((hostingContext, loggerConfiguration) => GetSerilogConfiguration(
+                    hostingContext: hostingContext,
+                    loggerConfiguration: loggerConfiguration));
 
             hostBuilder.Build().Run();
         }
