@@ -21,13 +21,32 @@ namespace EBuEf2IVUCore
 
         #region Public Methods
 
-        public static void Main(string[] args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
         {
+            var result = default(IHostBuilder);
+
             Parser.Default
                 .ParseArguments<CommandLineOptions>(args)
-                .WithParsed(options => RunWorker(
-                    args: args,
-                    options: options));
+                .WithParsed(options =>
+                {
+                    result = Host
+                    .CreateDefaultBuilder(args)
+                    .GetHostBuilder()
+                    .ConfigureAppConfiguration((hostingContext, config) => ConfigureAppConfiguration(
+                        configBuilder: config,
+                        options: options))
+                    .ConfigureServices((hostContext, services) => ConfigureServices(services))
+                    .UseSerilog((hostingContext, loggerConfiguration) => GetSerilogConfiguration(
+                        hostingContext: hostingContext,
+                        loggerConfiguration: loggerConfiguration));
+                });
+
+            return result;
+        }
+
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
         }
 
         #endregion Public Methods
@@ -73,22 +92,6 @@ namespace EBuEf2IVUCore
                     path2: SettingsFileName);
 
             return result;
-        }
-
-        private static void RunWorker(string[] args, CommandLineOptions options)
-        {
-            var hostBuilder = Host
-                .CreateDefaultBuilder(args)
-                .GetHostBuilder()
-                .ConfigureAppConfiguration((hostingContext, config) => ConfigureAppConfiguration(
-                    configBuilder: config,
-                    options: options))
-                .ConfigureServices((hostContext, services) => ConfigureServices(services))
-                .UseSerilog((hostingContext, loggerConfiguration) => GetSerilogConfiguration(
-                    hostingContext: hostingContext,
-                    loggerConfiguration: loggerConfiguration));
-
-            hostBuilder.Build().Run();
         }
 
         #endregion Private Methods
