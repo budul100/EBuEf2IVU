@@ -1,18 +1,23 @@
-SET FRAMEWORK=linux-x64
-REM SET FRAMEWORK=linux-arm
+SET FRAMEWORK=netcoreapp3.1
+SET RUNTIME=linux-x64
+REM SET RUNTIME=linux-arm
 
-SET FILENAME=EBuEf2IVUCore.*.*.*.%FRAMEWORK%.deb
-SET SOURCEDIR=.\EBuef2IVUCore\bin\Release\netcoreapp2.2\%FRAMEWORK%
+SET FILENAME=EBuEf2IVUCore.*.*.*.%RUNTIME%.deb
+SET SOURCEDIR=.\EBuef2IVUCore\bin\Release\%FRAMEWORK%\%RUNTIME%
 SET TARGETDIR=.
 SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 
-del /q %TARGETDIR%\%FILENAME%
-del /q %DROPBOXDIR%\%FILENAME%
+DEL /q %TARGETDIR%\%FILENAME%
+DEL /q %DROPBOXDIR%\%FILENAME%
 
-dotnet publish -c Release -r %FRAMEWORK% -f netcoreapp3.1 --self-contained
-dotnet deb -c Release -r %FRAMEWORK% -f netcoreapp3.1
+REM pushd .\EBuEf2IVUCore
+REM dotnet publish -c Release -r %RUNTIME% -f %FRAMEWORK% --self-contained
+REM dotnet deb -c Release -r %RUNTIME% -f %FRAMEWORK%
+REM popd
 
-xcopy /y %SOURCEDIR%\%FILENAME% %TARGETDIR%
-xcopy /y %SOURCEDIR%\%FILENAME% %DROPBOXDIR%
+BASH -c "sh Create_Linux-x64.sh"
+
+XCOPY /y %SOURCEDIR%\%FILENAME% %TARGETDIR%
+XCOPY /y %SOURCEDIR%\%FILENAME% %DROPBOXDIR%
 
 pause

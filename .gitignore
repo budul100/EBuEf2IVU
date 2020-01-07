@@ -1,6 +1,6 @@
 *.deb
+_Additionals/*
 Link_Ubuntu.txt
-.additionals/*
 EBuef2IVUCore/settings.xml
 
 ## Ignore Visual Studio temporary files, build results, and
