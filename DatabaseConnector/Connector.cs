@@ -92,28 +92,27 @@ namespace DatabaseConnector
 
             if (!cancellationToken.IsCancellationRequested)
             {
-                using (var context = new SitzungContext(connectionString))
+                using var context = new SitzungContext(connectionString);
+
+                logger.LogDebug($"Suche nach der aktuellen Fahrplan-Session.");
+
+                var sitzung = await context.Sitzungen
+                    .OrderByDescending(s => s.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (sitzung != default)
                 {
-                    logger.LogDebug($"Suche nach der aktuellen Fahrplan-Session.");
-
-                    var sitzung = await context.Sitzungen
-                        .OrderByDescending(s => s.Id)
-                        .FirstOrDefaultAsync(cancellationToken);
-
-                    if (sitzung != default)
+                    result = new EBuEfSession
                     {
-                        result = new EBuEfSession
-                        {
-                            IVUDate = sitzung.IvuDate ?? DateTime.Today,
-                            SessionStart = sitzung.SimulationStartzeit.ToDateTime(),
-                        };
+                        IVUDate = sitzung.IvuDate ?? DateTime.Today,
+                        SessionStart = sitzung.SimulationStartzeit.ToDateTime(),
+                    };
 
-                        logger.LogDebug($"EBuEf-Session gefunden: {result}");
-                    }
-                    else
-                    {
-                        logger.LogError($"Es wurde keine EBuEf-Session gefunden.");
-                    }
+                    logger.LogDebug($"EBuEf-Session gefunden: {result}");
+                }
+                else
+                {
+                    logger.LogError($"Es wurde keine EBuEf-Session gefunden.");
                 }
             }
 
