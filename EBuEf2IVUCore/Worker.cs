@@ -37,7 +37,7 @@ namespace EBuEf2IVUCore
         private readonly JsonSerializerSettings positionsReceiverSettings;
 
         private IConnector databaseConnector;
-        private DateTime sessionDate;
+        private DateTime ivuSessionDate = DateTime.Now;
 
         #endregion Private Fields
 
@@ -200,7 +200,7 @@ namespace EBuEf2IVUCore
                 var ebuefNachZeit = TimeSpan.FromSeconds(mapping.EBuEfNachVerschiebungSekunden.ToInt());
                 var ivuZeit = TimeSpan.FromSeconds(mapping.IVUVerschiebungSekunden.ToInt());
 
-                var ivuZeitpunkt = sessionDate.Add(message.SimulationsZeit.Add(ivuZeit).TimeOfDay);
+                var ivuZeitpunkt = ivuSessionDate.Add(message.SimulationsZeit.Add(ivuZeit).TimeOfDay);
 
                 result = new TrainPosition
                 {
@@ -276,10 +276,10 @@ namespace EBuEf2IVUCore
             {
                 var currentSession = await databaseConnector.GetEBuEfSessionAsync();
 
-                sessionDate = currentSession.IVUDate;
-                var startTime = sessionDate.Add(currentSession.SessionStart.TimeOfDay);
+                ivuSessionDate = currentSession.IVUDate;
+                var startTime = ivuSessionDate.Add(currentSession.SessionStart.TimeOfDay);
 
-                logger.LogInformation($"Die IVU-Sitzung beginnt am {sessionDate:yyyy-MM-dd} um {startTime:hh:mm:ss}.");
+                logger.LogInformation($"Die IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um {startTime:hh:mm:ss}.");
 
                 var allocations = await databaseConnector.GetVehicleAllocationsAsync();
                 ivuSender.AddAllocations(
