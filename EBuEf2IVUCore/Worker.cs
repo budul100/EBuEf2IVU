@@ -91,6 +91,8 @@ namespace EBuEf2IVUCore
                     positionsReceiver.RunAsync(cancellationToken),
                     ivuSender.RunAsnc(cancellationToken));
             };
+
+            logger.LogDebug($"Sitzung wurde aktiv beendet (IsCancellationRequested: {cancellationToken.IsCancellationRequested}).");
         }
 
         private Regex GetAllocationsRegex()
