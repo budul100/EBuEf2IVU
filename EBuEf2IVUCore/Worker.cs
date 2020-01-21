@@ -80,12 +80,12 @@ namespace EBuEf2IVUCore
 
         private async Task ExecuteServices(CancellationToken cancellationToken)
         {
+            databaseConnector = GetConnector(cancellationToken);
+
             await StartIVUSessionAsync();
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                databaseConnector = GetConnector(cancellationToken);
-
                 await Task.WhenAny(
                     allocationsReceiver.RunAsync(cancellationToken),
                     positionsReceiver.RunAsync(cancellationToken),
