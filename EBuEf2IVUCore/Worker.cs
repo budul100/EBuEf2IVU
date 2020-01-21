@@ -65,11 +65,15 @@ namespace EBuEf2IVUCore
 
         #region Public Methods
 
-        public override async Task StartAsync(CancellationToken cancellationToken)
+        public override Task StartAsync(CancellationToken cancellationToken)
         {
             databaseConnector = GetConnector(cancellationToken);
 
-            await StartIVUSessionAsync();
+            var result = Task.WhenAll(
+                StartIVUSessionAsync(),
+                base.StartAsync(cancellationToken));
+
+            return result;
         }
 
         #endregion Public Methods
@@ -85,8 +89,6 @@ namespace EBuEf2IVUCore
                     positionsReceiver.RunAsync(cancellationToken),
                     ivuSender.RunAsnc(cancellationToken));
             };
-
-            logger.LogDebug($"Sitzung wurde aktiv beendet (IsCancellationRequested: {cancellationToken.IsCancellationRequested}).");
         }
 
         #endregion Protected Methods
