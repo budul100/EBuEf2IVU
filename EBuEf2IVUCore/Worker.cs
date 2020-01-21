@@ -62,28 +62,21 @@ namespace EBuEf2IVUCore
 
         #endregion Public Constructors
 
-        #region Protected Methods
+        #region Public Methods
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
-        {
-            await ExecuteServices(cancellationToken);
-        }
-
-        #endregion Protected Methods
-
-        #region Private Methods
-
-        private static JsonSerializerSettings GetPositionsReceiverSettings()
-        {
-            return new JsonSerializerSettings();
-        }
-
-        private async Task ExecuteServices(CancellationToken cancellationToken)
+        public override async Task StartAsync(CancellationToken cancellationToken)
         {
             databaseConnector = GetConnector(cancellationToken);
 
             await StartIVUSessionAsync();
+        }
 
+        #endregion Public Methods
+
+        #region Protected Methods
+
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        {
             while (!cancellationToken.IsCancellationRequested)
             {
                 await Task.WhenAny(
@@ -93,6 +86,15 @@ namespace EBuEf2IVUCore
             };
 
             logger.LogDebug($"Sitzung wurde aktiv beendet (IsCancellationRequested: {cancellationToken.IsCancellationRequested}).");
+        }
+
+        #endregion Protected Methods
+
+        #region Private Methods
+
+        private static JsonSerializerSettings GetPositionsReceiverSettings()
+        {
+            return new JsonSerializerSettings();
         }
 
         private Regex GetAllocationsRegex()
@@ -111,6 +113,8 @@ namespace EBuEf2IVUCore
             var settings = config
                 .GetSection(nameof(EBuEfDBConnector))
                 .Get<EBuEfDBConnector>();
+
+            logger.LogDebug($"Verbindung zur Datenbank herstellen: {settings.ConnectionString}.");
 
             var result = new Connector(
                 logger: logger,
