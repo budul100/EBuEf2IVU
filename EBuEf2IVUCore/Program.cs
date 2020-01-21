@@ -69,8 +69,8 @@ namespace EBuEf2IVUCore
         private static IHostBuilder GetHostBuilder(this IHostBuilder defaultBuilder)
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? SystemdHostBuilderExtensions.UseSystemd(defaultBuilder)
-                : WindowsServiceLifetimeHostBuilderExtensions.UseWindowsService(defaultBuilder);
+                ? WindowsServiceLifetimeHostBuilderExtensions.UseWindowsService(defaultBuilder)
+                : SystemdHostBuilderExtensions.UseSystemd(defaultBuilder);
         }
 
         private static LoggerConfiguration GetSerilogConfiguration(HostBuilderContext hostingContext,
