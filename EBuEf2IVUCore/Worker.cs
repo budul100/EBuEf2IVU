@@ -37,6 +37,7 @@ namespace EBuEf2IVUCore
         private readonly JsonSerializerSettings positionsReceiverSettings;
 
         private IConnector databaseConnector;
+        private DateTime ebuefSessionStart = DateTime.Now;
         private DateTime ivuSessionDate = DateTime.Now;
 
         #endregion Private Fields
@@ -269,10 +270,26 @@ namespace EBuEf2IVUCore
             if (allocationsRegex.IsMatch(e.Content))
             {
                 await StartIVUSessionAsync();
+                await SetVehicleAllocationsAsync();
             }
             else
             {
                 logger.LogError($"Unbekanntes Kommando zum Sitzungsbeginn empfangen: '{e.Content}'.");
+            }
+        }
+
+        private async Task SetVehicleAllocationsAsync()
+        {
+            try
+            {
+                var allocations = await databaseConnector.GetVehicleAllocationsAsync();
+                ivuSender.AddAllocations(
+                    allocations: allocations,
+                    startTime: ebuefSessionStart);
+            }
+            catch (TaskCanceledException)
+            {
+                logger.LogDebug("Abruf der Fahrzeugaufstellung wurde aktiv beendet.");
             }
         }
 
@@ -283,18 +300,13 @@ namespace EBuEf2IVUCore
                 var currentSession = await databaseConnector.GetEBuEfSessionAsync();
 
                 ivuSessionDate = currentSession.IVUDate;
-                var startTime = ivuSessionDate.Add(currentSession.SessionStart.TimeOfDay);
+                ebuefSessionStart = ivuSessionDate.Add(currentSession.SessionStart.TimeOfDay);
 
-                logger.LogDebug($"IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um {startTime:hh:mm:ss}.");
-
-                var allocations = await databaseConnector.GetVehicleAllocationsAsync();
-                ivuSender.AddAllocations(
-                    allocations: allocations,
-                    startTime: startTime);
+                logger.LogDebug($"IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um {ebuefSessionStart:hh:mm:ss}.");
             }
             catch (TaskCanceledException)
             {
-                logger.LogDebug("Sitzung beendet.");
+                logger.LogDebug("Sitzungsbeginn wurde aktiv beendet.");
             }
         }
 
