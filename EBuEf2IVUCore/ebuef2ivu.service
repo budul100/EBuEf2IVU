@@ -3,7 +3,9 @@ Description=ebuef2ivu
 
 [Service]
 Type=notify
-ExecStart=/PFAD/ZU/ebuef2ivu
+ExecStart=/usr/share/EBuEf2IVUCore/EBuEf2IVUCore
+TimeoutSec=infinity
+Restart= always
 
 [Install]
 WantedBy=multi-user.target
