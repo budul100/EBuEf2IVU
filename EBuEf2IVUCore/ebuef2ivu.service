@@ -5,7 +5,7 @@ Description=ebuef2ivu
 Type=notify
 ExecStart=/usr/share/EBuEf2IVUCore/EBuEf2IVUCore
 TimeoutSec=infinity
-Restart= always
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
