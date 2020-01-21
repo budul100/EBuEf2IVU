@@ -279,7 +279,7 @@ namespace EBuEf2IVUCore
                 ivuSessionDate = currentSession.IVUDate;
                 var startTime = ivuSessionDate.Add(currentSession.SessionStart.TimeOfDay);
 
-                logger.LogInformation($"Die IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um {startTime:hh:mm:ss}.");
+                logger.LogDebug($"IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um {startTime:hh:mm:ss}.");
 
                 var allocations = await databaseConnector.GetVehicleAllocationsAsync();
                 ivuSender.AddAllocations(

@@ -108,7 +108,7 @@ namespace DatabaseConnector
                         SessionStart = sitzung.SimulationStartzeit.ToDateTime(),
                     };
 
-                    logger.LogDebug($"EBuEf-Session gefunden: {result}");
+                    logger.LogDebug($"Aktuelle EBuEf-Sitzung gefunden: {result}");
                 }
                 else
                 {

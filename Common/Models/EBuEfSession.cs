@@ -16,7 +16,7 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return $"EBuEf-Session - Start: {SessionStart} | IVU-Datum: {IVUDate:yyyy-MM-dd}";
+            return $"EBuEf-Session - Start: {SessionStart:hh:mm:ss} | IVU-Datum: {IVUDate:yyyy-MM-dd}";
         }
 
         #endregion Public Methods
