@@ -63,25 +63,14 @@ namespace EBuEf2IVUCore
 
         #endregion Public Constructors
 
-        #region Public Methods
-
-        public override Task StartAsync(CancellationToken cancellationToken)
-        {
-            databaseConnector = GetConnector(cancellationToken);
-
-            var result = Task.WhenAll(
-                StartIVUSessionAsync(),
-                base.StartAsync(cancellationToken));
-
-            return result;
-        }
-
-        #endregion Public Methods
-
         #region Protected Methods
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            databaseConnector = GetConnector(cancellationToken);
+
+            await StartIVUSessionAsync();
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 await Task.WhenAny(
