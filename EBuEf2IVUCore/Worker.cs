@@ -66,7 +66,7 @@ namespace EBuEf2IVUCore
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await Task.Run(async () => await ExecuteServices(cancellationToken));
+            await ExecuteServices(cancellationToken);
         }
 
         #endregion Protected Methods
@@ -80,6 +80,8 @@ namespace EBuEf2IVUCore
 
         private async Task ExecuteServices(CancellationToken cancellationToken)
         {
+            await StartIVUSessionAsync();
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 databaseConnector = GetConnector(cancellationToken);
@@ -222,7 +224,7 @@ namespace EBuEf2IVUCore
 
         private void OnPositionsReceived(object sender, MessageReceivedArgs e)
         {
-            logger.LogDebug($"Message received: {e.Content}");
+            logger.LogDebug($"Nachricht empfangen: {e.Content}");
 
             var message = default(RealTimeMessage);
 
@@ -234,7 +236,7 @@ namespace EBuEf2IVUCore
             }
             catch (JsonReaderException readerException)
             {
-                logger.LogError($"Received message cannot be converted into a real-time message: {readerException.Message}");
+                logger.LogError($"Die emfangene Nachricht kann nicht in einer Echtzeitmeldung umgeformt werden: {readerException.Message}");
             }
 
             if (!string.IsNullOrWhiteSpace(message?.Zugnummer))
@@ -250,7 +252,7 @@ namespace EBuEf2IVUCore
                     }
                     catch (TaskCanceledException)
                     {
-                        logger.LogDebug("Session is closed.");
+                        logger.LogDebug("Sitzung beendet.");
                     }
                 }
             }
@@ -260,26 +262,33 @@ namespace EBuEf2IVUCore
         {
             if (allocationsRegex.IsMatch(e.Content))
             {
-                try
-                {
-                    var currentSession = await databaseConnector.GetEBuEfSessionAsync();
-
-                    sessionDate = currentSession.IVUDate;
-                    var startTime = sessionDate.Add(currentSession.SessionStart.TimeOfDay);
-
-                    var allocations = await databaseConnector.GetVehicleAllocationsAsync();
-                    ivuSender.AddAllocations(
-                        allocations: allocations,
-                        startTime: startTime);
-                }
-                catch (TaskCanceledException)
-                {
-                    logger.LogDebug("Session is closed.");
-                }
+                await StartIVUSessionAsync();
             }
             else
             {
-                logger.LogError($"Unknown session start command received: '{e.Content}'.");
+                logger.LogError($"Unbekanntes Kommando zum Sitzungsbeginn empfangen: '{e.Content}'.");
+            }
+        }
+
+        private async Task StartIVUSessionAsync()
+        {
+            try
+            {
+                var currentSession = await databaseConnector.GetEBuEfSessionAsync();
+
+                sessionDate = currentSession.IVUDate;
+                var startTime = sessionDate.Add(currentSession.SessionStart.TimeOfDay);
+
+                logger.LogInformation($"Die IVU-Sitzung beginnt am {sessionDate:yyyy-MM-dd} um {startTime:hh:mm:ss}.");
+
+                var allocations = await databaseConnector.GetVehicleAllocationsAsync();
+                ivuSender.AddAllocations(
+                    allocations: allocations,
+                    startTime: startTime);
+            }
+            catch (TaskCanceledException)
+            {
+                logger.LogDebug("Sitzung beendet.");
             }
         }
 
