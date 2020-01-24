@@ -20,9 +20,9 @@ namespace DatabaseConnector
     {
         #region Private Fields
 
-        private const int SessionInPreparation = 1;
-        private const int SessionIsPaused = 5;
-        private const int SessionIsRunning = 2;
+        private const byte SessionInPreparation = 1;
+        private const byte SessionIsPaused = 5;
+        private const byte SessionIsRunning = 2;
 
         private readonly CancellationToken cancellationToken;
         private readonly string connectionString;
