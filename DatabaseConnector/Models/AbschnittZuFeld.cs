@@ -16,7 +16,7 @@ namespace DatabaseConnector.Models
 
         [Key]
         [Column("gbt_id")]
-        public int FeldID { get; set; }
+        public int? FeldID { get; set; }
 
         #endregion Public Properties
     }
