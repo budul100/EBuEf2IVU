@@ -97,7 +97,9 @@ namespace DatabaseConnector
                 logger.LogDebug($"Suche nach der aktuellen Fahrplan-Session.");
 
                 var sitzung = await context.Sitzungen
-                    .OrderByDescending(s => s.Id)
+                    .Where(s => s.Status == 1 || s.Status == 2 || s.Status == 5)
+                    .OrderByDescending(s => s.Status == 2)
+                    .ThenByDescending(s => s.Status == 5)
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (sitzung != default)

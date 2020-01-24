@@ -17,6 +17,9 @@ namespace DatabaseConnector.Models
         [Column("sim_startzeit")]
         public long SimulationStartzeit { get; set; }
 
+        [Column("status")]
+        public long Status { get; set; }
+
         #endregion Public Properties
     }
 }
