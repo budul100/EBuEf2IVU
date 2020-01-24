@@ -89,6 +89,7 @@ namespace EBuEf2IVUCore
             return new JsonSerializerSettings();
         }
 
+        // SessionWechsel-Nachricht auswerten: SESSION NEW STATUS 2
         private Regex GetAllocationsRegex()
         {
             var settings = config
@@ -234,7 +235,8 @@ namespace EBuEf2IVUCore
             }
             catch (JsonReaderException readerException)
             {
-                logger.LogError($"Die emfangene Nachricht kann nicht in einer Echtzeitmeldung umgeformt werden: {readerException.Message}");
+                logger.LogError($"Die empfangene Nachricht kann nicht in einer Echtzeitmeldung " +
+                    $"umgeformt werden: {readerException.Message}");
             }
 
             if (!string.IsNullOrWhiteSpace(message?.Zugnummer))

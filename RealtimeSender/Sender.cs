@@ -205,13 +205,22 @@ namespace RealtimeSender
                         var response = await client.importRealTimeInfoAsync(current);
                         var result = response.importRealTimeInfoResponse1;
 
-                        if (result.Any() && result.First().code == 0)
+                        if (result.Any())
                         {
-                            logger.LogDebug("Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet.");
-                        }
-                        else if (result.Any())
-                        {
-                            logger.LogError($"Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen: {result[0].message}");
+                            var relevant = current.First();
+
+                            if (result.First().code == 0)
+                            {
+                                logger.LogDebug($"Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet " +
+                                    $"(Zug: {current.First().tripNumber}, Betriebsstelle: {relevant.stopArea}, " +
+                                    $"Decoder: {current.First().vehicles.First().number}");
+                            }
+                            else
+                            {
+                                logger.LogError($"Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen: " +
+                                    $"{result[0].message} (Zug: {current.First().tripNumber}, Betriebsstelle: {relevant.stopArea}, " +
+                                    $"Decoder: {current.First().vehicles.First().number})");
+                            }
                         }
 
                         infosQueue.TryDequeue(out RealTimeInfoTO info);
