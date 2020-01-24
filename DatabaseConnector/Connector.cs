@@ -20,6 +20,10 @@ namespace DatabaseConnector
     {
         #region Private Fields
 
+        private const int SessionInPreparation = 1;
+        private const int SessionIsPaused = 5;
+        private const int SessionIsRunning = 2;
+
         private readonly CancellationToken cancellationToken;
         private readonly string connectionString;
         private readonly ILogger logger;
@@ -97,9 +101,11 @@ namespace DatabaseConnector
                 logger.LogDebug($"Suche nach der aktuellen Fahrplan-Session.");
 
                 var sitzung = await context.Sitzungen
-                    .Where(s => s.Status == 1 || s.Status == 2 || s.Status == 5)
-                    .OrderByDescending(s => s.Status == 2)
-                    .ThenByDescending(s => s.Status == 5)
+                    .Where(s => s.Status == SessionInPreparation
+                        || s.Status == SessionIsRunning
+                        || s.Status == SessionIsPaused)
+                    .OrderByDescending(s => s.Status == SessionIsRunning)
+                    .ThenByDescending(s => s.Status == SessionIsPaused)
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (sitzung != default)
