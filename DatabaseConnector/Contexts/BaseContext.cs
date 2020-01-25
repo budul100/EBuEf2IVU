@@ -1,15 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 
 namespace DatabaseConnector.Contexts
 {
     internal abstract class BaseContext
         : DbContext
     {
-        #region Protected Fields
+        #region Private Fields
 
-        protected readonly string connectionString;
+        private readonly string connectionString;
 
-        #endregion Protected Fields
+        #endregion Private Fields
 
         #region Public Constructors
 
@@ -24,8 +25,11 @@ namespace DatabaseConnector.Contexts
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            var conntectionStringBuilder = new MySqlConnectionStringBuilder(connectionString);
+            conntectionStringBuilder.TreatTinyAsBoolean = false;
+
             optionsBuilder
-                .UseMySql(connectionString);
+                .UseMySql(conntectionStringBuilder.ToString());
         }
 
         #endregion Protected Methods
