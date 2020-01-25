@@ -26,7 +26,7 @@ namespace EBuEf2IVUCore
 
         private const string MessageTypeAllocations = "Sessionstatus";
         private const string MessageTypePositions = "Echtzeit-Positionen";
-        private const string StatusRegexGroup = @"(?<status>\d)";
+        private const string StatusRegexGroupName = "status";
         private const string StatusRegexGroupWildcard = "$";
 
         private readonly IConfiguration config;
@@ -234,7 +234,7 @@ namespace EBuEf2IVUCore
 
             var statusPattern = settings.StatusPattern.Replace(
                 oldValue: StatusRegexGroupWildcard,
-                newValue: $@"(?<{StatusRegexGroup}>\d)");
+                newValue: $@"(?<{StatusRegexGroupName}>\d)");
 
             var result = new Regex(statusPattern);
 
