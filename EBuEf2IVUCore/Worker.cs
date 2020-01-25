@@ -42,6 +42,7 @@ namespace EBuEf2IVUCore
         private IConnector databaseConnector;
         private DateTime ebuefSessionStart = DateTime.Now;
         private DateTime ivuSessionDate = DateTime.Now;
+        private CancellationTokenSource sessionCancellationTokenSource;
 
         #endregion Private Fields
 
@@ -73,7 +74,18 @@ namespace EBuEf2IVUCore
         {
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                await RunWorkerAsync(workerCancellationToken);
+                var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
+                databaseConnector = GetConnector(sessionCancellationToken);
+
+                await StartIVUSessionAsync();
+
+                while (!sessionCancellationToken.IsCancellationRequested)
+                {
+                    await Task.WhenAny(
+                        statusReceiver.RunAsync(sessionCancellationToken),
+                        positionsReceiver.RunAsync(sessionCancellationToken),
+                        ivuSender.RunAsnc(sessionCancellationToken));
+                };
             }
         }
 
@@ -86,7 +98,7 @@ namespace EBuEf2IVUCore
             return new JsonSerializerSettings();
         }
 
-        private IConnector GetConnector(CancellationToken cancellationToken)
+        private IConnector GetConnector(CancellationToken sessionCancellationToken)
         {
             var settings = config
                 .GetSection(nameof(EBuEfDBConnector))
@@ -98,7 +110,7 @@ namespace EBuEf2IVUCore
                 logger: logger,
                 connectionString: settings.ConnectionString,
                 retryTime: settings.RetryTime,
-                cancellationToken: cancellationToken);
+                cancellationToken: sessionCancellationToken);
 
             return result;
         }
@@ -192,7 +204,7 @@ namespace EBuEf2IVUCore
 
         private CancellationToken GetSessionCancellationToken(CancellationToken workerCancellationToken)
         {
-            var sessionCancellationTokenSource = new CancellationTokenSource();
+            sessionCancellationTokenSource = new CancellationTokenSource();
             workerCancellationToken.Register(() => sessionCancellationTokenSource.Cancel());
 
             return sessionCancellationTokenSource.Token;
@@ -255,7 +267,7 @@ namespace EBuEf2IVUCore
             }
             catch (JsonReaderException readerException)
             {
-                logger.LogError($"Die empfangene Nachricht kann nicht in einer Echtzeitmeldung " +
+                logger.LogError($"Die Nachricht kann nicht in eine Echtzeitmeldung " +
                     $"umgeformt werden: {readerException.Message}");
             }
 
@@ -265,79 +277,52 @@ namespace EBuEf2IVUCore
 
                 if (position != null)
                 {
-                    try
-                    {
-                        databaseConnector.AddRealtimeAsync(position);
-                        ivuSender.AddRealtime(position);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        logger.LogDebug("Sitzung beendet.");
-                    }
+                    databaseConnector.AddRealtimeAsync(position);
+                    ivuSender.AddRealtime(position);
                 }
             }
         }
 
         private async void OnStatusReceived(object sender, MessageReceivedArgs e)
         {
-            if (startRegex.IsMatch(e.Content))
+            if (startRegex.IsMatch(e.Content) || statusRegex.IsMatch(e.Content))
             {
-                await StartIVUSessionAsync();
-                await SetVehicleAllocationsAsync();
+                if (startRegex.IsMatch(e.Content)
+                    || statusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
+                       == Connector.SessionIsRunning.ToString())
+                {
+                    await StartIVUSessionAsync();
+                    await SetVehicleAllocationsAsync();
+                }
+                else if (statusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
+                    == Connector.SessionIsPaused.ToString())
+                {
+                    sessionCancellationTokenSource.Cancel();
+                }
             }
             else
             {
-                logger.LogError($"Unbekanntes Kommando zum Sitzungsbeginn empfangen: '{e.Content}'.");
+                logger.LogError($"Unbekanntes Sessionstatus-Kommando empfangen: '{e.Content}'.");
             }
-        }
-
-        private async Task RunWorkerAsync(CancellationToken workerCancellationToken)
-        {
-            var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
-
-            databaseConnector = GetConnector(sessionCancellationToken);
-
-            await StartIVUSessionAsync();
-
-            while (!sessionCancellationToken.IsCancellationRequested)
-            {
-                await Task.WhenAny(
-                    statusReceiver.RunAsync(sessionCancellationToken),
-                    positionsReceiver.RunAsync(sessionCancellationToken),
-                    ivuSender.RunAsnc(sessionCancellationToken));
-            };
         }
 
         private async Task SetVehicleAllocationsAsync()
         {
-            try
-            {
-                var allocations = await databaseConnector.GetVehicleAllocationsAsync();
-                ivuSender.AddAllocations(
-                    allocations: allocations,
-                    startTime: ebuefSessionStart);
-            }
-            catch (TaskCanceledException)
-            {
-                logger.LogDebug("Abruf der Fahrzeugaufstellung wurde aktiv beendet.");
-            }
+            var allocations = await databaseConnector.GetVehicleAllocationsAsync();
+            ivuSender.AddAllocations(
+                allocations: allocations,
+                startTime: ebuefSessionStart);
         }
 
         private async Task StartIVUSessionAsync()
         {
-            try
-            {
-                var currentSession = await databaseConnector.GetEBuEfSessionAsync();
+            var currentSession = await databaseConnector.GetEBuEfSessionAsync();
 
-                ivuSessionDate = currentSession.IVUDate;
-                ebuefSessionStart = ivuSessionDate.Add(currentSession.SessionStart.TimeOfDay);
+            ivuSessionDate = currentSession.IVUDate;
+            ebuefSessionStart = ivuSessionDate.Add(currentSession.SessionStart.TimeOfDay);
 
-                logger.LogDebug($"IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um {ebuefSessionStart:hh:mm:ss}.");
-            }
-            catch (TaskCanceledException)
-            {
-                logger.LogDebug("Sitzungsbeginn wurde aktiv beendet.");
-            }
+            logger.LogDebug($"IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um " +
+                $"{ebuefSessionStart:hh:mm:ss}.");
         }
 
         #endregion Private Methods

@@ -18,11 +18,15 @@ namespace DatabaseConnector
     public class Connector
         : IConnector
     {
-        #region Private Fields
+        #region Public Fields
 
-        private const byte SessionInPreparation = 1;
-        private const byte SessionIsPaused = 5;
-        private const byte SessionIsRunning = 2;
+        public const byte SessionInPreparation = 1;
+        public const byte SessionIsPaused = 5;
+        public const byte SessionIsRunning = 2;
+
+        #endregion Public Fields
+
+        #region Private Fields
 
         private readonly CancellationToken cancellationToken;
         private readonly string connectionString;

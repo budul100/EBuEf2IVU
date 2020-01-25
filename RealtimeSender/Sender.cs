@@ -227,6 +227,11 @@ namespace RealtimeSender
                     }
                 }
             }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                infosQueue.Clear();
+            }
         }
 
         #endregion Private Methods
