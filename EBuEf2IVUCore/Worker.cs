@@ -13,6 +13,7 @@ using RealtimeSender;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,6 +53,9 @@ namespace EBuEf2IVUCore
         {
             this.config = config;
             this.logger = logger;
+
+            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
+            logger.LogInformation($"{assemblyInfo.Name} (Version {assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}) wird gestartet.");
 
             ivuSender = GetSender();
             infrastructureMappings = GetInfrastructureMappings();
