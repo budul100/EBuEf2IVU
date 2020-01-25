@@ -167,17 +167,16 @@ namespace DatabaseConnector
 
             if (!cancellationToken.IsCancellationRequested)
             {
-                using (var context = new AufstellungenContext(connectionString))
-                {
-                    logger.LogDebug($"Suche nach allen Fahrzeugen der Grundaufstellung.");
+                using var context = new AufstellungenContext(connectionString);
 
-                    var aufstellungen = await context.Aufstellungen
-                        .Include(a => a.Feld)
-                        .ThenInclude(f => f.AbschnittZuFeld)
-                        .ThenInclude(z => z.Abschnitt).ToArrayAsync(cancellationToken);
+                logger.LogDebug($"Suche nach allen Fahrzeugen der Grundaufstellung.");
 
-                    result = GetVehicleAllocations(aufstellungen).ToArray();
-                }
+                var aufstellungen = await context.Aufstellungen
+                    .Include(a => a.Feld)
+                    .ThenInclude(f => f.AbschnittZuFeld)
+                    .ThenInclude(z => z.Abschnitt).ToArrayAsync(cancellationToken);
+
+                result = GetVehicleAllocations(aufstellungen).ToArray();
             }
 
             return result;
@@ -191,46 +190,45 @@ namespace DatabaseConnector
 
         private async Task SaveTrainPositionAsync(TrainPosition position, bool istVon, CancellationToken cancellationToken)
         {
-            using (var context = new HalteContext(connectionString))
+            using var context = new HalteContext(connectionString);
+
+            var betriebsstelle = istVon
+                ? position.EBuEfBetriebsstelleVon
+                : position.EBuEfBetriebsstelleNach;
+
+            if (!string.IsNullOrWhiteSpace(betriebsstelle))
             {
-                var betriebsstelle = istVon
-                    ? position.EBuEfBetriebsstelleVon
-                    : position.EBuEfBetriebsstelleNach;
+                logger.LogDebug($"Suche in der EBuEf-DB nach dem letzten Halt von " +
+                    $"Zug {position.Zugnummer} in {betriebsstelle}.");
 
-                if (!string.IsNullOrWhiteSpace(betriebsstelle))
+                var halt = context.Halte
+                    .Where(h => h.Betriebsstelle == betriebsstelle)
+                    .Include(h => h.Zug)
+                    .FirstOrDefault(h => h.Zug.Zugnummer.ToString() == position.Zugnummer);
+
+                if (halt != null)
                 {
-                    logger.LogDebug($"Suche in der EBuEf-DB nach dem letzten Halt von " +
-                        $"Zug {position.Zugnummer} in {betriebsstelle}.");
+                    logger.LogDebug($@"Schreibe {(istVon ? "Von" : "Nach")}-Position in Session-Fahrplan.");
 
-                    var halt = context.Halte
-                        .Where(h => h.Betriebsstelle == betriebsstelle)
-                        .Include(h => h.Zug)
-                        .FirstOrDefault(h => h.Zug.Zugnummer.ToString() == position.Zugnummer);
-
-                    if (halt != null)
+                    if (!string.IsNullOrWhiteSpace(istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach))
                     {
-                        logger.LogDebug($@"Schreibe {(istVon ? "Von" : "Nach")}-Position in Session-Fahrplan.");
+                        halt.GleisIst = istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach;
+                    }
 
-                        if (!string.IsNullOrWhiteSpace(istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach))
-                        {
-                            halt.GleisIst = istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach;
-                        }
-
-                        if (istVon)
-                        {
-                            halt.AbfahrtIst = position.EBuEfZeitpunktVon;
-                        }
-                        else
-                        {
-                            halt.AnkunftIst = position.EBuEfZeitpunktNach;
-                        }
-
-                        await context.SaveChangesAsync(cancellationToken);
+                    if (istVon)
+                    {
+                        halt.AbfahrtIst = position.EBuEfZeitpunktVon;
                     }
                     else
                     {
-                        logger.LogDebug($"In Session-Fahrplan wurde {(istVon ? "Von" : "Nach")}-Position nicht gefunden.");
+                        halt.AnkunftIst = position.EBuEfZeitpunktNach;
                     }
+
+                    await context.SaveChangesAsync(cancellationToken);
+                }
+                else
+                {
+                    logger.LogDebug($"In Session-Fahrplan wurde {(istVon ? "Von" : "Nach")}-Position nicht gefunden.");
                 }
             }
         }
