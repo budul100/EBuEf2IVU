@@ -216,7 +216,6 @@ namespace EBuEf2IVUCore
                 .GetSection(nameof(StatusReceiver))
                 .Get<StatusReceiver>();
 
-            //new Regex(@"SESSION NEW STATUS (?<status>\d)")
             var result = new Regex(settings.Pattern);
 
             return result;
@@ -255,54 +254,65 @@ namespace EBuEf2IVUCore
 
         private void OnPositionReceived(object sender, MessageReceivedArgs e)
         {
-            logger.LogDebug($"Nachricht empfangen: {e.Content}");
-
-            var message = default(RealTimeMessage);
+            logger.LogDebug($"Positions-Nachricht empfangen: {e.Content}");
 
             try
             {
-                message = JsonConvert.DeserializeObject<RealTimeMessage>(
+                var message = JsonConvert.DeserializeObject<RealTimeMessage>(
                     value: e.Content,
                     settings: positionsReceiverSettings);
+
+                if (!string.IsNullOrWhiteSpace(message?.Zugnummer))
+                {
+                    var position = GetPosition(message);
+
+                    if (position != null)
+                    {
+                        databaseConnector.AddRealtimeAsync(position);
+                        ivuSender.AddRealtime(position);
+                    }
+                }
             }
             catch (JsonReaderException readerException)
             {
                 logger.LogError($"Die Nachricht kann nicht in eine Echtzeitmeldung " +
                     $"umgeformt werden: {readerException.Message}");
             }
-
-            if (!string.IsNullOrWhiteSpace(message?.Zugnummer))
-            {
-                var position = GetPosition(message);
-
-                if (position != null)
-                {
-                    databaseConnector.AddRealtimeAsync(position);
-                    ivuSender.AddRealtime(position);
-                }
-            }
         }
 
         private async void OnStatusReceived(object sender, MessageReceivedArgs e)
         {
+            logger.LogDebug($"Status-Nachricht empfangen: {e.Content}");
+
             if (startRegex.IsMatch(e.Content) || statusRegex.IsMatch(e.Content))
             {
+                var sessionStatus = statusRegex.IsMatch(e.Content)
+                    ? statusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
+                    : default;
+
                 if (startRegex.IsMatch(e.Content)
-                    || statusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
-                       == Connector.SessionIsRunning.ToString())
+                    || sessionStatus == Connector.SessionIsRunning.ToString())
                 {
+                    logger.LogInformation("Sessionstart-Nachricht empfangen.");
+
                     await StartIVUSessionAsync();
                     await SetVehicleAllocationsAsync();
                 }
-                else if (statusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
-                    == Connector.SessionIsPaused.ToString())
+                else if (sessionStatus == Connector.SessionIsPaused.ToString())
                 {
+                    logger.LogInformation("Sessionpause-Nachricht empfangen. Die Nachrichtenempfänger, " +
+                        "Datenbank-Verbindungen und IVU-Sender werden zurückgesetzt.");
+
                     sessionCancellationTokenSource.Cancel();
+                }
+                else
+                {
+                    logger.LogError($"Unbekannten Sessionstatus empfangen: {sessionStatus}.");
                 }
             }
             else
             {
-                logger.LogError($"Unbekanntes Sessionstatus-Kommando empfangen: '{e.Content}'.");
+                logger.LogError($"Unbekannte Status-Nachricht empfangen: '{e.Content}'.");
             }
         }
 
