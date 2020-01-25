@@ -6,7 +6,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <!--<RuntimeFrameworkVersion>2.2.6</RuntimeFrameworkVersion>-->
     <RuntimeIdentifiers>win10-x64;linux-arm;linux-x64</RuntimeIdentifiers>
-    <Version>0.19.0-dev0013</Version>
+    <Version>0.19.0-dev0020</Version>
     <StartupObject>EBuEf2IVUCore.Program</StartupObject>
   </PropertyGroup>
 

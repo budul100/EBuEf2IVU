@@ -98,7 +98,7 @@ namespace DatabaseConnector
             {
                 using var context = new SitzungContext(connectionString);
 
-                logger.LogDebug($"Suche nach der aktuellen Fahrplan-Session.");
+                logger.LogDebug($"Suche in der EBuEf-DB nach der aktuellen Fahrplan-Session.");
 
                 var sitzung = await context.Sitzungen
                     .Where(s => s.Status == SessionInPreparation
@@ -131,8 +131,12 @@ namespace DatabaseConnector
         {
             if (aufstellungen.Any())
             {
+                logger.LogDebug($"Suche in der EBuEf-DB nach den aktuellen Aufstellungen.");
+
                 var aufstellungenGroups = aufstellungen
                     .GroupBy(a => new { a.Feld.Betriebsstelle, a.Feld.Gleis, a.Decoder, a.Zugnummer }).ToArray();
+
+                logger.LogDebug($"Es wurden {aufstellungenGroups.Count()} Züge in der Grundaufstellungen gefunden.");
 
                 foreach (var aufstellungenGroup in aufstellungenGroups)
                 {
@@ -167,6 +171,9 @@ namespace DatabaseConnector
                 {
                     logger.LogDebug($"Suche nach allen Fahrzeugen der Grundaufstellung.");
 
+                    var x = context.Aufstellungen.Include(a => a.Feld)
+                        .ThenInclude(c => c.AbschnittZuFeld).ToArray();
+
                     var aufstellungen = await context.Aufstellungen
                         .Include(a => a.Feld.AbschnittZuFeld.Abschnitt)
                         .ToArrayAsync(cancellationToken);
@@ -194,6 +201,9 @@ namespace DatabaseConnector
 
                 if (!string.IsNullOrWhiteSpace(betriebsstelle))
                 {
+                    logger.LogDebug($"Suche in der EBuEf-DB nach dem letzten Halt von " +
+                        $"Zug {position.Zugnummer} in {betriebsstelle}.");
+
                     var halt = context.Halte
                         .Where(h => h.Betriebsstelle == betriebsstelle)
                         .Include(h => h.Zug)
