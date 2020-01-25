@@ -93,6 +93,8 @@ namespace RealtimeSender
 
         public Task RunAsnc(CancellationToken cancellationToken)
         {
+            cancellationToken.Register(() => infosQueue.Clear());
+
             var result = retryPolicy.ExecuteAsync(
                 action: (t) => RunSenderAsync(t),
                 cancellationToken: cancellationToken);
@@ -198,39 +200,32 @@ namespace RealtimeSender
                 {
                     var current = GetFirstInQueue().ToArray();
 
-                    using (var client = new RealTimeInformationImportFacadeClient())
+                    using var client = new RealTimeInformationImportFacadeClient();
+                    client.Endpoint.Address = endpointAddress;
+
+                    var response = await client.importRealTimeInfoAsync(current);
+                    var result = response.importRealTimeInfoResponse1;
+
+                    if (result.Any())
                     {
-                        client.Endpoint.Address = endpointAddress;
+                        var relevant = current.First();
 
-                        var response = await client.importRealTimeInfoAsync(current);
-                        var result = response.importRealTimeInfoResponse1;
-
-                        if (result.Any())
+                        if (result.First().code == 0)
                         {
-                            var relevant = current.First();
-
-                            if (result.First().code == 0)
-                            {
-                                logger.LogDebug($"Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet " +
-                                    $"(Zug: {current.First().tripNumber}, Betriebsstelle: {relevant.stopArea}, " +
-                                    $"Decoder: {current.First().vehicles.First().number}");
-                            }
-                            else
-                            {
-                                logger.LogError($"Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen: " +
-                                    $"{result[0].message} (Zug: {current.First().tripNumber}, Betriebsstelle: {relevant.stopArea}, " +
-                                    $"Decoder: {current.First().vehicles.First().number})");
-                            }
+                            logger.LogDebug($"Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet " +
+                                $"(Zug: {current.First().tripNumber}, Betriebsstelle: {relevant.stopArea}, " +
+                                $"Decoder: {current.First().vehicles.First().number}");
                         }
-
-                        infosQueue.TryDequeue(out RealTimeInfoTO info);
+                        else
+                        {
+                            logger.LogError($"Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen: " +
+                                $"{result[0].message} (Zug: {current.First().tripNumber}, Betriebsstelle: {relevant.stopArea}, " +
+                                $"Decoder: {current.First().vehicles.First().number})");
+                        }
                     }
-                }
-            }
 
-            if (cancellationToken.IsCancellationRequested)
-            {
-                infosQueue.Clear();
+                    infosQueue.TryDequeue(out RealTimeInfoTO info);
+                }
             }
         }
 
