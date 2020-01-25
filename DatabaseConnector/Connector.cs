@@ -135,8 +135,6 @@ namespace DatabaseConnector
         {
             if (aufstellungen.Any())
             {
-                logger.LogDebug($"Suche in der EBuEf-DB nach den aktuellen Aufstellungen.");
-
                 var aufstellungenGroups = aufstellungen
                     .GroupBy(a => new { a.Feld.Betriebsstelle, a.Feld.Gleis, a.Decoder, a.Zugnummer }).ToArray();
 
