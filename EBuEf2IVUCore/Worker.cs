@@ -24,17 +24,20 @@ namespace EBuEf2IVUCore
     {
         #region Private Fields
 
-        private const string MessageTypeAllocations = "Sessionstart";
+        private const string MessageTypeAllocations = "Sessionstatus";
         private const string MessageTypePositions = "Echtzeit-Positionen";
+        private const string StatusRegexGroup = @"(?<status>\d)";
+        private const string StatusRegexGroupWildcard = "$";
 
-        private readonly IReceiver allocationsReceiver;
-        private readonly Regex allocationsRegex;
         private readonly IConfiguration config;
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
         private readonly ISender ivuSender;
         private readonly ILogger<Worker> logger;
         private readonly IReceiver positionsReceiver;
         private readonly JsonSerializerSettings positionsReceiverSettings;
+        private readonly Regex startRegex;
+        private readonly IReceiver statusReceiver;
+        private readonly Regex statusRegex;
 
         private IConnector databaseConnector;
         private DateTime ebuefSessionStart = DateTime.Now;
@@ -52,12 +55,13 @@ namespace EBuEf2IVUCore
             ivuSender = GetSender();
             infrastructureMappings = GetInfrastructureMappings();
 
-            allocationsReceiver = GetReceiverAllocations();
-            allocationsReceiver.MessageReceivedEvent += OnSessionStartReceived;
-            allocationsRegex = GetAllocationsRegex();
+            statusReceiver = GetStatusReceiver();
+            statusReceiver.MessageReceivedEvent += OnStatusReceived;
+            statusRegex = GetStatusRegex();
+            startRegex = GetStartRegex();
 
-            positionsReceiver = GetReceiverPositions();
-            positionsReceiver.MessageReceivedEvent += OnPositionsReceived;
+            positionsReceiver = GetPositionReceiver();
+            positionsReceiver.MessageReceivedEvent += OnPositionReceived;
             positionsReceiverSettings = GetPositionsReceiverSettings();
         }
 
@@ -65,19 +69,12 @@ namespace EBuEf2IVUCore
 
         #region Protected Methods
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            databaseConnector = GetConnector(cancellationToken);
-
-            await StartIVUSessionAsync();
-
-            while (!cancellationToken.IsCancellationRequested)
+            while (!workerCancellationToken.IsCancellationRequested)
             {
-                await Task.WhenAny(
-                    allocationsReceiver.RunAsync(cancellationToken),
-                    positionsReceiver.RunAsync(cancellationToken),
-                    ivuSender.RunAsnc(cancellationToken));
-            };
+                await RunWorkerAsync(workerCancellationToken);
+            }
         }
 
         #endregion Protected Methods
@@ -87,18 +84,6 @@ namespace EBuEf2IVUCore
         private static JsonSerializerSettings GetPositionsReceiverSettings()
         {
             return new JsonSerializerSettings();
-        }
-
-        // TODO: SessionWechsel-Nachricht auswerten: SESSION NEW STATUS 2
-        private Regex GetAllocationsRegex()
-        {
-            var settings = config
-                .GetSection(nameof(AllocationsReceiver))
-                .Get<AllocationsReceiver>();
-
-            var result = new Regex(settings.Pattern);
-
-            return result;
         }
 
         private IConnector GetConnector(CancellationToken cancellationToken)
@@ -134,54 +119,7 @@ namespace EBuEf2IVUCore
             return result;
         }
 
-        private IReceiver GetReceiverAllocations()
-        {
-            var settings = config
-                .GetSection(nameof(AllocationsReceiver))
-                .Get<AllocationsReceiver>();
-
-            var result = new Receiver(
-                ipAdress: settings.IpAddress,
-                port: settings.ListenerPort,
-                retryTime: settings.RetryTime,
-                logger: logger,
-                messageType: MessageTypeAllocations);
-
-            return result;
-        }
-
-        private IReceiver GetReceiverPositions()
-        {
-            var settings = config
-                .GetSection(nameof(PositionsReceiver))
-                .Get<PositionsReceiver>();
-
-            var result = new Receiver(
-                ipAdress: settings.IpAddress,
-                port: settings.ListenerPort,
-                retryTime: settings.RetryTime,
-                logger: logger,
-                messageType: MessageTypePositions);
-
-            return result;
-        }
-
-        private ISender GetSender()
-        {
-            var settings = config
-                .GetSection(nameof(IVURealtimeSender))
-                .Get<IVURealtimeSender>();
-
-            var result = new Sender(
-                logger: logger,
-                division: settings.Division,
-                endpoint: settings.Endpoint,
-                retryTime: settings.RetryTime);
-
-            return result;
-        }
-
-        private TrainPosition GetTrainPosition(RealTimeMessage message)
+        private TrainPosition GetPosition(RealTimeMessage message)
         {
             var result = default(TrainPosition);
 
@@ -221,7 +159,89 @@ namespace EBuEf2IVUCore
             return result;
         }
 
-        private void OnPositionsReceived(object sender, MessageReceivedArgs e)
+        private IReceiver GetPositionReceiver()
+        {
+            var settings = config
+                .GetSection(nameof(PositionsReceiver))
+                .Get<PositionsReceiver>();
+
+            var result = new Receiver(
+                ipAdress: settings.IpAddress,
+                port: settings.ListenerPort,
+                retryTime: settings.RetryTime,
+                logger: logger,
+                messageType: MessageTypePositions);
+
+            return result;
+        }
+
+        private ISender GetSender()
+        {
+            var settings = config
+                .GetSection(nameof(IVURealtimeSender))
+                .Get<IVURealtimeSender>();
+
+            var result = new Sender(
+                logger: logger,
+                division: settings.Division,
+                endpoint: settings.Endpoint,
+                retryTime: settings.RetryTime);
+
+            return result;
+        }
+
+        private CancellationToken GetSessionCancellationToken(CancellationToken workerCancellationToken)
+        {
+            var sessionCancellationTokenSource = new CancellationTokenSource();
+            workerCancellationToken.Register(() => sessionCancellationTokenSource.Cancel());
+
+            return sessionCancellationTokenSource.Token;
+        }
+
+        private Regex GetStartRegex()
+        {
+            var settings = config
+                .GetSection(nameof(StatusReceiver))
+                .Get<StatusReceiver>();
+
+            //new Regex(@"SESSION NEW STATUS (?<status>\d)")
+            var result = new Regex(settings.Pattern);
+
+            return result;
+        }
+
+        private IReceiver GetStatusReceiver()
+        {
+            var settings = config
+                .GetSection(nameof(StatusReceiver))
+                .Get<StatusReceiver>();
+
+            var result = new Receiver(
+                ipAdress: settings.IpAddress,
+                port: settings.ListenerPort,
+                retryTime: settings.RetryTime,
+                logger: logger,
+                messageType: MessageTypeAllocations);
+
+            return result;
+        }
+
+        private Regex GetStatusRegex()
+        {
+            var settings = config
+                .GetSection(nameof(StatusReceiver))
+                .Get<StatusReceiver>();
+
+            var statusPattern = settings.StatusPattern.Replace(
+                oldValue: StatusRegexGroupWildcard,
+                newValue: $@"(?<{StatusRegexGroup}>\d)");
+
+            var result = new Regex(statusPattern);
+
+            return result;
+        }
+
+        private void OnPositionReceived(object sender, MessageReceivedArgs e)
         {
             logger.LogDebug($"Nachricht empfangen: {e.Content}");
 
@@ -241,7 +261,7 @@ namespace EBuEf2IVUCore
 
             if (!string.IsNullOrWhiteSpace(message?.Zugnummer))
             {
-                var position = GetTrainPosition(message);
+                var position = GetPosition(message);
 
                 if (position != null)
                 {
@@ -258,9 +278,9 @@ namespace EBuEf2IVUCore
             }
         }
 
-        private async void OnSessionStartReceived(object sender, MessageReceivedArgs e)
+        private async void OnStatusReceived(object sender, MessageReceivedArgs e)
         {
-            if (allocationsRegex.IsMatch(e.Content))
+            if (startRegex.IsMatch(e.Content))
             {
                 await StartIVUSessionAsync();
                 await SetVehicleAllocationsAsync();
@@ -269,6 +289,23 @@ namespace EBuEf2IVUCore
             {
                 logger.LogError($"Unbekanntes Kommando zum Sitzungsbeginn empfangen: '{e.Content}'.");
             }
+        }
+
+        private async Task RunWorkerAsync(CancellationToken workerCancellationToken)
+        {
+            var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
+
+            databaseConnector = GetConnector(sessionCancellationToken);
+
+            await StartIVUSessionAsync();
+
+            while (!sessionCancellationToken.IsCancellationRequested)
+            {
+                await Task.WhenAny(
+                    statusReceiver.RunAsync(sessionCancellationToken),
+                    positionsReceiver.RunAsync(sessionCancellationToken),
+                    ivuSender.RunAsnc(sessionCancellationToken));
+            };
         }
 
         private async Task SetVehicleAllocationsAsync()
