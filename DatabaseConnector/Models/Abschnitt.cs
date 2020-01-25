@@ -9,6 +9,8 @@ namespace DatabaseConnector.Models
     {
         #region Public Properties
 
+        public AbschnittZuFeld AbschnittZuFeld { get; set; }
+
         [Column("decoder_adresse")]
         public int Decoder { get; set; }
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,7 +10,7 @@ namespace DatabaseConnector.Models
         #region Public Properties
 
         [ForeignKey(nameof(ID))]
-        public AbschnittZuFeld AbschnittZuFeld { get; set; }
+        public IEnumerable<AbschnittZuFeld> AbschnittZuFeld { get; set; }
 
         [Column("betriebsstelle")]
         public string Betriebsstelle { get; set; }

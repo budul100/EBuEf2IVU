@@ -42,10 +42,10 @@ namespace DatabaseConnector
             retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
                     onRetry: (exception, reconnection) => OnRetry(
                         exception: exception,
-                        reconnection: reconnection));
+                        reconnection: reconnection),
+                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime));
         }
 
         #endregion Public Constructors
@@ -171,12 +171,10 @@ namespace DatabaseConnector
                 {
                     logger.LogDebug($"Suche nach allen Fahrzeugen der Grundaufstellung.");
 
-                    var x = context.Aufstellungen.Include(a => a.Feld)
-                        .ThenInclude(c => c.AbschnittZuFeld).ToArray();
-
                     var aufstellungen = await context.Aufstellungen
-                        .Include(a => a.Feld.AbschnittZuFeld.Abschnitt)
-                        .ToArrayAsync(cancellationToken);
+                        .Include(a => a.Feld)
+                        .ThenInclude(f => f.AbschnittZuFeld)
+                        .ThenInclude(z => z.Abschnitt).ToArrayAsync(cancellationToken);
 
                     result = GetVehicleAllocations(aufstellungen).ToArray();
                 }

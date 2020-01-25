@@ -14,6 +14,9 @@ namespace DatabaseConnector.Models
         [Column("fma_id")]
         public int? AbschnittID { get; set; }
 
+        [ForeignKey(nameof(FeldID))]
+        public Feld Feld { get; set; }
+
         [Key]
         [Column("gbt_id")]
         public int? FeldID { get; set; }
