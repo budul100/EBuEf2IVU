@@ -89,7 +89,7 @@ namespace EBuEf2IVUCore
             return new JsonSerializerSettings();
         }
 
-        // SessionWechsel-Nachricht auswerten: SESSION NEW STATUS 2
+        // TODO: SessionWechsel-Nachricht auswerten: SESSION NEW STATUS 2
         private Regex GetAllocationsRegex()
         {
             var settings = config
