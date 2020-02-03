@@ -275,6 +275,11 @@ namespace EBuEf2IVUCore
                         databaseConnector.AddRealtimeAsync(position);
                         ivuSender.AddRealtime(position);
                     }
+                    else
+                    {
+                        logger.LogDebug($"Zu der gesandten Echtzeitmeldung konnte " +
+                            $"in der aktuellen Sitzung keine Fahrt gefunden werden.");
+                    }
                 }
             }
             catch (JsonReaderException readerException)
