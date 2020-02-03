@@ -198,29 +198,33 @@ namespace RealtimeSender
             {
                 if (!infosQueue.IsEmpty)
                 {
-                    var current = GetFirstInQueue().ToArray();
+                    var currentMessage = GetFirstInQueue().ToArray();
 
                     using var client = new RealTimeInformationImportFacadeClient();
                     client.Endpoint.Address = endpointAddress;
 
-                    var response = await client.importRealTimeInfoAsync(current);
+                    var response = await client.importRealTimeInfoAsync(currentMessage);
                     var result = response.importRealTimeInfoResponse1?.ToArray();
 
                     if (result?.Any() ?? false)
                     {
-                        var relevant = current.First();
+                        var relevantValiditation = result.First();
+                        var relevantMessage = currentMessage.First();
 
-                        if (result.First().code == 0)
+                        if (relevantValiditation.code == 0)
                         {
                             logger.LogDebug($"Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet " +
-                                $"(Zug: {current.First().tripNumber}, Betriebsstelle: {relevant.stopArea}, " +
-                                $"Decoder: {current.First().vehicles.First().number}");
+                                $"(Zug: {relevantMessage.tripNumber}, " +
+                                $"Betriebsstelle: {relevantMessage.stopArea}, " +
+                                $"Decoder: {relevantMessage.vehicles.FirstOrDefault()?.number})");
                         }
                         else
                         {
                             logger.LogError($"Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen: " +
-                                $"{result[0].message} (Zug: {current.First().tripNumber}, Betriebsstelle: {relevant.stopArea}, " +
-                                $"Decoder: {current.First().vehicles.First().number})");
+                                $"{relevantValiditation.message} " +
+                                $"(Zug: {relevantMessage.tripNumber}, " +
+                                $"Betriebsstelle: {relevantMessage.stopArea}, " +
+                                $"Decoder: {relevantMessage.vehicles.FirstOrDefault()?.number})");
                         }
                     }
 
