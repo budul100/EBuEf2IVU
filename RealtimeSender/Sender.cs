@@ -204,9 +204,9 @@ namespace RealtimeSender
                     client.Endpoint.Address = endpointAddress;
 
                     var response = await client.importRealTimeInfoAsync(current);
-                    var result = response.importRealTimeInfoResponse1;
+                    var result = response.importRealTimeInfoResponse1?.ToArray();
 
-                    if (result.Any())
+                    if (result?.Any() ?? false)
                     {
                         var relevant = current.First();
 
