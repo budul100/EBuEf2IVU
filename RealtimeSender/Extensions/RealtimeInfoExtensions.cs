@@ -9,11 +9,11 @@ namespace RealtimeSender.Extensions
     {
         #region Private Fields
 
-        private const int RT2IVUEventCodeArrival = 1;
-        private const int RT2IVUEventCodeDeparture = 2;
-        private const int RT2IVUEventCodePassing = 3;
-        private const int RT2IVUTrainCombinationComplete = 1;
-        private const int RT2IVUTrainCombinationUnknown = 2;
+        private const int EventCodeArrival = 1;
+        private const int EventCodeDeparture = 2;
+        private const int EventCodePassing = 3;
+        private const int TrainCombinationComplete = 1;
+        private const int TrainCombinationUnknown = 2;
 
         private static readonly DateTime timestampSubtract;
 
@@ -35,21 +35,21 @@ namespace RealtimeSender.Extensions
             switch (trainPosition.IVUTrainPositionTyp)
             {
                 case TrainPositionType.Abfahrt:
-                    return RT2IVUEventCodeDeparture;
+                    return EventCodeDeparture;
 
                 case TrainPositionType.Ankunft:
-                    return RT2IVUEventCodeArrival;
+                    return EventCodeArrival;
 
                 default:
-                    return RT2IVUEventCodePassing;
+                    return EventCodePassing;
             }
         }
 
         public static int GetTrainCombinationComplete(this IEnumerable<VehicleTO> vehicles)
         {
             return vehicles.Any()
-                ? RT2IVUTrainCombinationUnknown
-                : RT2IVUTrainCombinationComplete;
+                ? TrainCombinationUnknown
+                : TrainCombinationComplete;
         }
 
         public static long ToUnixTimestamp(this DateTime originalDate)
