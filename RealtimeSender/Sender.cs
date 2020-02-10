@@ -21,9 +21,9 @@ namespace RealtimeSender
 
         private const string EnvironmentComputer = "COMPUTERNAME";
 
-        private const int RT2IVUEventCodeAllocation = 9;
-        private const int RT2IVUShuntingTrip = 0;
-        private const int RT2IVUTrackPosition = 0;
+        private const int EventCodeAllocation = 9;
+        private const int ShuntingTrip = 0;
+        private const int TrackPosition = 0;
 
         private readonly string deviceID;
         private readonly string division;
@@ -62,7 +62,7 @@ namespace RealtimeSender
             foreach (var allocation in allocations)
             {
                 var info = GetRealtimeInfo(
-                    eventCode: RT2IVUEventCodeAllocation,
+                    eventCode: EventCodeAllocation,
                     tripNumber: allocation.Zugnummer,
                     timeStamp: sessionDate,
                     stopArea: allocation.Betriebsstelle,
@@ -165,9 +165,9 @@ namespace RealtimeSender
                     if (!string.IsNullOrEmpty(track))
                     {
                         result.track = track;
-                        result.trackposition = RT2IVUTrackPosition;
+                        result.trackposition = TrackPosition;
                         result.trackpositionSpecified = true;
-                        result.shuntingTrip = RT2IVUShuntingTrip;
+                        result.shuntingTrip = ShuntingTrip;
                         result.shuntingTripSpecified = true;
                     }
 
