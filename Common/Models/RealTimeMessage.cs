@@ -3,6 +3,13 @@ using System;
 
 namespace Common.Models
 {
+    public enum SignalTyp
+    {
+        ASig,
+        BkSig,
+        ESig,
+    }
+
     public class RealTimeMessage
     {
         #region Public Properties
@@ -15,6 +22,9 @@ namespace Common.Models
 
         [JsonProperty("end_gleis")]
         public string EndGleis { get; set; }
+
+        [JsonProperty("signaltyp")]
+        public SignalTyp SignalTyp { get; set; }
 
         [JsonProperty("simulationszeit")]
         public DateTime SimulationsZeit { get; set; }
@@ -34,8 +44,8 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return $@"Zug: {Zugnummer} | Betriebsstelle: {Betriebsstelle} | Startgleis: {StartGleis} | " +
-                $@"Zielgleis: {ZielGleis} |  Simulationszeit: {SimulationsZeit:hh\:mm}";
+            return $@"Zug: {Zugnummer} | Betriebsstelle: {Betriebsstelle} | Signaltyp: {SignalTyp.ToString()} | " +
+                @"Startgleis: {StartGleis} | Zielgleis: {ZielGleis} |  Simulationszeit: {SimulationsZeit:hh\:mm}";
         }
 
         #endregion Public Methods
