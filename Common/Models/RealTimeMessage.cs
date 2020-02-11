@@ -45,7 +45,7 @@ namespace Common.Models
         public override string ToString()
         {
             return $@"Zug: {Zugnummer} | Betriebsstelle: {Betriebsstelle} | Signaltyp: {SignalTyp.ToString()} | " +
-                @"Startgleis: {StartGleis} | Zielgleis: {ZielGleis} |  Simulationszeit: {SimulationsZeit:hh\:mm}";
+                $@"Startgleis: {StartGleis} | Zielgleis: {ZielGleis} |  Simulationszeit: {SimulationsZeit:hh\:mm}";
         }
 
         #endregion Public Methods
