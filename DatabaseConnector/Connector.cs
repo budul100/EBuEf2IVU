@@ -3,6 +3,7 @@ using Common.Models;
 using DatabaseConnector.Contexts;
 using DatabaseConnector.Extensions;
 using DatabaseConnector.Models;
+using Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -214,7 +215,9 @@ namespace DatabaseConnector
 
                     if (!string.IsNullOrWhiteSpace(istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach))
                     {
-                        halt.GleisIst = istVon ? position.EBuEfGleisVon : position.EBuEfGleisNach;
+                        halt.GleisIst = istVon
+                            ? position.EBuEfGleisVon.ToInt()
+                            : position.EBuEfGleisNach.ToInt();
                     }
 
                     if (istVon)

@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Extensions\ConverterExtensions\ConverterExtensions.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 

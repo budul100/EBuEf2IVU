@@ -19,7 +19,7 @@ namespace DatabaseConnector.Models
         public string Betriebsstelle { get; set; }
 
         [Column("gleis_ist")]
-        public string GleisIst { get; set; }
+        public int GleisIst { get; set; }
 
         [Key]
         [Column("id")]
