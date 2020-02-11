@@ -292,8 +292,12 @@ namespace EBuEf2IVUCore
             }
             catch (JsonReaderException readerException)
             {
+                logger.LogError($"Die Nachricht kann nicht gelesen werden: {readerException.Message}");
+            }
+            catch (JsonSerializationException serializationException)
+            {
                 logger.LogError($"Die Nachricht kann nicht in eine Echtzeitmeldung " +
-                    $"umgeformt werden: {readerException.Message}");
+                    $"umgeformt werden: {serializationException.Message}");
             }
         }
 
