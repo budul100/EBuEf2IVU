@@ -1,4 +1,5 @@
-﻿using Common.EventsArgs;
+﻿using Common.Enums;
+using Common.EventsArgs;
 using Common.Interfaces;
 using MessageReceiver;
 using Microsoft.Extensions.Logging;
@@ -94,19 +95,34 @@ namespace StateHandler
                     sender: this,
                     e: null);
             }
-            else if (statusRegex.IsMatch(e.Content))
-            {
-                var sessionStatus = statusRegex
-                    .Match(e.Content)
-                    .Groups[StatusRegexGroupName].Value;
-
-                SessionChangedEvent?.Invoke(
-                    sender: this,
-                    e: new StateChangedArgs(sessionStatus));
-            }
             else
             {
-                logger.LogError($"Unbekannte Status-Nachricht empfangen: '{e.Content}'.");
+                var sessionStatus = statusRegex.IsMatch(e.Content)
+                    ? statusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
+                    : default;
+
+                if (sessionStatus == SessionStates.InPreparation.ToString())
+                {
+                    SessionChangedEvent?.Invoke(
+                        sender: this,
+                        e: new StateChangedArgs(SessionStates.InPreparation));
+                }
+                else if (sessionStatus == SessionStates.IsRunning.ToString())
+                {
+                    SessionChangedEvent?.Invoke(
+                        sender: this,
+                        e: new StateChangedArgs(SessionStates.IsRunning));
+                }
+                else if (sessionStatus == SessionStates.IsPaused.ToString())
+                {
+                    SessionChangedEvent?.Invoke(
+                        sender: this,
+                        e: new StateChangedArgs(SessionStates.IsPaused));
+                }
+                else
+                {
+                    logger.LogError($"Unbekannte Status-Nachricht empfangen: '{e.Content}'.");
+                }
             }
         }
 

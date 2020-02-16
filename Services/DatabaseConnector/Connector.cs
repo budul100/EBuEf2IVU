@@ -1,3 +1,4 @@
+using Common.Enums;
 using Common.Interfaces;
 using Common.Models;
 using DatabaseConnector.Contexts;
@@ -19,14 +20,6 @@ namespace DatabaseConnector
     public class Connector
         : IConnector
     {
-        #region Public Fields
-
-        public const byte SessionInPreparation = 1;
-        public const byte SessionIsPaused = 5;
-        public const byte SessionIsRunning = 2;
-
-        #endregion Public Fields
-
         #region Private Fields
 
         private readonly ILogger logger;
@@ -122,11 +115,11 @@ namespace DatabaseConnector
                 logger.LogDebug($"Suche in der EBuEf-DB nach der aktuellen Fahrplan-Session.");
 
                 var sitzung = await context.Sitzungen
-                    .Where(s => s.Status == SessionInPreparation
-                        || s.Status == SessionIsRunning
-                        || s.Status == SessionIsPaused)
-                    .OrderByDescending(s => s.Status == SessionIsRunning)
-                    .ThenByDescending(s => s.Status == SessionIsPaused)
+                    .Where(s => s.Status == Convert.ToByte(SessionStates.InPreparation)
+                        || s.Status == Convert.ToByte(SessionStates.IsRunning)
+                        || s.Status == Convert.ToByte(SessionStates.IsPaused))
+                    .OrderByDescending(s => s.Status == Convert.ToByte(SessionStates.IsRunning))
+                    .ThenByDescending(s => s.Status == Convert.ToByte(SessionStates.IsPaused))
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (sitzung != default)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Enums;
+using System;
 
 namespace Common.EventsArgs
 {
@@ -7,16 +8,16 @@ namespace Common.EventsArgs
     {
         #region Public Constructors
 
-        public StateChangedArgs(string status)
+        public StateChangedArgs(SessionStates state)
         {
-            Status = status;
+            State = state;
         }
 
         #endregion Public Constructors
 
         #region Public Properties
 
-        public string Status { get; private set; }
+        public SessionStates State { get; private set; }
 
         #endregion Public Properties
     }
