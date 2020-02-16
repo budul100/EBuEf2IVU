@@ -2,7 +2,7 @@ using Common.EventsArgs;
 using Common.Interfaces;
 using Common.Models;
 using DatabaseConnector;
-using EBuEf2IVUCore.Settings;
+using EBuEf2IVUVehicle.Settings;
 using Extensions;
 using MessageReceiver;
 using Microsoft.Extensions.Configuration;
@@ -18,9 +18,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EBuEf2IVUCore
+namespace EBuEf2IVUVehicle
 {
-    public class Worker
+    internal class Worker
         : BackgroundService
     {
         #region Private Fields
@@ -119,7 +119,7 @@ namespace EBuEf2IVUCore
             return result;
         }
 
-        private IEnumerable<string> GetFahrzeuge(RealTimeMessage message)
+        private IEnumerable<string> GetDecoders(RealTimeMessage message)
         {
             if (!string.IsNullOrWhiteSpace(message?.Decoder))
                 yield return message.Decoder;
@@ -171,7 +171,7 @@ namespace EBuEf2IVUCore
                     EBuEfGleisVon = message.StartGleis,
                     EBuEfZeitpunktNach = message.SimulationsZeit.Add(ebuefNachZeit).TimeOfDay,
                     EBuEfZeitpunktVon = message.SimulationsZeit.Add(ebuefVonZeit).TimeOfDay,
-                    Fahrzeuge = GetFahrzeuge(message).ToArray(),
+                    Fahrzeuge = GetDecoders(message).ToArray(),
                     IVUGleis = mapping.IVUGleis,
                     IVUNetzpunkt = mapping.IVUNetzpunkt,
                     IVUTrainPositionTyp = mapping.IVUTrainPositionType,

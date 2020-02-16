@@ -1,6 +1,6 @@
 using Common.Models;
 
-namespace EBuEf2IVUCore.Settings
+namespace EBuEf2IVUVehicle.Settings
 {
     internal class InfrastructureMapping
     {

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBuEf2IVUCore", "EBuEf2IVUCore\EBuEf2IVUCore.csproj", "{76530AC2-D9B7-46C5-B140-4FB7068C78E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBuEf2IVUVehicle", "EBuEf2IVUVehicle\EBuEf2IVUVehicle.csproj", "{76530AC2-D9B7-46C5-B140-4FB7068C78E5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnector", "DatabaseConnector\DatabaseConnector.csproj", "{6CDC3AAE-48BF-408E-A554-028916847682}"
 EndProject
@@ -16,6 +16,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegexExtensions", "..\Extensions\RegexExtensions\RegexExtensions.csproj", "{DAE0F974-DA2C-42A3-AF59-589E41AC89C7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConverterExtensions", "..\Extensions\ConverterExtensions\ConverterExtensions.csproj", "{EB7E8EBE-9858-4E78-A161-560E38ABF079}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBuEf2IVUCrew", "EBuEf2IVUCrew\EBuEf2IVUCrew.csproj", "{03F5CEF5-C13B-4500-9F8A-C3A14FD3E476}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{4129F1CE-BB62-40CD-847F-A58EFE37390B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{B66A038D-89B1-4317-BD2D-85C054B7CA12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,11 +57,38 @@ Global
 		{EB7E8EBE-9858-4E78-A161-560E38ABF079}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB7E8EBE-9858-4E78-A161-560E38ABF079}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB7E8EBE-9858-4E78-A161-560E38ABF079}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03F5CEF5-C13B-4500-9F8A-C3A14FD3E476}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03F5CEF5-C13B-4500-9F8A-C3A14FD3E476}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03F5CEF5-C13B-4500-9F8A-C3A14FD3E476}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03F5CEF5-C13B-4500-9F8A-C3A14FD3E476}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6CDC3AAE-48BF-408E-A554-028916847682} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
+		{D98CEFE4-06DB-4F43-B6C8-2FBEB40435E1} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
+		{B48CB5E9-6C72-49B8-B60F-38F0C28DBBC8} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
+		{DAE0F974-DA2C-42A3-AF59-589E41AC89C7} = {4129F1CE-BB62-40CD-847F-A58EFE37390B}
+		{EB7E8EBE-9858-4E78-A161-560E38ABF079} = {4129F1CE-BB62-40CD-847F-A58EFE37390B}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E929A830-61A1-48FF-9596-23961F1A08C4}
+	EndGlobalSection
+	GlobalSection(AutomaticVersions) = postSolution
+		UpdateAssemblyVersion.Debug|Any CPU = True
+		UpdateAssemblyFileVersion.Debug|Any CPU = False
+		UpdateAssemblyInfoVersion.Debug|Any CPU = False
+		AssemblyVersionSettings.Debug|Any CPU = None.None.IncrementWithResetOnIncrease.None
+		UpdatePackageVersion.Debug|Any CPU = False
+		AssemblyInfoVersionType.Debug|Any CPU = SettingsVersion
+		InheritWinAppVersionFrom.Debug|Any CPU = None
+		UpdateAssemblyVersion.Release|Any CPU = True
+		UpdateAssemblyFileVersion.Release|Any CPU = False
+		UpdateAssemblyInfoVersion.Release|Any CPU = False
+		AssemblyVersionSettings.Release|Any CPU = None.IncrementWithResetOnIncrease.NoneWithAutoReset.NoneWithAutoReset
+		UpdatePackageVersion.Release|Any CPU = False
+		AssemblyInfoVersionType.Release|Any CPU = SettingsVersion
+		InheritWinAppVersionFrom.Release|Any CPU = None
 	EndGlobalSection
 EndGlobal
