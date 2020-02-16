@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,22 +24,17 @@ namespace EBuEf2IVUVehicle
     {
         #region Private Fields
 
-        private const string MessageTypeAllocations = "Sessionstatus";
         private const string MessageTypePositions = "Echtzeit-Positionen";
-        private const string StatusRegexGroupName = "status";
-        private const string StatusRegexGroupWildcard = "$";
 
         private readonly IConfiguration config;
+        private readonly IConnector databaseConnector;
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
         private readonly ISender ivuSender;
-        private readonly ILogger<Worker> logger;
+        private readonly ILogger logger;
         private readonly IReceiver positionsReceiver;
-        private readonly JsonSerializerSettings positionsReceiverSettings;
-        private readonly Regex startRegex;
-        private readonly IReceiver statusReceiver;
-        private readonly Regex statusRegex;
+        private readonly JsonSerializerSettings positionsReceiverSettings = new JsonSerializerSettings();
+        private readonly IStateHandler sessionStateHandler;
 
-        private IConnector databaseConnector;
         private DateTime ebuefSessionStart = DateTime.Now;
         private DateTime ivuSessionDate = DateTime.Now;
         private CancellationTokenSource sessionCancellationTokenSource;
@@ -49,7 +43,7 @@ namespace EBuEf2IVUVehicle
 
         #region Public Constructors
 
-        public Worker(IConfiguration config, ILogger<Worker> logger)
+        public Worker(IConfiguration config, ILogger<Worker> logger, IStateHandler stateHandler, IConnector connector)
         {
             this.config = config;
             this.logger = logger;
@@ -60,14 +54,14 @@ namespace EBuEf2IVUVehicle
             ivuSender = GetSender();
             infrastructureMappings = GetInfrastructureMappings();
 
-            statusReceiver = GetStatusReceiver();
-            statusReceiver.MessageReceivedEvent += OnStatusReceived;
-            statusRegex = GetStatusRegex();
-            startRegex = GetStartRegex();
-
             positionsReceiver = GetPositionReceiver();
             positionsReceiver.MessageReceivedEvent += OnPositionReceived;
-            positionsReceiverSettings = GetPositionsReceiverSettings();
+
+            databaseConnector = connector;
+
+            sessionStateHandler = stateHandler;
+            sessionStateHandler.SessionStartedEvent += OnSessionStartedAsync;
+            sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
         }
 
         #endregion Public Constructors
@@ -76,17 +70,19 @@ namespace EBuEf2IVUVehicle
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
+            InitializeStateHandler();
+
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
-                databaseConnector = GetConnector(sessionCancellationToken);
+                InitializeConnector(sessionCancellationToken);
 
                 await StartIVUSessionAsync();
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     await Task.WhenAny(
-                        statusReceiver.RunAsync(sessionCancellationToken),
+                        sessionStateHandler.RunAsync(sessionCancellationToken),
                         positionsReceiver.RunAsync(sessionCancellationToken),
                         ivuSender.RunAsnc(sessionCancellationToken));
                 };
@@ -96,28 +92,6 @@ namespace EBuEf2IVUVehicle
         #endregion Protected Methods
 
         #region Private Methods
-
-        private static JsonSerializerSettings GetPositionsReceiverSettings()
-        {
-            return new JsonSerializerSettings();
-        }
-
-        private IConnector GetConnector(CancellationToken sessionCancellationToken)
-        {
-            var settings = config
-                .GetSection(nameof(EBuEfDBConnector))
-                .Get<EBuEfDBConnector>();
-
-            logger.LogDebug($"Verbindung zur Datenbank herstellen: {settings.ConnectionString}.");
-
-            var result = new Connector(
-                logger: logger,
-                connectionString: settings.ConnectionString,
-                retryTime: settings.RetryTime,
-                cancellationToken: sessionCancellationToken);
-
-            return result;
-        }
 
         private IEnumerable<string> GetDecoders(RealTimeMessage message)
         {
@@ -222,46 +196,32 @@ namespace EBuEf2IVUVehicle
             return sessionCancellationTokenSource.Token;
         }
 
-        private Regex GetStartRegex()
+        private void InitializeConnector(CancellationToken sessionCancellationToken)
         {
             var settings = config
-                .GetSection(nameof(StatusReceiver))
-                .Get<StatusReceiver>();
+                .GetSection(nameof(EBuEfDBConnector))
+                .Get<EBuEfDBConnector>();
 
-            var result = new Regex(settings.Pattern);
+            logger.LogDebug($"Verbindung zur Datenbank herstellen: {settings.ConnectionString}.");
 
-            return result;
+            databaseConnector.Initialize(
+                connectionString: settings.ConnectionString,
+                retryTime: settings.RetryTime,
+                cancellationToken: sessionCancellationToken);
         }
 
-        private IReceiver GetStatusReceiver()
+        private void InitializeStateHandler()
         {
             var settings = config
                 .GetSection(nameof(StatusReceiver))
                 .Get<StatusReceiver>();
 
-            var result = new Receiver(
+            sessionStateHandler.Initialize(
                 ipAdress: settings.IpAddress,
                 port: settings.ListenerPort,
                 retryTime: settings.RetryTime,
-                logger: logger,
-                messageType: MessageTypeAllocations);
-
-            return result;
-        }
-
-        private Regex GetStatusRegex()
-        {
-            var settings = config
-                .GetSection(nameof(StatusReceiver))
-                .Get<StatusReceiver>();
-
-            var statusPattern = settings.StatusPattern.Replace(
-                oldValue: StatusRegexGroupWildcard,
-                newValue: $@"(?<{StatusRegexGroupName}>\d)");
-
-            var result = new Regex(statusPattern);
-
-            return result;
+                startPattern: settings.StartPattern,
+                statusPattern: settings.StatusPattern);
         }
 
         private void OnPositionReceived(object sender, MessageReceivedArgs e)
@@ -301,40 +261,30 @@ namespace EBuEf2IVUVehicle
             }
         }
 
-        private async void OnStatusReceived(object sender, MessageReceivedArgs e)
+        private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
         {
-            logger.LogDebug($"Status-Nachricht empfangen: {e.Content}");
-
-            if (startRegex.IsMatch(e.Content) || statusRegex.IsMatch(e.Content))
+            if (e.Status == Connector.SessionIsRunning.ToString())
             {
-                var sessionStatus = statusRegex.IsMatch(e.Content)
-                    ? statusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
-                    : default;
+                logger?.LogInformation("Sessionstart-Nachricht empfangen.");
 
-                if (startRegex.IsMatch(e.Content)
-                    || sessionStatus == Connector.SessionIsRunning.ToString())
-                {
-                    logger.LogInformation("Sessionstart-Nachricht empfangen.");
-
-                    await StartIVUSessionAsync();
-                    await SetVehicleAllocationsAsync();
-                }
-                else if (sessionStatus == Connector.SessionIsPaused.ToString())
-                {
-                    logger.LogInformation("Sessionpause-Nachricht empfangen. Die Nachrichtenempfänger, " +
-                        "Datenbank-Verbindungen und IVU-Sender werden zurückgesetzt.");
-
-                    sessionCancellationTokenSource.Cancel();
-                }
-                else
-                {
-                    logger.LogError($"Unbekannten Sessionstatus empfangen: {sessionStatus}.");
-                }
+                await StartIVUSessionAsync();
+                await SetVehicleAllocationsAsync();
             }
-            else
+            else if (e.Status == Connector.SessionIsPaused.ToString())
             {
-                logger.LogError($"Unbekannte Status-Nachricht empfangen: '{e.Content}'.");
+                logger.LogInformation("Sessionpause-Nachricht empfangen. Die Nachrichtenempfänger, " +
+                    "Datenbank-Verbindungen und IVU-Sender werden zurückgesetzt.");
+
+                sessionCancellationTokenSource.Cancel();
             }
+        }
+
+        private async void OnSessionStartedAsync(object sender, EventArgs e)
+        {
+            logger?.LogInformation("Sessionstart-Nachricht empfangen.");
+
+            await StartIVUSessionAsync();
+            await SetVehicleAllocationsAsync();
         }
 
         private async Task SetVehicleAllocationsAsync()
@@ -349,7 +299,7 @@ namespace EBuEf2IVUVehicle
         {
             var currentSession = await databaseConnector.GetEBuEfSessionAsync();
 
-            ivuSessionDate = currentSession.IVUDate;
+            ivuSessionDate = currentSession.IVUDatum;
             ebuefSessionStart = ivuSessionDate.Add(currentSession.SessionStart.TimeOfDay);
 
             logger.LogDebug($"IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um " +

@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using Common.Interfaces;
 using EBuEf2IVUVehicle.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,6 +65,9 @@ namespace EBuEf2IVUVehicle
         private static void ConfigureServices(IServiceCollection services)
         {
             services.AddHostedService<Worker>();
+
+            services.AddSingleton<IConnector, DatabaseConnector.Connector>();
+            services.AddSingleton<IStateHandler, StateHandler.Handler>();
         }
 
         private static IHostBuilder GetHostBuilder(this IHostBuilder defaultBuilder)

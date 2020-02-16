@@ -129,14 +129,9 @@ namespace MessageReceiver
 
                 if (!string.IsNullOrWhiteSpace(content))
                 {
-                    var messageReceivedArgs = new MessageReceivedArgs
-                    {
-                        Content = content,
-                    };
-
                     MessageReceivedEvent?.Invoke(
                         sender: this,
-                        e: messageReceivedArgs);
+                        e: new MessageReceivedArgs(content));
                 }
             }
         }

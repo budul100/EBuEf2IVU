@@ -1,22 +1,22 @@
-using System;
+﻿using System;
 
 namespace Common.EventsArgs
 {
-    public class MessageReceivedArgs
+    public class StateChangedArgs
         : EventArgs
     {
         #region Public Constructors
 
-        public MessageReceivedArgs(string content)
+        public StateChangedArgs(string status)
         {
-            Content = content;
+            Status = status;
         }
 
         #endregion Public Constructors
 
         #region Public Properties
 
-        public string Content { get; private set; }
+        public string Status { get; private set; }
 
         #endregion Public Properties
     }

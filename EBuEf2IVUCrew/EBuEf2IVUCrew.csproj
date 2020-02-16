@@ -6,7 +6,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RuntimeIdentifiers>win10-x64;linux-arm;linux-x64</RuntimeIdentifiers>
     <StartupObject>EBuEf2IVUCrew.Program</StartupObject>
-    <AssemblyVersion>0.29.4.0</AssemblyVersion>
+    <AssemblyVersion>0.29.9.0</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -35,6 +35,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="settings.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
   </ItemGroup>
 
@@ -52,7 +58,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Services\DatabaseConnector\DatabaseConnector.csproj" />
   </ItemGroup>
 
   <ItemGroup>

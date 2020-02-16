@@ -1,6 +1,5 @@
 ﻿using Common.Interfaces;
-using DatabaseConnector;
-using EBuEf2IVUVehicle.Settings;
+using EBuEf2IVUCrew.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,18 +14,21 @@ namespace EBuEf2IVUCrew
         #region Private Fields
 
         private readonly IConfiguration config;
-        private readonly ILogger<Worker> logger;
-        private IConnector databaseConnector;
+        private readonly IConnector databaseConnector;
+        private readonly ILogger logger;
+
         private CancellationTokenSource sessionCancellationTokenSource;
+        private TrainRunQueries trainRunQuerySettings;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Worker(IConfiguration config, ILogger<Worker> logger)
+        public Worker(IConfiguration config, ILogger<Worker> logger, IConnector databaseConnector)
         {
             this.config = config;
             this.logger = logger;
+            this.databaseConnector = databaseConnector;
         }
 
         #endregion Public Constructors
@@ -38,7 +40,11 @@ namespace EBuEf2IVUCrew
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
-                databaseConnector = GetConnector(sessionCancellationToken);
+                InitializeConnector(sessionCancellationToken);
+
+                trainRunQuerySettings = config
+                    .GetSection(nameof(TrainRunQueries))
+                    .Get<TrainRunQueries>();
 
                 await TestAsync();
             }
@@ -48,23 +54,6 @@ namespace EBuEf2IVUCrew
 
         #region Private Methods
 
-        private IConnector GetConnector(CancellationToken sessionCancellationToken)
-        {
-            var settings = config
-                .GetSection(nameof(EBuEfDBConnector))
-                .Get<EBuEfDBConnector>();
-
-            logger.LogDebug($"Verbindung zur Datenbank herstellen: {settings.ConnectionString}.");
-
-            var result = new Connector(
-                logger: logger,
-                connectionString: settings.ConnectionString,
-                retryTime: settings.RetryTime,
-                cancellationToken: sessionCancellationToken);
-
-            return result;
-        }
-
         private CancellationToken GetSessionCancellationToken(CancellationToken workerCancellationToken)
         {
             sessionCancellationTokenSource = new CancellationTokenSource();
@@ -73,8 +62,28 @@ namespace EBuEf2IVUCrew
             return sessionCancellationTokenSource.Token;
         }
 
+        private void InitializeConnector(CancellationToken sessionCancellationToken)
+        {
+            var settings = config
+                .GetSection(nameof(EBuEfDBConnector))
+                .Get<EBuEfDBConnector>();
+
+            logger.LogDebug($"Verbindung zur Datenbank herstellen: {settings.ConnectionString}.");
+
+            databaseConnector.Initialize(
+                connectionString: settings.ConnectionString,
+                retryTime: settings.RetryTime,
+                cancellationToken: sessionCancellationToken);
+        }
+
         private async Task TestAsync()
         {
+            //var stops = await databaseConnector.GetTrainRunsAsync();
+
+            //foreach (var stop in stops)
+            //{
+            //    Debug.WriteLine(stop.ToString());
+            //}
         }
 
         #endregion Private Methods

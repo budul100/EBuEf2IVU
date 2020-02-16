@@ -6,9 +6,11 @@ namespace Common.Models
     {
         #region Public Properties
 
-        public DateTime IVUDate { get; set; }
+        public DateTime IVUDatum { get; set; }
 
         public DateTime SessionStart { get; set; }
+
+        public TimeSpan Verschiebung { get; set; }
 
         #endregion Public Properties
 
@@ -16,7 +18,8 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return $"EBuEf-Session - Start: {SessionStart:hh:mm:ss} | IVU-Datum: {IVUDate:yyyy-MM-dd}";
+            return @$"EBuEf-Session | Start: {SessionStart:hh\:mm\:ss} | IVU-Datum: {IVUDatum:yyyy-MM-dd} | " +
+                @$"Verschiebung: {(Verschiebung >= TimeSpan.Zero ? string.Empty : "-")}{Verschiebung:d\.hh\:mm\:ss}";
         }
 
         #endregion Public Methods

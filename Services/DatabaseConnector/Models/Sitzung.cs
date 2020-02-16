@@ -20,6 +20,9 @@ namespace DatabaseConnector.Models
         [Column("status")]
         public byte Status { get; set; }
 
+        [Column("timeshift")]
+        public int Verschiebung { get; set; }
+
         #endregion Public Properties
     }
 }

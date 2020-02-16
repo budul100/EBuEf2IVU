@@ -12,20 +12,26 @@ namespace DatabaseConnector.Models
         [Column("abfahrt_ist")]
         public TimeSpan? AbfahrtIst { get; set; }
 
-        [Column("ankunft_ist")]
-        public TimeSpan? AnkunftIst { get; set; }
-
         [Column("abfahrt_plan")]
         public TimeSpan? AbfahrtPlan { get; set; }
 
+        [Column("abfahrt_soll")]
+        public TimeSpan? AbfahrtSoll { get; set; }
+
+        [Column("ankunft_ist")]
+        public TimeSpan? AnkunftIst { get; set; }
+
         [Column("ankunft_plan")]
         public TimeSpan? AnkunftPlan { get; set; }
+
+        [Column("ankunft_soll")]
+        public TimeSpan? AnkunftSoll { get; set; }
 
         [Column("betriebsstelle")]
         public string Betriebsstelle { get; set; }
 
         [Column("gleis_ist")]
-        public int GleisIst { get; set; }
+        public int? GleisIst { get; set; }
 
         [Key]
         [Column("id")]

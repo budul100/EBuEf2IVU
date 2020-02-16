@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using Common.Interfaces;
 using EBuEf2IVUCrew.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,6 +65,8 @@ namespace EBuEf2IVUCrew
         private static void ConfigureServices(IServiceCollection services)
         {
             services.AddHostedService<Worker>();
+
+            services.AddSingleton<IConnector, DatabaseConnector.Connector>();
         }
 
         private static IHostBuilder GetHostBuilder(this IHostBuilder defaultBuilder)

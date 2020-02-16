@@ -29,18 +29,67 @@ namespace DatabaseConnector
 
         #region Private Fields
 
-        private readonly CancellationToken cancellationToken;
-        private readonly string connectionString;
         private readonly ILogger logger;
-        private readonly AsyncRetryPolicy retryPolicy;
+        private CancellationToken cancellationToken;
+        private string connectionString;
+        private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Connector(ILogger logger, string connectionString, int retryTime, CancellationToken cancellationToken)
+        public Connector(ILogger<Connector> logger)
         {
             this.logger = logger;
+        }
+
+        #endregion Public Constructors
+
+        #region Public Methods
+
+        public Task AddRealtimeAsync(TrainPosition position)
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (token) => SetTrainPositionsAsync(
+                    position: position,
+                    cancellationToken: token),
+                cancellationToken: cancellationToken);
+
+            return result;
+        }
+
+        public Task<EBuEfSession> GetEBuEfSessionAsync()
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (token) => GetSessionDateAsync(token),
+                cancellationToken: cancellationToken);
+
+            return result;
+        }
+
+        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime)
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (token) => GetTrainRuns(
+                    minTime: minTime,
+                    maxTime: maxTime,
+                    cancellationToken: token),
+                cancellationToken: cancellationToken);
+
+            return result;
+        }
+
+        public Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync()
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (token) => GetVehicleAllocationsAsync(token),
+                cancellationToken: cancellationToken);
+
+            return result;
+        }
+
+        public void Initialize(string connectionString, int retryTime, CancellationToken cancellationToken)
+        {
             this.connectionString = connectionString;
             this.cancellationToken = cancellationToken;
 
@@ -51,48 +100,6 @@ namespace DatabaseConnector
                         exception: exception,
                         reconnection: reconnection),
                     sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime));
-        }
-
-        #endregion Public Constructors
-
-        #region Public Methods
-
-        public Task AddRealtimeAsync(TrainPosition position)
-        {
-            var result = retryPolicy.ExecuteAsync(
-                action: (t) => SetTrainPositionsAsync(
-                    position: position,
-                    cancellationToken: t),
-                cancellationToken: cancellationToken);
-
-            return result;
-        }
-
-        public Task<EBuEfSession> GetEBuEfSessionAsync()
-        {
-            var result = retryPolicy.ExecuteAsync(
-                action: (t) => GetSessionDateAsync(t),
-                cancellationToken: cancellationToken);
-
-            return result;
-        }
-
-        public Task<IEnumerable<TimetableStop>> GetTimetableStops()
-        {
-            var result = retryPolicy.ExecuteAsync(
-                action: (t) => GetTimetableStops(t),
-                cancellationToken: cancellationToken);
-
-            return result;
-        }
-
-        public Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync()
-        {
-            var result = retryPolicy.ExecuteAsync(
-                action: (t) => GetVehicleAllocationsAsync(t),
-                cancellationToken: cancellationToken);
-
-            return result;
         }
 
         #endregion Public Methods
@@ -124,10 +131,16 @@ namespace DatabaseConnector
 
                 if (sitzung != default)
                 {
+                    var timeshift = new TimeSpan(
+                        hours: 0,
+                        minutes: 0,
+                        seconds: sitzung.Verschiebung * -1);
+
                     result = new EBuEfSession
                     {
-                        IVUDate = sitzung.IvuDate ?? DateTime.Today,
+                        IVUDatum = sitzung.IvuDate ?? DateTime.Today,
                         SessionStart = sitzung.SimulationStartzeit.ToDateTime(),
+                        Verschiebung = timeshift,
                     };
 
                     logger.LogDebug($"Aktuelle EBuEf-Sitzung gefunden: {result}");
@@ -141,9 +154,28 @@ namespace DatabaseConnector
             return result;
         }
 
-        private async Task<IEnumerable<TimetableStop>> GetTimetableStops(CancellationToken cancellationToken)
+        private IEnumerable<TrainRun> GetTrainRuns(IEnumerable<Halt> halte)
         {
-            var result = Enumerable.Empty<TimetableStop>();
+            if (halte.Any())
+            {
+                foreach (var halt in halte)
+                {
+                    var result = new TrainRun
+                    {
+                        AbfahrtSollPlan = halt.AbfahrtPlan,
+                        AbfahrtIst = halt.AbfahrtIst,
+                        Zugnummer = halt.Zug?.Zugnummer.ToString(),
+                    };
+
+                    yield return result;
+                }
+            }
+        }
+
+        private async Task<IEnumerable<TrainRun>> GetTrainRuns(TimeSpan minTime, TimeSpan maxTime,
+            CancellationToken cancellationToken)
+        {
+            var result = Enumerable.Empty<TrainRun>();
 
             if (!cancellationToken.IsCancellationRequested)
             {
@@ -153,35 +185,14 @@ namespace DatabaseConnector
 
                 var halte = await context.Halte
                     .Include(h => h.Zug)
+                    .Where(h => h.IsInMinTime(minTime))
+                    .Where(h => h.IsInMaxTime(maxTime))
                     .ToArrayAsync(cancellationToken);
 
-                result = GetTimetableStops(halte).ToArray();
+                result = GetTrainRuns(halte).ToArray();
             }
 
             return result;
-        }
-
-        private IEnumerable<TimetableStop> GetTimetableStops(IEnumerable<Halt> halte)
-        {
-            if (halte.Any())
-            {
-                foreach (var halt in halte)
-                {
-                    var result = new TimetableStop
-                    {
-                        Abfahrt = halt.AbfahrtPlan,
-                        Ankunft = halt.AnkunftPlan,
-                        Betriebsstelle = halt.Betriebsstelle,
-                        Zugnummer = halt.Zug?.Zugnummer.ToString(),
-                    };
-
-                    yield return result;
-                }
-            }
-            else
-            {
-                logger.LogInformation($"In der Grundaufstellung sind keine Fahrzeuge eingetragen.");
-            }
         }
 
         private IEnumerable<VehicleAllocation> GetVehicleAllocations(IEnumerable<Aufstellung> aufstellungen)
