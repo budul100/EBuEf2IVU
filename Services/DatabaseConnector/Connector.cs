@@ -83,6 +83,8 @@ namespace DatabaseConnector
 
         public void Initialize(string connectionString, int retryTime, CancellationToken cancellationToken)
         {
+            logger.LogDebug($"Verwendete Datenbankverbindung: {connectionString}.");
+
             this.connectionString = connectionString;
             this.cancellationToken = cancellationToken;
 
@@ -151,13 +153,16 @@ namespace DatabaseConnector
         {
             if (halte.Any())
             {
-                foreach (var halt in halte)
+                var relevants = halte
+                    .GroupBy(h => h.ZugID)
+                    .Select(g => g.OrderBy(h => h.GetAbfahrt()).First()).ToArray();
+
+                foreach (var relevant in relevants)
                 {
                     var result = new TrainRun
                     {
-                        AbfahrtSollPlan = halt.AbfahrtPlan,
-                        AbfahrtIst = halt.AbfahrtIst,
-                        Zugnummer = halt.Zug?.Zugnummer.ToString(),
+                        Abfahrt = relevant.GetAbfahrt(),
+                        Zugnummer = relevant.Zug?.Zugnummer.ToString(),
                     };
 
                     yield return result;
@@ -178,8 +183,9 @@ namespace DatabaseConnector
 
                 var halte = await context.Halte
                     .Include(h => h.Zug)
-                    .Where(h => h.IsInMinTime(minTime))
-                    .Where(h => h.IsInMaxTime(maxTime))
+                    .Where(h => h.AbfahrtIst.HasValue || h.AbfahrtSoll.HasValue || h.AbfahrtPlan.HasValue)
+                    .Where(h => (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan ?? TimeSpan.MinValue) >= minTime)
+                    .Where(h => (h.AbfahrtSoll ?? h.AbfahrtPlan ?? TimeSpan.MaxValue) <= maxTime)
                     .ToArrayAsync(cancellationToken);
 
                 result = GetTrainRuns(halte).ToArray();

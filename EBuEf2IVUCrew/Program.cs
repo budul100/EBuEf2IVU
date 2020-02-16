@@ -1,6 +1,5 @@
 ﻿using CommandLine;
 using Common.Interfaces;
-using EBuEf2IVUCrew.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,7 +26,7 @@ namespace EBuEf2IVUCrew
             var result = default(IHostBuilder);
 
             Parser.Default
-                .ParseArguments<CommandLineOptions>(args)
+                .ParseArguments<Settings.CommandLine>(args)
                 .WithParsed(options =>
                 {
                     result = Host
@@ -54,7 +53,7 @@ namespace EBuEf2IVUCrew
 
         #region Private Methods
 
-        private static void ConfigureAppConfiguration(IConfigurationBuilder configBuilder, CommandLineOptions options)
+        private static void ConfigureAppConfiguration(IConfigurationBuilder configBuilder, Settings.CommandLine options)
         {
             configBuilder.AddXmlFile(
                 path: GetSettingsPath(options),
@@ -67,6 +66,7 @@ namespace EBuEf2IVUCrew
             services.AddHostedService<Worker>();
 
             services.AddSingleton<IConnector, DatabaseConnector.Connector>();
+            services.AddSingleton<IStateHandler, StateHandler.Handler>();
         }
 
         private static IHostBuilder GetHostBuilder(this IHostBuilder defaultBuilder)
@@ -86,7 +86,7 @@ namespace EBuEf2IVUCrew
             return result;
         }
 
-        private static string GetSettingsPath(CommandLineOptions options)
+        private static string GetSettingsPath(Settings.CommandLine options)
         {
             var result = !string.IsNullOrWhiteSpace(options?.SettingsPath)
                 ? options.SettingsPath

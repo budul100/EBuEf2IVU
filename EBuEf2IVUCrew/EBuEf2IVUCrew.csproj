@@ -60,6 +60,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Services\DatabaseConnector\DatabaseConnector.csproj" />
+    <ProjectReference Include="..\Services\StateHandler\StateHandler.csproj" />
   </ItemGroup>
 
   <ItemGroup>

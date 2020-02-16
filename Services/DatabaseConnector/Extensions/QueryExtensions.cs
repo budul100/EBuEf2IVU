@@ -7,28 +7,9 @@ namespace DatabaseConnector.Extensions
     {
         #region Public Methods
 
-        public static bool IsInMaxTime(this Halt halt, TimeSpan maxTime)
+        public static TimeSpan? GetAbfahrt(this Halt halt)
         {
-            if (halt.AbfahrtSoll.HasValue)
-            {
-                return halt.AbfahrtSoll <= maxTime;
-            }
-            else if (halt.AbfahrtPlan.HasValue)
-            {
-                return halt.AbfahrtPlan <= maxTime;
-            }
-
-            return false;
-        }
-
-        public static bool IsInMinTime(this Halt halt, TimeSpan minTime)
-        {
-            if (halt.AbfahrtIst.HasValue)
-            {
-                return halt.AbfahrtIst >= minTime;
-            }
-
-            return halt.AbfahrtPlan.HasValue || halt.AbfahrtSoll.HasValue;
+            return halt.AbfahrtIst ?? halt.AbfahrtSoll ?? halt.AbfahrtPlan;
         }
 
         public static DateTime ToDateTime(this long unixTimeStamp)

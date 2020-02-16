@@ -21,6 +21,8 @@ namespace EBuEf2IVUCrew
         private readonly ILogger logger;
         private readonly IStateHandler sessionStateHandler;
 
+        private TimeSpan queryDurationFuture;
+        private TimeSpan queryDurationPast;
         private CancellationTokenSource sessionCancellationTokenSource;
         private TimeSpan timeshift;
         private TrainRunQueries trainRunQuerySettings;
@@ -51,7 +53,10 @@ namespace EBuEf2IVUCrew
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
+
                 InitializeConnector(sessionCancellationToken);
+                InitializeQueries();
+                InitializeStateHandler();
 
                 trainRunQuerySettings = config
                     .GetSection(nameof(TrainRunQueries))
@@ -73,18 +78,38 @@ namespace EBuEf2IVUCrew
             return sessionCancellationTokenSource.Token;
         }
 
+        private TimeSpan GetSimTime()
+        {
+            return DateTime.Now.Add(timeshift).TimeOfDay;
+        }
+
         private void InitializeConnector(CancellationToken sessionCancellationToken)
         {
             var settings = config
                 .GetSection(nameof(EBuEfDBConnector))
                 .Get<EBuEfDBConnector>();
 
-            logger.LogDebug($"Verbindung zur Datenbank herstellen: {settings.ConnectionString}.");
-
             databaseConnector.Initialize(
                 connectionString: settings.ConnectionString,
                 retryTime: settings.RetryTime,
                 cancellationToken: sessionCancellationToken);
+        }
+
+        private void InitializeQueries()
+        {
+            var settings = config
+                .GetSection(nameof(TrainRunQueries))
+                .Get<TrainRunQueries>();
+
+            queryDurationPast = new TimeSpan(
+                hours: 0,
+                minutes: settings.AbfrageInVergangenheit * -1,
+                seconds: 0);
+
+            queryDurationFuture = new TimeSpan(
+                hours: 0,
+                minutes: settings.AbfrageInZukunft,
+                seconds: 0);
         }
 
         private void InitializeStateHandler()
@@ -134,12 +159,17 @@ namespace EBuEf2IVUCrew
 
         private async Task TestAsync()
         {
-            //var stops = await databaseConnector.GetTrainRunsAsync();
+            var minTime = GetSimTime().Add(queryDurationPast);
+            var maxTime = GetSimTime().Add(queryDurationFuture);
 
-            //foreach (var stop in stops)
-            //{
-            //    Debug.WriteLine(stop.ToString());
-            //}
+            var stops = await databaseConnector.GetTrainRunsAsync(
+                minTime: minTime,
+                maxTime: maxTime);
+
+            foreach (var stop in stops)
+            {
+                logger.LogDebug(stop.ToString());
+            }
         }
 
         #endregion Private Methods

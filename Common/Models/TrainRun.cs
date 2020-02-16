@@ -6,9 +6,7 @@ namespace Common.Models
     {
         #region Public Properties
 
-        public TimeSpan? AbfahrtIst { get; set; }
-
-        public TimeSpan? AbfahrtSollPlan { get; set; }
+        public TimeSpan? Abfahrt { get; set; }
 
         public string Zugnummer { get; set; }
 
@@ -18,7 +16,7 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return @$"Zug: {Zugnummer} | Abfahrt: {AbfahrtSollPlan:hh:mm:ss} | Ist-Abfahrt: {AbfahrtIst:hh:mm:ss}";
+            return @$"Zug: {Zugnummer} | Abfahrt: {Abfahrt:hh\:mm\:ss}";
         }
 
         #endregion Public Methods

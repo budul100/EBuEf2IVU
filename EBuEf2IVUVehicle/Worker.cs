@@ -1,7 +1,7 @@
+using Common.Enums;
 using Common.EventsArgs;
 using Common.Interfaces;
 using Common.Models;
-using DatabaseConnector;
 using EBuEf2IVUVehicle.Settings;
 using Extensions;
 using MessageReceiver;
@@ -71,12 +71,12 @@ namespace EBuEf2IVUVehicle
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            InitializeStateHandler();
-
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
+
                 InitializeConnector(sessionCancellationToken);
+                InitializeStateHandler();
 
                 await StartIVUSessionAsync();
 
@@ -203,8 +203,6 @@ namespace EBuEf2IVUVehicle
                 .GetSection(nameof(EBuEfDBConnector))
                 .Get<EBuEfDBConnector>();
 
-            logger.LogDebug($"Verbindung zur Datenbank herstellen: {settings.ConnectionString}.");
-
             databaseConnector.Initialize(
                 connectionString: settings.ConnectionString,
                 retryTime: settings.RetryTime,
@@ -264,14 +262,14 @@ namespace EBuEf2IVUVehicle
 
         private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
         {
-            if (e.IsPaused == Connector.SessionIsRunning.ToString())
+            if (e.State == SessionStates.IsRunning)
             {
                 logger?.LogInformation("Sessionstart-Nachricht empfangen.");
 
                 await StartIVUSessionAsync();
                 await SetVehicleAllocationsAsync();
             }
-            else if (e.IsPaused == Connector.SessionIsPaused.ToString())
+            else if (e.State == SessionStates.IsPaused)
             {
                 logger.LogInformation("Sessionpause-Nachricht empfangen. Die Nachrichtenempfänger, " +
                     "Datenbank-Verbindungen und IVU-Sender werden zurückgesetzt.");

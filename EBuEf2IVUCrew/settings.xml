@@ -18,6 +18,10 @@
     <ConnectionString>SERVER=db.ebuef;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
     <RetryTime>30</RetryTime>
   </EBuEfDBConnector>
+  <TrainRunQueries>
+    <AbfrageInVergangenheit>3600</AbfrageInVergangenheit>
+    <AbfrageInZukunft>3600</AbfrageInZukunft>
+  </TrainRunQueries>
   <StatusReceiver>
     <IpAddress>224.0.0.8</IpAddress>
     <ListenerPort>4454</ListenerPort>

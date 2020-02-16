@@ -1,9 +1,9 @@
 using CommandLine;
 using System;
 
-namespace EBuEf2IVUCrew.Models
+namespace EBuEf2IVUCrew.Settings
 {
-    internal class CommandLineOptions
+    internal class CommandLine
     {
         #region Public Properties
 
