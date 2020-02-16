@@ -43,7 +43,8 @@ namespace EBuEf2IVUVehicle
 
         #region Public Constructors
 
-        public Worker(IConfiguration config, ILogger<Worker> logger, IStateHandler stateHandler, IConnector connector)
+        public Worker(IConfiguration config, ILogger<Worker> logger, IStateHandler sessionStateHandler,
+            IConnector databaseConnector)
         {
             this.config = config;
             this.logger = logger;
@@ -57,11 +58,11 @@ namespace EBuEf2IVUVehicle
             positionsReceiver = GetPositionReceiver();
             positionsReceiver.MessageReceivedEvent += OnPositionReceived;
 
-            databaseConnector = connector;
+            this.databaseConnector = databaseConnector;
 
-            sessionStateHandler = stateHandler;
-            sessionStateHandler.SessionStartedEvent += OnSessionStartedAsync;
-            sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
+            this.sessionStateHandler = sessionStateHandler;
+            this.sessionStateHandler.SessionStartedEvent += OnSessionStartedAsync;
+            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
         }
 
         #endregion Public Constructors
@@ -263,14 +264,14 @@ namespace EBuEf2IVUVehicle
 
         private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
         {
-            if (e.Status == Connector.SessionIsRunning.ToString())
+            if (e.IsPaused == Connector.SessionIsRunning.ToString())
             {
                 logger?.LogInformation("Sessionstart-Nachricht empfangen.");
 
                 await StartIVUSessionAsync();
                 await SetVehicleAllocationsAsync();
             }
-            else if (e.Status == Connector.SessionIsPaused.ToString())
+            else if (e.IsPaused == Connector.SessionIsPaused.ToString())
             {
                 logger.LogInformation("Sessionpause-Nachricht empfangen. Die Nachrichtenempfänger, " +
                     "Datenbank-Verbindungen und IVU-Sender werden zurückgesetzt.");
@@ -299,10 +300,10 @@ namespace EBuEf2IVUVehicle
         {
             var currentSession = await databaseConnector.GetEBuEfSessionAsync();
 
-            ivuSessionDate = currentSession.IVUDatum;
-            ebuefSessionStart = ivuSessionDate.Add(currentSession.SessionStart.TimeOfDay);
+            ebuefSessionStart = currentSession.IVUDatum
+                .Add(currentSession.SessionStart.TimeOfDay);
 
-            logger.LogDebug($"IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um " +
+            logger.LogDebug($"Die IVU-Sitzung beginnt am {ebuefSessionStart:yyyy-MM-dd} um " +
                 $"{ebuefSessionStart:hh:mm:ss}.");
         }
 

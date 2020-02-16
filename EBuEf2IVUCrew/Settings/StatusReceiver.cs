@@ -1,4 +1,4 @@
-﻿namespace EBuEf2IVUVehicle.Settings
+﻿namespace EBuEf2IVUCrew.Settings
 {
     internal class StatusReceiver
     {

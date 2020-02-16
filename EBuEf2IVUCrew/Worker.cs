@@ -1,8 +1,11 @@
-﻿using Common.Interfaces;
+﻿using Common.Enums;
+using Common.EventsArgs;
+using Common.Interfaces;
 using EBuEf2IVUCrew.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,19 +19,27 @@ namespace EBuEf2IVUCrew
         private readonly IConfiguration config;
         private readonly IConnector databaseConnector;
         private readonly ILogger logger;
+        private readonly IStateHandler sessionStateHandler;
 
         private CancellationTokenSource sessionCancellationTokenSource;
+        private TimeSpan timeshift;
         private TrainRunQueries trainRunQuerySettings;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Worker(IConfiguration config, ILogger<Worker> logger, IConnector databaseConnector)
+        public Worker(IConfiguration config, ILogger<Worker> logger, IStateHandler sessionStateHandler,
+            IConnector databaseConnector)
         {
             this.config = config;
             this.logger = logger;
+
             this.databaseConnector = databaseConnector;
+
+            this.sessionStateHandler = sessionStateHandler;
+            this.sessionStateHandler.SessionStartedEvent += OnSessionStartedAsync;
+            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
         }
 
         #endregion Public Constructors
@@ -74,6 +85,51 @@ namespace EBuEf2IVUCrew
                 connectionString: settings.ConnectionString,
                 retryTime: settings.RetryTime,
                 cancellationToken: sessionCancellationToken);
+        }
+
+        private void InitializeStateHandler()
+        {
+            var settings = config
+                .GetSection(nameof(StatusReceiver))
+                .Get<StatusReceiver>();
+
+            sessionStateHandler.Initialize(
+                ipAdress: settings.IpAddress,
+                port: settings.ListenerPort,
+                retryTime: settings.RetryTime,
+                startPattern: settings.StartPattern,
+                statusPattern: settings.StatusPattern);
+        }
+
+        private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
+        {
+            if (e.State == SessionStates.IsRunning)
+            {
+                logger?.LogInformation("Sessionstart-Nachricht empfangen.");
+
+                await StartIVUSessionAsync();
+            }
+            else if (e.State == SessionStates.IsPaused)
+            {
+                logger.LogInformation("Sessionpause-Nachricht empfangen. Die Nachrichtenempfänger, " +
+                    "Datenbank-Verbindungen und IVU-Sender werden zurückgesetzt.");
+
+                sessionCancellationTokenSource.Cancel();
+            }
+        }
+
+        private async void OnSessionStartedAsync(object sender, EventArgs e)
+        {
+            logger?.LogInformation("Sessionstart-Nachricht empfangen.");
+
+            await StartIVUSessionAsync();
+        }
+
+        private async Task StartIVUSessionAsync()
+        {
+            var currentSession = await databaseConnector.GetEBuEfSessionAsync();
+
+            timeshift = currentSession.Verschiebung;
         }
 
         private async Task TestAsync()
