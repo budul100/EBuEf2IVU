@@ -77,6 +77,15 @@ namespace DatabaseConnector
             return result;
         }
 
+        public Task<IEnumerable<TimetableStop>> GetTimetableStops()
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (t) => GetTimetableStops(t),
+                cancellationToken: cancellationToken);
+
+            return result;
+        }
+
         public Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync()
         {
             var result = retryPolicy.ExecuteAsync(
@@ -130,6 +139,49 @@ namespace DatabaseConnector
             }
 
             return result;
+        }
+
+        private async Task<IEnumerable<TimetableStop>> GetTimetableStops(CancellationToken cancellationToken)
+        {
+            var result = Enumerable.Empty<TimetableStop>();
+
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                using var context = new HalteContext(connectionString);
+
+                logger.LogDebug($"Suche nach aktuellen Fahrplaneinträgen.");
+
+                var halte = await context.Halte
+                    .Include(h => h.Zug)
+                    .ToArrayAsync(cancellationToken);
+
+                result = GetTimetableStops(halte).ToArray();
+            }
+
+            return result;
+        }
+
+        private IEnumerable<TimetableStop> GetTimetableStops(IEnumerable<Halt> halte)
+        {
+            if (halte.Any())
+            {
+                foreach (var halt in halte)
+                {
+                    var result = new TimetableStop
+                    {
+                        Abfahrt = halt.AbfahrtPlan,
+                        Ankunft = halt.AnkunftPlan,
+                        Betriebsstelle = halt.Betriebsstelle,
+                        Zugnummer = halt.Zug?.Zugnummer.ToString(),
+                    };
+
+                    yield return result;
+                }
+            }
+            else
+            {
+                logger.LogInformation($"In der Grundaufstellung sind keine Fahrzeuge eingetragen.");
+            }
         }
 
         private IEnumerable<VehicleAllocation> GetVehicleAllocations(IEnumerable<Aufstellung> aufstellungen)

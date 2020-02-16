@@ -15,6 +15,12 @@ namespace DatabaseConnector.Models
         [Column("ankunft_ist")]
         public TimeSpan? AnkunftIst { get; set; }
 
+        [Column("abfahrt_plan")]
+        public TimeSpan? AbfahrtPlan { get; set; }
+
+        [Column("ankunft_plan")]
+        public TimeSpan? AnkunftPlan { get; set; }
+
         [Column("betriebsstelle")]
         public string Betriebsstelle { get; set; }
 
