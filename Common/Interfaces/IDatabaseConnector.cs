@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Common.Interfaces
 {
-    public interface IConnector
+    public interface IDatabaseConnector
     {
         #region Public Methods
 

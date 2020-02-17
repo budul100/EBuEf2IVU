@@ -65,8 +65,9 @@ namespace EBuEf2IVUCrew
         {
             services.AddHostedService<Worker>();
 
-            services.AddSingleton<IConnector, DatabaseConnector.Connector>();
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
+            services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
+            services.AddSingleton<ICrewChecker, CrewChecker.Checker>();
         }
 
         private static IHostBuilder GetHostBuilder(this IHostBuilder defaultBuilder)

@@ -21,7 +21,7 @@ namespace StateHandler
 
         private readonly ILogger logger;
 
-        private IReceiver receiver;
+        private IMessageReceiver receiver;
         private Regex startRegex;
         private Regex statusRegex;
 

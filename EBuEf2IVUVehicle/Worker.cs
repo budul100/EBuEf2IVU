@@ -27,11 +27,11 @@ namespace EBuEf2IVUVehicle
         private const string MessageTypePositions = "Echtzeit-Positionen";
 
         private readonly IConfiguration config;
-        private readonly IConnector databaseConnector;
+        private readonly IDatabaseConnector databaseConnector;
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
-        private readonly ISender ivuSender;
+        private readonly IRealtimeSender ivuSender;
         private readonly ILogger logger;
-        private readonly IReceiver positionsReceiver;
+        private readonly IMessageReceiver positionsReceiver;
         private readonly JsonSerializerSettings positionsReceiverSettings = new JsonSerializerSettings();
         private readonly IStateHandler sessionStateHandler;
 
@@ -44,7 +44,7 @@ namespace EBuEf2IVUVehicle
         #region Public Constructors
 
         public Worker(IConfiguration config, ILogger<Worker> logger, IStateHandler sessionStateHandler,
-            IConnector databaseConnector)
+            IDatabaseConnector databaseConnector)
         {
             this.config = config;
             this.logger = logger;
@@ -158,7 +158,7 @@ namespace EBuEf2IVUVehicle
             return result;
         }
 
-        private IReceiver GetPositionReceiver()
+        private IMessageReceiver GetPositionReceiver()
         {
             var settings = config
                 .GetSection(nameof(PositionsReceiver))
@@ -174,7 +174,7 @@ namespace EBuEf2IVUVehicle
             return result;
         }
 
-        private ISender GetSender()
+        private IRealtimeSender GetSender()
         {
             var settings = config
                 .GetSection(nameof(IVURealtimeSender))
@@ -298,10 +298,11 @@ namespace EBuEf2IVUVehicle
         {
             var currentSession = await databaseConnector.GetEBuEfSessionAsync();
 
-            ebuefSessionStart = currentSession.IVUDatum
+            ivuSessionDate = currentSession.IVUDatum;
+            ebuefSessionStart = ivuSessionDate
                 .Add(currentSession.SessionStart.TimeOfDay);
 
-            logger.LogDebug($"Die IVU-Sitzung beginnt am {ebuefSessionStart:yyyy-MM-dd} um " +
+            logger.LogDebug($"Die IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um " +
                 $"{ebuefSessionStart:hh:mm:ss}.");
         }
 

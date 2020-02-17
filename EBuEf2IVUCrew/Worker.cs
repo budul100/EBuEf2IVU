@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,31 +18,34 @@ namespace EBuEf2IVUCrew
         #region Private Fields
 
         private readonly IConfiguration config;
-        private readonly IConnector databaseConnector;
+        private readonly ICrewChecker crewChecker;
+        private readonly IDatabaseConnector databaseConnector;
         private readonly ILogger logger;
         private readonly IStateHandler sessionStateHandler;
 
+        private IVUCrewChecker checkerSettings;
+        private DateTime ivuSessionDate = DateTime.Now;
         private TimeSpan queryDurationFuture;
         private TimeSpan queryDurationPast;
         private CancellationTokenSource sessionCancellationTokenSource;
         private TimeSpan timeshift;
-        private TrainRunQueries trainRunQuerySettings;
 
         #endregion Private Fields
 
         #region Public Constructors
 
         public Worker(IConfiguration config, ILogger<Worker> logger, IStateHandler sessionStateHandler,
-            IConnector databaseConnector)
+            IDatabaseConnector databaseConnector, ICrewChecker crewChecker)
         {
             this.config = config;
             this.logger = logger;
 
-            this.databaseConnector = databaseConnector;
-
             this.sessionStateHandler = sessionStateHandler;
             this.sessionStateHandler.SessionStartedEvent += OnSessionStartedAsync;
             this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
+
+            this.databaseConnector = databaseConnector;
+            this.crewChecker = crewChecker;
         }
 
         #endregion Public Constructors
@@ -54,21 +58,43 @@ namespace EBuEf2IVUCrew
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                InitializeConnector(sessionCancellationToken);
-                InitializeQueries();
                 InitializeStateHandler();
+                InitializeConnector(sessionCancellationToken);
+                InitializeChecker(sessionCancellationToken);
 
-                trainRunQuerySettings = config
-                    .GetSection(nameof(TrainRunQueries))
-                    .Get<TrainRunQueries>();
+                await StartIVUSessionAsync();
 
-                await TestAsync();
+                while (!sessionCancellationToken.IsCancellationRequested)
+                {
+                    await Task.Run(() => CheckCrewsAsync(sessionCancellationToken));
+                }
             }
         }
 
         #endregion Protected Methods
 
         #region Private Methods
+
+        private async Task CheckCrewsAsync(CancellationToken sessionCancellationToken)
+        {
+            var minTime = GetSimTime().Add(queryDurationPast);
+            var maxTime = GetSimTime().Add(queryDurationFuture);
+
+            var trainRuns = await databaseConnector.GetTrainRunsAsync(
+                minTime: minTime,
+                maxTime: maxTime);
+
+            if (trainRuns.Any())
+            {
+                var tripNumbers = trainRuns
+                    .Select(t => t.Zugnummer).ToArray();
+
+                var x = await crewChecker.GetCrewingElementsAsync(
+                    tripNumbers: new string[] { "18601", "18604" },
+                    date: ivuSessionDate,
+                    cancellationToken: sessionCancellationToken);
+            }
+        }
 
         private CancellationToken GetSessionCancellationToken(CancellationToken workerCancellationToken)
         {
@@ -83,32 +109,47 @@ namespace EBuEf2IVUCrew
             return DateTime.Now.Add(timeshift).TimeOfDay;
         }
 
+        private void InitializeChecker(CancellationToken sessionCancellationToken)
+        {
+            checkerSettings = config
+                .GetSection(nameof(IVUCrewChecker))
+                .Get<IVUCrewChecker>();
+
+            crewChecker.Initialize(
+                host: checkerSettings.Host,
+                port: checkerSettings.Port,
+                path: checkerSettings.Path,
+                username: checkerSettings.Username,
+                password: checkerSettings.Password,
+                isHttps: checkerSettings.IsHttps,
+                division: checkerSettings.Division,
+                planningLevel: checkerSettings.PlanningLevel,
+                retryTime: checkerSettings.RetryTime);
+        }
+
         private void InitializeConnector(CancellationToken sessionCancellationToken)
         {
-            var settings = config
+            var connectorSettings = config
                 .GetSection(nameof(EBuEfDBConnector))
                 .Get<EBuEfDBConnector>();
 
             databaseConnector.Initialize(
-                connectionString: settings.ConnectionString,
-                retryTime: settings.RetryTime,
+                connectionString: connectorSettings.ConnectionString,
+                retryTime: connectorSettings.RetryTime,
                 cancellationToken: sessionCancellationToken);
-        }
 
-        private void InitializeQueries()
-        {
-            var settings = config
+            var querySettings = config
                 .GetSection(nameof(TrainRunQueries))
                 .Get<TrainRunQueries>();
 
             queryDurationPast = new TimeSpan(
                 hours: 0,
-                minutes: settings.AbfrageInVergangenheit * -1,
+                minutes: querySettings.AbfrageInVergangenheit * -1,
                 seconds: 0);
 
             queryDurationFuture = new TimeSpan(
                 hours: 0,
-                minutes: settings.AbfrageInZukunft,
+                minutes: querySettings.AbfrageInZukunft,
                 seconds: 0);
         }
 
@@ -154,22 +195,10 @@ namespace EBuEf2IVUCrew
         {
             var currentSession = await databaseConnector.GetEBuEfSessionAsync();
 
+            ivuSessionDate = currentSession.IVUDatum;
             timeshift = currentSession.Verschiebung;
-        }
 
-        private async Task TestAsync()
-        {
-            var minTime = GetSimTime().Add(queryDurationPast);
-            var maxTime = GetSimTime().Add(queryDurationFuture);
-
-            var stops = await databaseConnector.GetTrainRunsAsync(
-                minTime: minTime,
-                maxTime: maxTime);
-
-            foreach (var stop in stops)
-            {
-                logger.LogDebug(stop.ToString());
-            }
+            logger.LogDebug($"Die IVU-Sitzung läuft am {ivuSessionDate:yyyy-MM-dd}.");
         }
 
         #endregion Private Methods

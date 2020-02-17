@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Common.Interfaces
 {
-    public interface IReceiver
+    public interface IMessageReceiver
     {
         #region Public Events
 

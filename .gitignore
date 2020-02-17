@@ -1,6 +1,4 @@
 *.deb
-_Additionals/*
-_localhost.lnk
 EBuef2IVUCore/settings.xml
 
 ## Ignore Visual Studio temporary files, build results, and

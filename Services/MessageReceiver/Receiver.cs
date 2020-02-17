@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace MessageReceiver
 {
     public class Receiver
-        : IReceiver
+        : IMessageReceiver
     {
         #region Private Fields
 

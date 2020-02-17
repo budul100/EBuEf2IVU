@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace DatabaseConnector
 {
     public class Connector
-        : IConnector
+        : IDatabaseConnector
     {
         #region Private Fields
 
@@ -155,7 +155,8 @@ namespace DatabaseConnector
             {
                 var relevants = halte
                     .GroupBy(h => h.ZugID)
-                    .Select(g => g.OrderBy(h => h.GetAbfahrt()).First()).ToArray();
+                    .Select(g => g.OrderBy(h => h.GetAbfahrt()).First())
+                    .Distinct().ToArray();
 
                 foreach (var relevant in relevants)
                 {

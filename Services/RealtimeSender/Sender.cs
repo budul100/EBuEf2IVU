@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace RealtimeSender
 {
     public class Sender
-        : ISender
+        : IRealtimeSender
     {
         #region Private Fields
 
@@ -41,7 +41,7 @@ namespace RealtimeSender
             this.logger = logger;
             this.division = division;
 
-            endpointAddress = new EndpointAddress(endpoint ?? string.Empty);
+            endpointAddress = new EndpointAddress(endpoint);
             deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
 
             retryPolicy = Policy
@@ -96,7 +96,7 @@ namespace RealtimeSender
             cancellationToken.Register(() => infosQueue.Clear());
 
             var result = retryPolicy.ExecuteAsync(
-                action: (t) => RunSenderAsync(t),
+                action: (token) => RunSenderAsync(token),
                 cancellationToken: cancellationToken);
 
             return result;

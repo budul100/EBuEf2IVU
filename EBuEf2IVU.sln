@@ -23,7 +23,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{B66A038D-89B1-4317-BD2D-85C054B7CA12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StateHandler", "Services\StateHandler\StateHandler.csproj", "{1CBAA357-9855-4551-8D96-8E576150EDB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StateHandler", "Services\StateHandler\StateHandler.csproj", "{1CBAA357-9855-4551-8D96-8E576150EDB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrewChecker", "Services\CrewChecker\CrewChecker.csproj", "{DAFDF6EE-8018-4DA1-9018-1BFCF3D439BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,10 @@ Global
 		{1CBAA357-9855-4551-8D96-8E576150EDB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CBAA357-9855-4551-8D96-8E576150EDB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CBAA357-9855-4551-8D96-8E576150EDB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAFDF6EE-8018-4DA1-9018-1BFCF3D439BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAFDF6EE-8018-4DA1-9018-1BFCF3D439BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAFDF6EE-8018-4DA1-9018-1BFCF3D439BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAFDF6EE-8018-4DA1-9018-1BFCF3D439BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +84,7 @@ Global
 		{DAE0F974-DA2C-42A3-AF59-589E41AC89C7} = {4129F1CE-BB62-40CD-847F-A58EFE37390B}
 		{EB7E8EBE-9858-4E78-A161-560E38ABF079} = {4129F1CE-BB62-40CD-847F-A58EFE37390B}
 		{1CBAA357-9855-4551-8D96-8E576150EDB2} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
+		{DAFDF6EE-8018-4DA1-9018-1BFCF3D439BF} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E929A830-61A1-48FF-9596-23961F1A08C4}

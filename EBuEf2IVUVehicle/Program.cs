@@ -65,7 +65,7 @@ namespace EBuEf2IVUVehicle
         {
             services.AddHostedService<Worker>();
 
-            services.AddSingleton<IConnector, DatabaseConnector.Connector>();
+            services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
         }
 
