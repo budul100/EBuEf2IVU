@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\WebServiceBase\WebServiceBase.csproj" />
     <ProjectReference Include="..\..\Common\Common.csproj" />
   </ItemGroup>
 

@@ -18,7 +18,7 @@ namespace CrewChecker
 
         private readonly ILogger logger;
 
-        private CrewCheckerClient client;
+        private CheckerChannel client;
         private bool disposed;
         private AsyncRetryPolicy retryPolicy;
 
@@ -57,7 +57,7 @@ namespace CrewChecker
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
             string division, string planningLevel, int retryTime)
         {
-            client = new CrewCheckerClient(
+            client = new CheckerChannel(
                 host: host,
                 port: port,
                 path: path,

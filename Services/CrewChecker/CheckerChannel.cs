@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace CrewChecker.Client
 {
-    internal class CrewCheckerClient
-        : ClientBase<CrewOnTripPortTypeChannel>
+    internal class CheckerChannel
+        : BaseChannel<CrewOnTripPortTypeChannel>
     {
         #region Private Fields
 
@@ -18,7 +18,7 @@ namespace CrewChecker.Client
 
         #region Public Constructors
 
-        public CrewCheckerClient(string host, int port, string path, string userName, string password, bool isHttps,
+        public CheckerChannel(string host, int port, string path, string userName, string password, bool isHttps,
             bool ignoreCertificateErrors, string division, string planningLevel)
             : base(host, port, path, userName, password, isHttps, ignoreCertificateErrors)
         {
@@ -36,7 +36,7 @@ namespace CrewChecker.Client
                 tripNumbers: tripNumbers,
                 date: date);
 
-            var response = await Client.exportCrewAssignmentsForTripsAsync(request);
+            var response = await Channel.exportCrewAssignmentsForTripsAsync(request);
 
             if (response.exportCrewAssignmentsResponse.error != default)
             {
