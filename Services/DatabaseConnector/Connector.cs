@@ -180,14 +180,19 @@ namespace DatabaseConnector
             return result;
         }
 
-        private int? GetTrainId(string zugNummer)
+        private int? GetTrainId(string zugnummer)
         {
-            using var context = new ZuegeContext(connectionString);
+            var result = default(int?);
 
-            var trainNumber = zugNummer.ToInt();
+            if (!string.IsNullOrWhiteSpace(zugnummer))
+            {
+                using var context = new ZuegeContext(connectionString);
 
-            var result = context.Zuege
-                .FirstOrDefault(z => z.Zugnummer == trainNumber)?.ID;
+                var trainNumber = zugnummer.ToInt();
+
+                result = context.Zuege
+                    .FirstOrDefault(z => z.Zugnummer == trainNumber)?.ID;
+            }
 
             return result;
         }
@@ -298,6 +303,8 @@ namespace DatabaseConnector
 
         private void OnRetry(Exception exception, TimeSpan reconnection)
         {
+            while (exception.InnerException != null) exception = exception.InnerException;
+
             logger.LogError($"Fehler beim Verbinden mit der EBuEf-Datenbank: {exception.Message}\r\n" +
                 $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
         }
