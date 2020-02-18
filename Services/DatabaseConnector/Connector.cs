@@ -97,13 +97,44 @@ namespace DatabaseConnector
                     sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime));
         }
 
+        public Task SetCrewingsAsync(IEnumerable<CrewingElement> crewingElements)
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (token) => SaveCrewings(
+                    crewingElements: crewingElements,
+                    cancellationToken: token),
+                cancellationToken: cancellationToken);
+
+            return result;
+        }
+
         #endregion Public Methods
 
         #region Private Methods
 
-        private IEnumerable<string> GetFahrzeuge(Aufstellung aufstellung)
+        private IEnumerable<Besatzung> GetCrewings(IEnumerable<CrewingElement> crewingElements)
         {
-            yield return aufstellung.Decoder.ToString();
+            if (crewingElements?.Any() ?? false)
+            {
+                foreach (var crewingElement in crewingElements)
+                {
+                    var trainId = GetTrainId(crewingElement.Zugnummer);
+                    var predecessorTrainId = GetTrainId(crewingElement.ZugnummerVorgaenger);
+
+                    var result = new Besatzung
+                    {
+                        BetriebsstelleNach = crewingElement.BetriebsstelleNach,
+                        BetriebsstelleVon = crewingElement.BetriebsstelleVon,
+                        Dienst = crewingElement.DienstKurzname,
+                        PersonalNachname = crewingElement.PersonalNachname,
+                        PersonalNummer = crewingElement.PersonalNummer.ToInt(),
+                        VorgaengerZugId = predecessorTrainId ?? 0,
+                        ZugId = trainId ?? 0,
+                    };
+
+                    yield return result;
+                }
+            }
         }
 
         private async Task<EBuEfSession> GetSessionDateAsync(CancellationToken cancellationToken)
@@ -112,7 +143,7 @@ namespace DatabaseConnector
 
             if (!cancellationToken.IsCancellationRequested)
             {
-                using var context = new SitzungContext(connectionString);
+                using var context = new SitzungenContext(connectionString);
 
                 logger.LogDebug($"Suche in der EBuEf-DB nach der aktuellen Fahrplan-Session.");
 
@@ -145,6 +176,18 @@ namespace DatabaseConnector
                     logger.LogError($"Es wurde keine EBuEf-Session gefunden.");
                 }
             }
+
+            return result;
+        }
+
+        private int? GetTrainId(string zugNummer)
+        {
+            using var context = new ZuegeContext(connectionString);
+
+            var trainNumber = zugNummer.ToInt();
+
+            var result = context.Zuege
+                .FirstOrDefault(z => z.Zugnummer == trainNumber)?.ID;
 
             return result;
         }
@@ -211,7 +254,7 @@ namespace DatabaseConnector
                     var result = new VehicleAllocation
                     {
                         Betriebsstelle = relevantAufstellung.Feld?.Betriebsstelle,
-                        Fahrzeuge = GetFahrzeuge(relevantAufstellung).ToArray(),
+                        Fahrzeuge = GetVehicles(relevantAufstellung).ToArray(),
                         Gleis = relevantAufstellung.Feld?.Gleis.ToString(),
                         Zugnummer = relevantAufstellung.Zugnummer?.ToString(),
                     };
@@ -248,22 +291,49 @@ namespace DatabaseConnector
             return result;
         }
 
+        private IEnumerable<string> GetVehicles(Aufstellung aufstellung)
+        {
+            yield return aufstellung.Decoder.ToString();
+        }
+
         private void OnRetry(Exception exception, TimeSpan reconnection)
         {
             logger.LogError($"Fehler beim Verbinden mit der EBuEf-Datenbank: {exception.Message}\r\n" +
                 $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
         }
 
+        private async Task SaveCrewings(IEnumerable<CrewingElement> crewingElements, CancellationToken cancellationToken)
+        {
+            if (crewingElements?.Any() ?? false)
+            {
+                using var context = new BesatzungenContext(connectionString);
+
+                context.Database.OpenConnection();
+
+                var besatzungen = GetCrewings(crewingElements).ToArray();
+
+                if (besatzungen.Any())
+                {
+                    context.Besatzungen.RemoveRange(context.Besatzungen);
+                    context.Besatzungen.AddRange(besatzungen);
+
+                    await context.SaveChangesAsync(cancellationToken);
+                }
+
+                context.Database.CloseConnection();
+            }
+        }
+
         private async Task SaveTrainPositionAsync(TrainPosition position, bool istVon, CancellationToken cancellationToken)
         {
-            using var context = new HalteContext(connectionString);
-
             var betriebsstelle = istVon
                 ? position.EBuEfBetriebsstelleVon
                 : position.EBuEfBetriebsstelleNach;
 
             if (!string.IsNullOrWhiteSpace(betriebsstelle))
             {
+                using var context = new HalteContext(connectionString);
+
                 logger.LogDebug($"Suche in der EBuEf-DB nach dem letzten Halt von " +
                     $"Zug {position.Zugnummer} in {betriebsstelle}.");
 

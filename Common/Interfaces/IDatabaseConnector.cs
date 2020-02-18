@@ -20,6 +20,8 @@ namespace Common.Interfaces
 
         void Initialize(string connectionString, int retryTime, CancellationToken cancellationToken);
 
+        Task SetCrewingsAsync(IEnumerable<CrewingElement> crewingElements);
+
         #endregion Public Methods
     }
 }

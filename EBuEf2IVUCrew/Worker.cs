@@ -27,6 +27,7 @@ namespace EBuEf2IVUCrew
         private DateTime ivuSessionDate = DateTime.Now;
         private TimeSpan queryDurationFuture;
         private TimeSpan queryDurationPast;
+        private TimeSpan serviceInterval;
         private CancellationTokenSource sessionCancellationTokenSource;
         private TimeSpan timeshift;
 
@@ -58,6 +59,7 @@ namespace EBuEf2IVUCrew
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
+                InitializeService();
                 InitializeStateHandler();
                 InitializeConnector(sessionCancellationToken);
                 InitializeChecker(sessionCancellationToken);
@@ -67,6 +69,10 @@ namespace EBuEf2IVUCrew
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     await Task.Run(() => CheckCrewsAsync(sessionCancellationToken));
+
+                    await Task.Delay(
+                        delay: serviceInterval,
+                        cancellationToken: sessionCancellationToken);
                 }
             }
         }
@@ -89,10 +95,17 @@ namespace EBuEf2IVUCrew
                 var tripNumbers = trainRuns
                     .Select(t => t.Zugnummer).ToArray();
 
-                var x = await crewChecker.GetCrewingElementsAsync(
-                    tripNumbers: new string[] { "18601", "18604" },
+                tripNumbers = new string[] { "18601", "18604" };
+
+                var crewingElements = await crewChecker.GetCrewingElementsAsync(
+                    tripNumbers: tripNumbers,
                     date: ivuSessionDate,
                     cancellationToken: sessionCancellationToken);
+
+                if (crewingElements.Any())
+                {
+                    await databaseConnector.SetCrewingsAsync(crewingElements);
+                }
             }
         }
 
@@ -137,20 +150,28 @@ namespace EBuEf2IVUCrew
                 connectionString: connectorSettings.ConnectionString,
                 retryTime: connectorSettings.RetryTime,
                 cancellationToken: sessionCancellationToken);
+        }
 
-            var querySettings = config
-                .GetSection(nameof(TrainRunQueries))
-                .Get<TrainRunQueries>();
+        private void InitializeService()
+        {
+            var serviceSettings = config
+                .GetSection(nameof(ServiceSettings))
+                .Get<ServiceSettings>();
 
             queryDurationPast = new TimeSpan(
                 hours: 0,
-                minutes: querySettings.AbfrageInVergangenheit * -1,
+                minutes: serviceSettings.AbfrageInVergangenheitMin * -1,
                 seconds: 0);
 
             queryDurationFuture = new TimeSpan(
                 hours: 0,
-                minutes: querySettings.AbfrageInZukunft,
+                minutes: serviceSettings.AbfrageInZukunftMin,
                 seconds: 0);
+
+            serviceInterval = new TimeSpan(
+                hours: 0,
+                minutes: 0,
+                seconds: serviceSettings.AbfrageIntervalSek);
         }
 
         private void InitializeStateHandler()
