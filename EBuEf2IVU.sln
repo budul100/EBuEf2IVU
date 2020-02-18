@@ -102,14 +102,14 @@ Global
 		UpdateAssemblyVersion.Debug|Any CPU = True
 		UpdateAssemblyFileVersion.Debug|Any CPU = False
 		UpdateAssemblyInfoVersion.Debug|Any CPU = False
-		AssemblyVersionSettings.Debug|Any CPU = None.None.IncrementWithResetOnIncrease.None
+		AssemblyVersionSettings.Debug|Any CPU = NoneWithAutoReset.NoneWithAutoReset.NoneWithAutoReset.IncrementWithResetOnIncrease
 		UpdatePackageVersion.Debug|Any CPU = False
 		AssemblyInfoVersionType.Debug|Any CPU = SettingsVersion
 		InheritWinAppVersionFrom.Debug|Any CPU = None
 		UpdateAssemblyVersion.Release|Any CPU = True
 		UpdateAssemblyFileVersion.Release|Any CPU = False
 		UpdateAssemblyInfoVersion.Release|Any CPU = False
-		AssemblyVersionSettings.Release|Any CPU = NoneWithAutoReset.IncrementWithResetOnIncrease.NoneWithAutoReset.None
+		AssemblyVersionSettings.Release|Any CPU = NoneWithAutoReset.NoneWithAutoReset.IncrementWithResetOnIncrease.None
 		UpdatePackageVersion.Release|Any CPU = False
 		AssemblyInfoVersionType.Release|Any CPU = SettingsVersion
 		InheritWinAppVersionFrom.Release|Any CPU = None
