@@ -12,13 +12,16 @@ using System.Threading.Tasks;
 namespace CrewChecker
 {
     public class Checker
-        : ICrewChecker
+        : ICrewChecker, IDisposable
     {
         #region Private Fields
 
         private readonly ILogger logger;
 
         private CheckerChannel client;
+
+        private bool disposed = false;
+
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
@@ -34,9 +37,16 @@ namespace CrewChecker
 
         #region Public Methods
 
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
         public Task<IEnumerable<CrewingElement>> GetCrewingElementsAsync(IEnumerable<string> tripNumbers, DateTime date,
             CancellationToken cancellationToken)
         {
+            cancellationToken.Register(() => client.Dispose());
+
             var result = retryPolicy.ExecuteAsync(
                 action: (token) => client.GetAsync(
                     tripNumbers: tripNumbers,
@@ -71,10 +81,29 @@ namespace CrewChecker
 
         #endregion Public Methods
 
+        #region Protected Methods
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    client.Dispose();
+                }
+
+                disposed = true;
+            }
+        }
+
+        #endregion Protected Methods
+
         #region Private Methods
 
         private void OnRetry(Exception exception, TimeSpan reconnection)
         {
+            while (exception.InnerException != null) exception = exception.InnerException;
+
             logger.LogError(
                 $"Fehler beim Abrufen der Crew-Informationen von IVU.rail: {exception.Message}\r\n" +
                 $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
