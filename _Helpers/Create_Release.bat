@@ -1,22 +1,6 @@
-pushd D:\Users\mgr\Entwicklung\NET\Extensions\ConverterExtensions
-dotnet build -c release -f netstandard2.0
+pushd ..
 
-pushd D:\Users\mgr\Entwicklung\NET\Extensions\RegexExtensions
-dotnet build -c release -f netstandard2.0
-
-pushd D:\Users\mgr\Entwicklung\NET\EBuEf2IVUCore\EBuEfDBConnector
-dotnet build -c release -f netstandard2.0
-
-pushd D:\Users\mgr\Entwicklung\NET\EBuEf2IVUCore\MessageReceiver
-dotnet build -c release -f netstandard2.0
-
-pushd D:\Users\mgr\Entwicklung\NET\EBuEf2IVUCore\RealtimeSender
-dotnet build -c release -f netstandard2.0
-
-pushd D:\Users\mgr\Entwicklung\NET\EBuEf2IVUCore\Common
-dotnet build -c release -f netstandard2.0
-
-pushd D:\Users\mgr\Entwicklung\NET\EBuEf2IVUCore\EBuef2IVUCore
-dotnet build -c release -f netcoreapp3.1
+dotnet build -c release -f netcoreapp3.1 .\EBuEf2IVUCrew\EBuEf2IVUCrew.csproj 
+dotnet build -c release -f netcoreapp3.1 .\EBuEf2IVUVehicle\EBuEf2IVUVehicle.csproj 
 
 pause
