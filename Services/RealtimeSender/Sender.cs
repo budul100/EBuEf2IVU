@@ -187,6 +187,8 @@ namespace RealtimeSender
 
         private void OnRetry(Exception exception, TimeSpan reconnection)
         {
+            while (exception.InnerException != null) exception = exception.InnerException;
+
             logger.LogError(
                 $"Fehler beim Senden der Ist-Zeiten an IVU.rail: {exception.Message}\r\n" +
                 $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");

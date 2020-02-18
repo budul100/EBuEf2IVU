@@ -82,6 +82,8 @@ namespace MessageReceiver
             }
             else
             {
+                while (exception.InnerException != null) exception = exception.InnerException;
+
                 logger.LogError(
                     $"Fehler beim Nachrichtenempfänger an {ipAdress}:{port}: {exception.Message}\r\n" +
                     $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
