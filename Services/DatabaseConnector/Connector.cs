@@ -43,7 +43,7 @@ namespace DatabaseConnector
         public Task AddRealtimeAsync(TrainPosition position)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => SetTrainPositionsAsync(
+                action: (token) => SaveTrainPositionsAsync(
                     position: position,
                     cancellationToken: token),
                 cancellationToken: cancellationToken);
@@ -119,20 +119,24 @@ namespace DatabaseConnector
                 foreach (var crewingElement in crewingElements)
                 {
                     var trainId = GetTrainId(crewingElement.Zugnummer);
-                    var predecessorTrainId = GetTrainId(crewingElement.ZugnummerVorgaenger);
 
-                    var result = new Besatzung
+                    if (trainId.HasValue)
                     {
-                        BetriebsstelleNach = crewingElement.BetriebsstelleNach,
-                        BetriebsstelleVon = crewingElement.BetriebsstelleVon,
-                        Dienst = crewingElement.DienstKurzname,
-                        PersonalNachname = crewingElement.PersonalNachname,
-                        PersonalNummer = crewingElement.PersonalNummer.ToInt(),
-                        VorgaengerZugId = predecessorTrainId ?? 0,
-                        ZugId = trainId ?? 0,
-                    };
+                        var predecessorTrainId = GetTrainId(crewingElement.ZugnummerVorgaenger);
 
-                    yield return result;
+                        var result = new Besatzung
+                        {
+                            BetriebsstelleNach = crewingElement.BetriebsstelleNach,
+                            BetriebsstelleVon = crewingElement.BetriebsstelleVon,
+                            Dienst = crewingElement.DienstKurzname,
+                            PersonalNachname = crewingElement.PersonalNachname,
+                            PersonalNummer = crewingElement.PersonalNummer.ToInt(),
+                            VorgaengerZugId = predecessorTrainId,
+                            ZugId = trainId.Value,
+                        };
+
+                        yield return result;
+                    }
                 }
             }
         }
@@ -321,10 +325,17 @@ namespace DatabaseConnector
 
                 if (besatzungen.Any())
                 {
+                    logger.LogDebug($"Die vorhandenen Crewing-Einträge in der EBuEf-DB werden gelöscht.");
+
                     context.Besatzungen.RemoveRange(context.Besatzungen);
+
+                    logger.LogDebug($"Es werden {besatzungen.Count()} Crewing-Einträge in der EBuEf-DB gespeichert.");
+
                     context.Besatzungen.AddRange(besatzungen);
 
                     await context.SaveChangesAsync(cancellationToken);
+
+                    logger.LogDebug("Die Crewing-Einträge wurden gespeichert.");
                 }
 
                 context.Database.CloseConnection();
@@ -370,6 +381,8 @@ namespace DatabaseConnector
                     }
 
                     await context.SaveChangesAsync(cancellationToken);
+
+                    logger.LogDebug("Das Update des Halts wurde gespeichert.");
                 }
                 else
                 {
@@ -378,7 +391,7 @@ namespace DatabaseConnector
             }
         }
 
-        private async Task SetTrainPositionsAsync(TrainPosition position, CancellationToken cancellationToken)
+        private async Task SaveTrainPositionsAsync(TrainPosition position, CancellationToken cancellationToken)
         {
             if (position != null && !cancellationToken.IsCancellationRequested)
             {

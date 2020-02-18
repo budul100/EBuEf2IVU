@@ -83,24 +83,29 @@ namespace EBuEf2IVUCrew
 
         private async Task CheckCrewsAsync(CancellationToken sessionCancellationToken)
         {
-            var minTime = GetSimTime().Add(queryDurationPast);
-            var maxTime = GetSimTime().Add(queryDurationFuture);
+            var minTime = GetSimTime()
+                .Add(queryDurationPast).TimeOfDay;
+            var maxTime = GetSimTime()
+                .Add(queryDurationFuture).TimeOfDay;
 
             var trainRuns = await databaseConnector.GetTrainRunsAsync(
                 minTime: minTime,
                 maxTime: maxTime);
 
+            logger.LogDebug(@$"In der EBuEf-DB wurden {trainRuns.Count()} Züge für den " +
+                @$"Zeitraum zwischen {minTime:hh\:mm} und {maxTime:hh\:mm} gefunden.");
+
             if (trainRuns.Any())
             {
                 var tripNumbers = trainRuns
                     .Select(t => t.Zugnummer).ToArray();
-
-                tripNumbers = new string[] { "18601", "18604" };
-
                 var crewingElements = await crewChecker.GetCrewingElementsAsync(
                     tripNumbers: tripNumbers,
                     date: ivuSessionDate,
                     cancellationToken: sessionCancellationToken);
+
+                logger.LogDebug($"In der IVU.rail wurden {crewingElements.Count()} " +
+                    $"Besatzungseinträge zu den Zügen gefunden.");
 
                 if (crewingElements.Any())
                 {
@@ -117,9 +122,9 @@ namespace EBuEf2IVUCrew
             return sessionCancellationTokenSource.Token;
         }
 
-        private TimeSpan GetSimTime()
+        private DateTime GetSimTime()
         {
-            return DateTime.Now.Add(timeshift).TimeOfDay;
+            return DateTime.Now.Add(timeshift);
         }
 
         private void InitializeChecker(CancellationToken sessionCancellationToken)
