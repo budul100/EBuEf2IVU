@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseConnector.Contexts
 {
-    internal class SitzungContext
+    internal class ZuegeContext
         : BaseContext
     {
         #region Public Constructors
 
-        public SitzungContext(string connectionString)
+        public ZuegeContext(string connectionString)
             : base(connectionString)
         { }
 
@@ -16,7 +16,7 @@ namespace DatabaseConnector.Contexts
 
         #region Public Properties
 
-        public DbSet<Sitzung> Sitzungen { get; set; }
+        public DbSet<Zug> Zuege { get; set; }
 
         #endregion Public Properties
     }
