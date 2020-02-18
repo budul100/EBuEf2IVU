@@ -12,14 +12,13 @@ using System.Threading.Tasks;
 namespace CrewChecker
 {
     public class Checker
-        : ICrewChecker, IDisposable
+        : ICrewChecker
     {
         #region Private Fields
 
         private readonly ILogger logger;
 
         private CheckerChannel client;
-        private bool disposed;
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
@@ -35,16 +34,9 @@ namespace CrewChecker
 
         #region Public Methods
 
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
         public Task<IEnumerable<CrewingElement>> GetCrewingElementsAsync(IEnumerable<string> tripNumbers, DateTime date,
-                    CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
-            cancellationToken.Register(() => client.Dispose());
-
             var result = retryPolicy.ExecuteAsync(
                 action: (token) => client.GetAsync(
                     tripNumbers: tripNumbers,
@@ -78,23 +70,6 @@ namespace CrewChecker
         }
 
         #endregion Public Methods
-
-        #region Protected Methods
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    client.Dispose();
-                }
-
-                disposed = true;
-            }
-        }
-
-        #endregion Protected Methods
 
         #region Private Methods
 
