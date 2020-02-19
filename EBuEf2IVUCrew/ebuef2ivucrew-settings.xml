@@ -20,7 +20,7 @@
   </EBuEfDBConnector>
   <IVUCrewChecker>
     <Division>EBUEF</Division>
-    <Host>ivu.ebuef</Host>
+    <Host>192.168.17.52</Host>
     <IsHttps>false</IsHttps>
     <Password>crewontrip</Password>
     <Path>intf.crewontrip.impl/CrewOnTripWebFacadeBean</Path>
