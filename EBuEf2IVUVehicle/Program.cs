@@ -65,8 +65,9 @@ namespace EBuEf2IVUVehicle
         {
             services.AddHostedService<Worker>();
 
-            services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
+            services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
+            services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();
         }
 
         private static IHostBuilder GetHostBuilder(this IHostBuilder defaultBuilder)
