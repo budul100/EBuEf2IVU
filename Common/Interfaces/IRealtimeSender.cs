@@ -14,6 +14,8 @@ namespace Common.Interfaces
 
         void AddRealtime(TrainPosition position);
 
+        void Initialize(string division, string endpoint, int retryTime);
+
         Task RunAsnc(CancellationToken cancellationToken);
 
         #endregion Public Methods

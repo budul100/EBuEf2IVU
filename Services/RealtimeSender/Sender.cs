@@ -25,32 +25,21 @@ namespace RealtimeSender
         private const int ShuntingTrip = 0;
         private const int TrackPosition = 0;
 
-        private readonly string deviceID;
-        private readonly string division;
-        private readonly EndpointAddress endpointAddress;
         private readonly ConcurrentQueue<RealTimeInfoTO> infosQueue = new ConcurrentQueue<RealTimeInfoTO>();
         private readonly ILogger logger;
-        private readonly AsyncRetryPolicy retryPolicy;
+
+        private string deviceID;
+        private string division;
+        private EndpointAddress endpointAddress;
+        private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Sender(ILogger logger, string division, string endpoint, int retryTime)
+        public Sender(ILogger logger)
         {
             this.logger = logger;
-            this.division = division;
-
-            endpointAddress = new EndpointAddress(endpoint);
-            deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
-
-            retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
-                    onRetry: (exception, reconnection) => OnRetry(
-                        exception: exception,
-                        reconnection: reconnection));
         }
 
         #endregion Public Constructors
@@ -89,6 +78,22 @@ namespace RealtimeSender
                 if (info != default)
                     infosQueue.Enqueue(info);
             }
+        }
+
+        public void Initialize(string division, string endpoint, int retryTime)
+        {
+            this.division = division;
+
+            endpointAddress = new EndpointAddress(endpoint);
+            deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
+
+            retryPolicy = Policy
+                .Handle<Exception>()
+                .WaitAndRetryForeverAsync(
+                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
+                    onRetry: (exception, reconnection) => OnRetry(
+                        exception: exception,
+                        reconnection: reconnection));
         }
 
         public Task RunAsnc(CancellationToken cancellationToken)

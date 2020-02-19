@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using RealtimeSender;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +43,7 @@ namespace EBuEf2IVUVehicle
         #region Public Constructors
 
         public Worker(IConfiguration config, ILogger<Worker> logger, IStateHandler sessionStateHandler,
-            IDatabaseConnector databaseConnector)
+            IDatabaseConnector databaseConnector, IRealtimeSender ivuSender)
         {
             this.config = config;
             this.logger = logger;
@@ -52,12 +51,12 @@ namespace EBuEf2IVUVehicle
             var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
             logger.LogInformation($"{assemblyInfo.Name} (Version {assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}) wird gestartet.");
 
-            ivuSender = GetSender();
             infrastructureMappings = GetInfrastructureMappings();
 
             positionsReceiver = GetPositionReceiver();
             positionsReceiver.MessageReceivedEvent += OnPositionReceived;
 
+            this.ivuSender = ivuSender;
             this.databaseConnector = databaseConnector;
 
             this.sessionStateHandler = sessionStateHandler;
@@ -75,8 +74,9 @@ namespace EBuEf2IVUVehicle
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                InitializeConnector(sessionCancellationToken);
                 InitializeStateHandler();
+                InitializeConnector(sessionCancellationToken);
+                InitializeSender();
 
                 await StartIVUSessionAsync();
 
@@ -174,21 +174,6 @@ namespace EBuEf2IVUVehicle
             return result;
         }
 
-        private IRealtimeSender GetSender()
-        {
-            var settings = config
-                .GetSection(nameof(IVURealtimeSender))
-                .Get<IVURealtimeSender>();
-
-            var result = new Sender(
-                logger: logger,
-                division: settings.Division,
-                endpoint: settings.Endpoint,
-                retryTime: settings.RetryTime);
-
-            return result;
-        }
-
         private CancellationToken GetSessionCancellationToken(CancellationToken workerCancellationToken)
         {
             sessionCancellationTokenSource = new CancellationTokenSource();
@@ -207,6 +192,18 @@ namespace EBuEf2IVUVehicle
                 connectionString: settings.ConnectionString,
                 retryTime: settings.RetryTime,
                 cancellationToken: sessionCancellationToken);
+        }
+
+        private void InitializeSender()
+        {
+            var settings = config
+                .GetSection(nameof(IVURealtimeSender))
+                .Get<IVURealtimeSender>();
+
+            ivuSender.Initialize(
+                division: settings.Division,
+                endpoint: settings.Endpoint,
+                retryTime: settings.RetryTime);
         }
 
         private void InitializeStateHandler()
