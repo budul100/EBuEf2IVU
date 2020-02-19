@@ -6,7 +6,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RuntimeIdentifiers>win10-x64;linux-arm;linux-x64</RuntimeIdentifiers>
     <StartupObject>EBuEf2IVUCrew.Program</StartupObject>
-    <AssemblyVersion>0.31.2.0</AssemblyVersion>
+    <AssemblyVersion>0.31.1.0</AssemblyVersion>
+    <FileVersion>0.31.1.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
