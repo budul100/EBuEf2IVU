@@ -31,7 +31,7 @@ namespace MessageReceiver
 
         #region Public Constructors
 
-        public Receiver(ILogger logger)
+        public Receiver(ILogger<Receiver> logger)
         {
             this.logger = logger;
         }

@@ -65,7 +65,7 @@ namespace EBuEf2IVUVehicle
         {
             services.AddHostedService<Worker>();
 
-            services.AddScoped<IMessageReceiver, MessageReceiver.Receiver>();
+            services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
             services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();

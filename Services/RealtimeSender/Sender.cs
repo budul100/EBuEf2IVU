@@ -37,7 +37,7 @@ namespace RealtimeSender
 
         #region Public Constructors
 
-        public Sender(ILogger logger)
+        public Sender(ILogger<Sender> logger)
         {
             this.logger = logger;
         }
