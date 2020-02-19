@@ -1,7 +1,6 @@
 ﻿using Common.Enums;
 using Common.EventsArgs;
 using Common.Interfaces;
-using MessageReceiver;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text.RegularExpressions;
@@ -20,8 +19,8 @@ namespace StateHandler
         private const string StatusRegexGroupWildcard = "$";
 
         private readonly ILogger logger;
+        private readonly IMessageReceiver stateReceiver;
 
-        private IMessageReceiver receiver;
         private Regex startRegex;
         private Regex statusRegex;
 
@@ -29,9 +28,12 @@ namespace StateHandler
 
         #region Public Constructors
 
-        public Handler(ILogger<Handler> logger)
+        public Handler(ILogger<Handler> logger, IMessageReceiver stateReceiver)
         {
             this.logger = logger;
+
+            this.stateReceiver = stateReceiver;
+            this.stateReceiver.MessageReceivedEvent += OnStatusReceived;
         }
 
         #endregion Public Constructors
@@ -48,13 +50,11 @@ namespace StateHandler
 
         public void Initialize(string ipAdress, int port, int retryTime, string startPattern, string statusPattern)
         {
-            receiver = new Receiver(
+            stateReceiver.Initialize(
                 ipAdress: ipAdress,
                 port: port,
                 retryTime: retryTime,
-                logger: logger,
                 messageType: MessageType);
-            receiver.MessageReceivedEvent += OnStatusReceived;
 
             startRegex = GetStartRegex(startPattern);
             statusRegex = GetStatusRegex(statusPattern);
@@ -62,7 +62,7 @@ namespace StateHandler
 
         public Task RunAsync(CancellationToken cancellationToken)
         {
-            return receiver.RunAsync(cancellationToken);
+            return stateReceiver.RunAsync(cancellationToken);
         }
 
         #endregion Public Methods

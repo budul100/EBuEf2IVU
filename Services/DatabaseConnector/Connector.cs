@@ -23,6 +23,7 @@ namespace DatabaseConnector
         #region Private Fields
 
         private readonly ILogger logger;
+
         private CancellationToken cancellationToken;
         private string connectionString;
         private AsyncRetryPolicy retryPolicy;

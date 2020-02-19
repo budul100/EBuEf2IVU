@@ -20,30 +20,20 @@ namespace MessageReceiver
 
         private const char EndChar = '\0';
 
-        private readonly string ipAdress;
         private readonly ILogger logger;
-        private readonly string messageType;
-        private readonly int port;
-        private readonly AsyncRetryPolicy retryPolicy;
+
+        private string ipAdress;
+        private string messageType;
+        private int port;
+        private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Receiver(ILogger logger, string ipAdress, int port, int retryTime, string messageType = default)
+        public Receiver(ILogger logger)
         {
-            this.ipAdress = ipAdress;
-            this.port = port;
             this.logger = logger;
-            this.messageType = messageType;
-
-            retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
-                    onRetry: (exception, reconnection) => OnRetry(
-                        exception: exception,
-                        reconnection: reconnection));
         }
 
         #endregion Public Constructors
@@ -55,6 +45,21 @@ namespace MessageReceiver
         #endregion Public Events
 
         #region Public Methods
+
+        public void Initialize(string ipAdress, int port, int retryTime, string messageType = default)
+        {
+            this.ipAdress = ipAdress;
+            this.port = port;
+            this.messageType = messageType;
+
+            retryPolicy = Policy
+                .Handle<Exception>()
+                .WaitAndRetryForeverAsync(
+                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
+                    onRetry: (exception, reconnection) => OnRetry(
+                        exception: exception,
+                        reconnection: reconnection));
+        }
 
         public Task RunAsync(CancellationToken cancellationToken)
         {
@@ -97,24 +102,25 @@ namespace MessageReceiver
                 address: IPAddress.Any,
                 port: port);
 
-            using (var udpClient = new UdpClient())
+            using var udpClient = new UdpClient
             {
-                udpClient.ExclusiveAddressUse = false;
-                udpClient.Client.SetSocketOption(
-                    optionLevel: SocketOptionLevel.Socket,
-                    optionName: SocketOptionName.ReuseAddress,
-                    optionValue: true);
-                udpClient.Client.Bind(localEp);
-                udpClient.JoinMulticastGroup(multicastAddress);
+                ExclusiveAddressUse = false
+            };
 
-                logger.LogDebug($"Lausche auf {ipAdress}:{port} nach Nachrichten" +
-                    (!string.IsNullOrWhiteSpace(messageType) ? $" vom Typ {messageType}." : "."));
+            udpClient.Client.SetSocketOption(
+                optionLevel: SocketOptionLevel.Socket,
+                optionName: SocketOptionName.ReuseAddress,
+                optionValue: true);
+            udpClient.Client.Bind(localEp);
+            udpClient.JoinMulticastGroup(multicastAddress);
 
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    var result = await udpClient.ReceiveAsync();
-                    SendMessageReceived(result);
-                }
+            logger.LogDebug($"Lausche auf {ipAdress}:{port} nach Nachrichten" +
+                (!string.IsNullOrWhiteSpace(messageType) ? $" vom Typ {messageType}." : "."));
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var result = await udpClient.ReceiveAsync();
+                SendMessageReceived(result);
             }
         }
 

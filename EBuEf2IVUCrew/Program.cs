@@ -65,6 +65,7 @@ namespace EBuEf2IVUCrew
         {
             services.AddHostedService<Worker>();
 
+            services.AddScoped<IMessageReceiver, MessageReceiver.Receiver>();
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
             services.AddSingleton<ICrewChecker, CrewChecker.Checker>();

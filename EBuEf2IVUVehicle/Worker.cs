@@ -4,7 +4,6 @@ using Common.Interfaces;
 using Common.Models;
 using EBuEf2IVUVehicle.Settings;
 using Extensions;
-using MessageReceiver;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -30,6 +29,7 @@ namespace EBuEf2IVUVehicle
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
         private readonly IRealtimeSender ivuSender;
         private readonly ILogger logger;
+        private readonly IMessageReceiver messageReceiver;
         private readonly IMessageReceiver positionsReceiver;
         private readonly JsonSerializerSettings positionsReceiverSettings = new JsonSerializerSettings();
         private readonly IStateHandler sessionStateHandler;
@@ -43,25 +43,25 @@ namespace EBuEf2IVUVehicle
         #region Public Constructors
 
         public Worker(IConfiguration config, ILogger<Worker> logger, IStateHandler sessionStateHandler,
-            IDatabaseConnector databaseConnector, IRealtimeSender ivuSender)
+            IMessageReceiver positionsReceiver, IDatabaseConnector databaseConnector, IRealtimeSender ivuSender)
         {
             this.config = config;
             this.logger = logger;
 
-            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
-            logger.LogInformation($"{assemblyInfo.Name} (Version {assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}) wird gestartet.");
-
             infrastructureMappings = GetInfrastructureMappings();
 
-            positionsReceiver = GetPositionReceiver();
-            positionsReceiver.MessageReceivedEvent += OnPositionReceived;
-
-            this.ivuSender = ivuSender;
-            this.databaseConnector = databaseConnector;
+            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
+            logger.LogInformation($"{assemblyInfo.Name} (Version {assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}) wird gestartet.");
 
             this.sessionStateHandler = sessionStateHandler;
             this.sessionStateHandler.SessionStartedEvent += OnSessionStartedAsync;
             this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
+
+            this.positionsReceiver = positionsReceiver;
+            this.positionsReceiver.MessageReceivedEvent += OnPositionReceived;
+
+            this.databaseConnector = databaseConnector;
+            this.ivuSender = ivuSender;
         }
 
         #endregion Public Constructors
@@ -75,6 +75,7 @@ namespace EBuEf2IVUVehicle
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
                 InitializeStateHandler();
+                InitializePositionReceiver();
                 InitializeConnector(sessionCancellationToken);
                 InitializeSender();
 
@@ -158,22 +159,6 @@ namespace EBuEf2IVUVehicle
             return result;
         }
 
-        private IMessageReceiver GetPositionReceiver()
-        {
-            var settings = config
-                .GetSection(nameof(PositionsReceiver))
-                .Get<PositionsReceiver>();
-
-            var result = new Receiver(
-                ipAdress: settings.IpAddress,
-                port: settings.ListenerPort,
-                retryTime: settings.RetryTime,
-                logger: logger,
-                messageType: MessageTypePositions);
-
-            return result;
-        }
-
         private CancellationToken GetSessionCancellationToken(CancellationToken workerCancellationToken)
         {
             sessionCancellationTokenSource = new CancellationTokenSource();
@@ -192,6 +177,19 @@ namespace EBuEf2IVUVehicle
                 connectionString: settings.ConnectionString,
                 retryTime: settings.RetryTime,
                 cancellationToken: sessionCancellationToken);
+        }
+
+        private void InitializePositionReceiver()
+        {
+            var settings = config
+                .GetSection(nameof(PositionsReceiver))
+                .Get<PositionsReceiver>();
+
+            positionsReceiver.Initialize(
+                ipAdress: settings.IpAddress,
+                port: settings.ListenerPort,
+                retryTime: settings.RetryTime,
+                messageType: MessageTypePositions);
         }
 
         private void InitializeSender()

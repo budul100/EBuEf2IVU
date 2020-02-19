@@ -15,6 +15,8 @@ namespace Common.Interfaces
 
         #region Public Methods
 
+        void Initialize(string ipAdress, int port, int retryTime, string messageType = default);
+
         Task RunAsync(CancellationToken cancellationToken);
 
         #endregion Public Methods
