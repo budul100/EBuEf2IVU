@@ -130,7 +130,7 @@ namespace DatabaseConnector
                             BetriebsstelleVon = crewingElement.BetriebsstelleVon,
                             Dienst = crewingElement.DienstKurzname,
                             PersonalNachname = crewingElement.PersonalNachname,
-                            PersonalNummer = crewingElement.PersonalNummer.ToInt(),
+                            PersonalNummer = crewingElement.PersonalNummer.ToNullableInt(),
                             VorgaengerZugId = predecessorTrainId,
                             ZugId = trainId.Value,
                         };

@@ -18,7 +18,7 @@ namespace CrewChecker
 
         private readonly ILogger logger;
 
-        private CheckerChannel client;
+        private CheckerChannel channel;
 
         private bool disposed = false;
 
@@ -45,10 +45,10 @@ namespace CrewChecker
         public Task<IEnumerable<CrewingElement>> GetCrewingElementsAsync(IEnumerable<string> tripNumbers, DateTime date,
             CancellationToken cancellationToken)
         {
-            cancellationToken.Register(() => client.Dispose());
+            cancellationToken.Register(() => channel.Dispose());
 
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => client.GetAsync(
+                action: (token) => channel.GetAsync(
                     tripNumbers: tripNumbers,
                     date: date),
                 cancellationToken: cancellationToken);
@@ -59,7 +59,7 @@ namespace CrewChecker
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
             string division, string planningLevel, int retryTime)
         {
-            client = new CheckerChannel(
+            channel = new CheckerChannel(
                 host: host,
                 port: port,
                 path: path,
@@ -89,7 +89,7 @@ namespace CrewChecker
             {
                 if (disposing)
                 {
-                    client.Dispose();
+                    channel.Dispose();
                 }
 
                 disposed = true;
