@@ -5,4 +5,6 @@ export PATH='/bin':'/home/mgr/.dotnet/tools':'/mnt/c/Oracle/product/12.2.0/clien
 
 cd /mnt/d/Users/mgr/Entwicklung/EBuEf2IVU
 
+# dotnet deb --configuration Release --runtime linux-x64 --framework netcoreapp3.1 /mnt/d/Users/mgr/Entwicklung/EBuEf2IVU/EBuEf2IVUCrew/EBuEf2IVUCrew.csproj
+
 dotnet deb --configuration Release --runtime $RUNTIME --framework $FRAMEWORK /mnt/d/Users/mgr/Entwicklung/EBuEf2IVU/$1/$1.csproj
