@@ -271,8 +271,8 @@ namespace EBuEf2IVUVehicle
             }
             else if (e.State == SessionStates.IsPaused)
             {
-                logger.LogInformation("Sessionpause-Nachricht empfangen. Die Nachrichtenempfänger, " +
-                    "Datenbank-Verbindungen und IVU-Sender werden zurückgesetzt.");
+                logger.LogInformation("Sessionpause-Nachricht empfangen. Die NachrichtenempfÃ¤nger, " +
+                    "Datenbank-Verbindungen und IVU-Sender werden zurÃ¼ckgesetzt.");
 
                 sessionCancellationTokenSource.Cancel();
             }

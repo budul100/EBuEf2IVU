@@ -232,7 +232,7 @@ namespace DatabaseConnector
             {
                 using var context = new HalteContext(connectionString);
 
-                logger.LogDebug($"Suche nach aktuellen Fahrplaneinträgen.");
+                logger.LogDebug($"Suche nach aktuellen FahrplaneintrÃ¤gen.");
 
                 var halte = await context.Halte
                     .Include(h => h.Zug)
@@ -254,7 +254,7 @@ namespace DatabaseConnector
                 var aufstellungenGroups = aufstellungen
                     .GroupBy(a => new { a.Feld.Betriebsstelle, a.Feld.Gleis, a.Decoder, a.Zugnummer }).ToArray();
 
-                logger.LogDebug($"Es wurden {aufstellungenGroups.Count()} Züge in der Grundaufstellungen gefunden.");
+                logger.LogDebug($"Es wurden {aufstellungenGroups.Count()} ZÃ¼ge in der Grundaufstellungen gefunden.");
 
                 foreach (var aufstellungenGroup in aufstellungenGroups)
                 {
@@ -325,17 +325,17 @@ namespace DatabaseConnector
 
                 if (besatzungen.Any())
                 {
-                    logger.LogDebug($"Die vorhandenen Crewing-Einträge in der EBuEf-DB werden gelöscht.");
+                    logger.LogDebug($"Die vorhandenen Crewing-EintrÃ¤ge in der EBuEf-DB werden gelÃ¶scht.");
 
                     context.Besatzungen.RemoveRange(context.Besatzungen);
 
-                    logger.LogDebug($"Es werden {besatzungen.Count()} Crewing-Einträge in der EBuEf-DB gespeichert.");
+                    logger.LogDebug($"Es werden {besatzungen.Count()} Crewing-EintrÃ¤ge in der EBuEf-DB gespeichert.");
 
                     context.Besatzungen.AddRange(besatzungen);
 
                     await context.SaveChangesAsync(cancellationToken);
 
-                    logger.LogDebug("Die Crewing-Einträge wurden gespeichert.");
+                    logger.LogDebug("Die Crewing-EintrÃ¤ge wurden gespeichert.");
                 }
 
                 context.Database.CloseConnection();
