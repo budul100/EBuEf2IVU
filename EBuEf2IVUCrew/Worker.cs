@@ -110,8 +110,8 @@ namespace EBuEf2IVUCrew
                     date: ivuSessionDate,
                     cancellationToken: sessionCancellationToken);
 
-                logger.LogDebug($"In der IVU.rail wurden {crewingElements.Count()} " +
-                    $"Besatzungseinträge zu den Zügen gefunden.");
+                logger.LogDebug($"In der IVU.rail wurden {crewingElements.Count()} Besatzungseinträge zu den Zügen gefunden.");
+                logger.LogDebug(string.Join(@"\r\n\", crewingElements));
 
                 if (crewingElements.Any())
                 {
