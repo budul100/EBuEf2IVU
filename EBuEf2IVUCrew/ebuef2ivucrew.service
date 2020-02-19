@@ -1,12 +1,12 @@
 [Unit]
-Description=ebuef2ivuvehicle
+Description=ebuef2ivucrew
 
 [Service]
 Type=notify
-ExecStart=/usr/share/EBuEf2IVU/EBuEf2IVUVehicle
+ExecStart=/usr/share/EBuEf2IVUCrew/EBuEf2IVUCrew
 TimeoutSec=infinity
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
-Alias=ebuef2ivu
+Alias=ebuef2ivucrew

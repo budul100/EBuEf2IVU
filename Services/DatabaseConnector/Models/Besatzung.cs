@@ -25,7 +25,7 @@ namespace DatabaseConnector.Models
         public string PersonalNachname { get; set; }
 
         [Column("personalnummer")]
-        public int PersonalNummer { get; set; }
+        public int? PersonalNummer { get; set; }
 
         [Column("vorgaenger_zug_id")]
         public int? VorgaengerZugId { get; set; }

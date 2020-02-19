@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -41,12 +42,15 @@ namespace EBuEf2IVUCrew
             this.config = config;
             this.logger = logger;
 
-            this.sessionStateHandler = sessionStateHandler;
-            this.sessionStateHandler.SessionStartedEvent += OnSessionStartedAsync;
-            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
+            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
+            logger.LogInformation($"{assemblyInfo.Name} (Version {assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}) wird gestartet.");
 
             this.databaseConnector = databaseConnector;
             this.crewChecker = crewChecker;
+
+            this.sessionStateHandler = sessionStateHandler;
+            this.sessionStateHandler.SessionStartedEvent += OnSessionStartedAsync;
+            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
         }
 
         #endregion Public Constructors
@@ -68,7 +72,9 @@ namespace EBuEf2IVUCrew
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
-                    await Task.Run(() => CheckCrewsAsync(sessionCancellationToken));
+                    await Task.WhenAny(
+                        sessionStateHandler.RunAsync(sessionCancellationToken),
+                        CheckCrewsAsync(sessionCancellationToken));
 
                     await Task.Delay(
                         delay: serviceInterval,

@@ -19,15 +19,15 @@
     <RetryTime>30</RetryTime>
   </EBuEfDBConnector>
   <IVUCrewChecker>
-    <Division>LD</Division>
+    <Division>EBUEF</Division>
     <Host>ivu.ebuef</Host>
     <IsHttps>false</IsHttps>
-    <Password>ivu$admin</Password>
+    <Password>crewontrip</Password>
     <Path>intf.crewontrip.impl/CrewOnTripWebFacadeBean</Path>
-    <PlanningLevel>DISPATCH</PlanningLevel>
+    <PlanningLevel>ACTUAL</PlanningLevel>
     <Port>20000</Port>
     <RetryTime>30</RetryTime>
-    <Username>ivu</Username>
+    <Username>crewontrip</Username>
   </IVUCrewChecker>
   <StatusReceiver>
     <IpAddress>224.0.0.8</IpAddress>

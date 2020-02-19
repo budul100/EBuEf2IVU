@@ -76,9 +76,11 @@ namespace StateHandler
 
         private Regex GetStatusRegex(string statusPattern)
         {
+            // The new value cannot be created with \d!
+
             var correctedPattern = statusPattern.Replace(
                 oldValue: StatusRegexGroupWildcard,
-                newValue: $@"(?<{StatusRegexGroupName}>\d)");
+                newValue: @$"(?<{StatusRegexGroupName}>[0-9])");
 
             var result = new Regex(correctedPattern);
 
@@ -101,19 +103,19 @@ namespace StateHandler
                     ? statusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
                     : default;
 
-                if (sessionStatus == SessionStates.InPreparation.ToString())
+                if (sessionStatus == SessionStates.InPreparation.ToString("D"))
                 {
                     SessionChangedEvent?.Invoke(
                         sender: this,
                         e: new StateChangedArgs(SessionStates.InPreparation));
                 }
-                else if (sessionStatus == SessionStates.IsRunning.ToString())
+                else if (sessionStatus == SessionStates.IsRunning.ToString("D"))
                 {
                     SessionChangedEvent?.Invoke(
                         sender: this,
                         e: new StateChangedArgs(SessionStates.IsRunning));
                 }
-                else if (sessionStatus == SessionStates.IsPaused.ToString())
+                else if (sessionStatus == SessionStates.IsPaused.ToString("D"))
                 {
                     SessionChangedEvent?.Invoke(
                         sender: this,
