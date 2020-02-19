@@ -19,5 +19,17 @@
         public string ZugnummerVorgaenger { get; set; }
 
         #endregion Public Properties
+
+        #region Public Methods
+
+        public override string ToString()
+        {
+            var result = $"{Zugnummer} ({BetriebsstelleVon} - {BetriebsstelleNach}): " +
+                $"{DienstKurzname ?? string.Empty} / {PersonalNachname ?? string.Empty}";
+
+            return result;
+        }
+
+        #endregion Public Methods
     }
 }
