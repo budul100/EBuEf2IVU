@@ -13,7 +13,7 @@ pushd .\%SERVICENAME%\
 dotnet restore
 dotnet build -c release -f netcoreapp3.1 .\%SERVICENAME%\%SERVICENAME%.csproj 
 
-BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
+BASH -c "sh Create_Linux-x64_%SERVICENAME%.sh"
 
 DEL /q %TARGETDIR%\%DEBFILE%
 DEL /q %DROPBOXDIR%\%DEBFILE%
@@ -29,7 +29,7 @@ pushd .\%SERVICENAME%\
 dotnet restore
 dotnet build -c release -f netcoreapp3.1 .\%SERVICENAME%\%SERVICENAME%.csproj 
 
-BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
+BASH -c "sh Create_Linux-x64_%SERVICENAME%.sh"
 
 DEL /q %TARGETDIR%\%DEBFILE%
 DEL /q %DROPBOXDIR%\%DEBFILE%
