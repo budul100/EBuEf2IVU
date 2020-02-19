@@ -6,6 +6,7 @@ using Polly;
 using Polly.Retry;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -48,7 +49,7 @@ namespace CrewChecker
             cancellationToken.Register(() => channel.Dispose());
 
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => channel.GetAsync(
+                action: (token) => GetAsync(
                     tripNumbers: tripNumbers,
                     date: date),
                 cancellationToken: cancellationToken);
@@ -99,6 +100,39 @@ namespace CrewChecker
         #endregion Protected Methods
 
         #region Private Methods
+
+        private async Task<IEnumerable<CrewingElement>> GetAsync(IEnumerable<string> tripNumbers, DateTime date)
+        {
+            var assignments = await channel.GetAssignmentsAsync(
+                tripNumbers: tripNumbers,
+                date: date);
+
+            var result = GetCrewingElements(assignments).ToArray();
+
+            return result;
+        }
+
+        private IEnumerable<CrewingElement> GetCrewingElements(IEnumerable<tripAssignment> tripAssignments)
+        {
+            if (tripAssignments?.Any() ?? false)
+            {
+                foreach (var tripAssignment in tripAssignments)
+                {
+                    var result = new CrewingElement
+                    {
+                        BetriebsstelleVon = tripAssignment.employeeOrigin,
+                        BetriebsstelleNach = tripAssignment.employeeDestination,
+                        DienstKurzname = tripAssignment.duty,
+                        PersonalNachname = tripAssignment.name,
+                        PersonalNummer = tripAssignment.personnelNumber,
+                        Zugnummer = tripAssignment.trip,
+                        ZugnummerVorgaenger = tripAssignment.previousTripNumber,
+                    };
+
+                    yield return result;
+                }
+            }
+        }
 
         private void OnRetry(Exception exception, TimeSpan reconnection)
         {
