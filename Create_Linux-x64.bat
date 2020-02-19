@@ -8,6 +8,9 @@ SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 SET SERVICENAME=EBuEf2IVUVehicle
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
 
+pushd .\%SERVICENAME%\
+
+dotnet restore
 dotnet build -c release -f netcoreapp3.1 .\%SERVICENAME%\%SERVICENAME%.csproj 
 
 BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
@@ -21,6 +24,9 @@ XCOPY /y .\EBuEf2IVUCrew\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
 SET SERVICENAME=EBuEf2IVUCrew
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
 
+pushd .\%SERVICENAME%\
+
+dotnet restore
 dotnet build -c release -f netcoreapp3.1 .\%SERVICENAME%\%SERVICENAME%.csproj 
 
 BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
@@ -31,4 +37,5 @@ DEL /q %DROPBOXDIR%\%DEBFILE%
 XCOPY /y .\EBuEf2IVUCrew\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
 XCOPY /y .\EBuEf2IVUCrew\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
 
+popd
 pause

@@ -15,7 +15,7 @@ namespace EBuEf2IVUCrew
     {
         #region Private Fields
 
-        private const string SettingsFileName = "settings.xml";
+        private const string SettingsFileName = "ebuef2ivucrew-settings.xml";
 
         #endregion Private Fields
 

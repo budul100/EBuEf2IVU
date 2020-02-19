@@ -15,7 +15,7 @@ namespace EBuEf2IVUVehicle
     {
         #region Private Fields
 
-        private const string SettingsFileName = "settings.xml";
+        private const string SettingsFileName = "ebuef2ivuvehicle-settings.xml";
 
         #endregion Private Fields
 
