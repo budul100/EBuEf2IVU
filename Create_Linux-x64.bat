@@ -1,3 +1,5 @@
+@echo off
+
 SET FRAMEWORK=netcoreapp3.1
 SET RUNTIME=linux-x64
 
@@ -5,37 +7,41 @@ SET TARGETDIR=.
 SET SOURCEDIR=.\bin\Release\%FRAMEWORK%\%RUNTIME%
 SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 
-SET SERVICENAME=EBuEf2IVUVehicle
-SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
-
-pushd .\%SERVICENAME%\
-
-dotnet restore
-dotnet build -c release -f netcoreapp3.1 .\%SERVICENAME%\%SERVICENAME%.csproj 
-
-BASH -c "sh Create_Linux-x64_%SERVICENAME%.sh"
-
-DEL /q %TARGETDIR%\%DEBFILE%
-DEL /q %DROPBOXDIR%\%DEBFILE%
-
-XCOPY /y .\EBuEf2IVUCrew\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
-XCOPY /y .\EBuEf2IVUCrew\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
-
 SET SERVICENAME=EBuEf2IVUCrew
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
 
 pushd .\%SERVICENAME%\
 
-dotnet restore
-dotnet build -c release -f netcoreapp3.1 .\%SERVICENAME%\%SERVICENAME%.csproj 
+REM dotnet restore
+REM dotnet build -c release -f netcoreapp3.1 .\%SERVICENAME%.csproj 
 
-BASH -c "sh Create_Linux-x64_%SERVICENAME%.sh"
+popd
+
+BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
 
 DEL /q %TARGETDIR%\%DEBFILE%
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
-XCOPY /y .\EBuEf2IVUCrew\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
-XCOPY /y .\EBuEf2IVUCrew\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
+XCOPY /y .\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
+
+
+SET SERVICENAME=EBuEf2IVUVehicle
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
+
+pushd .\%SERVICENAME%\
+
+REM dotnet restore
+REM dotnet build -c release -f netcoreapp3.1 .\%SERVICENAME%.csproj 
 
 popd
+
+BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
+
+DEL /q %TARGETDIR%\%DEBFILE%
+DEL /q %DROPBOXDIR%\%DEBFILE%
+
+XCOPY /y .\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
+
 pause
