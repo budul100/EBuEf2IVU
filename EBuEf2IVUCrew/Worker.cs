@@ -1,4 +1,4 @@
-﻿using Common.Enums;
+using Common.Enums;
 using Common.EventsArgs;
 using Common.Interfaces;
 using EBuEf2IVUCrew.Settings;
@@ -111,7 +111,7 @@ namespace EBuEf2IVUCrew
                     cancellationToken: sessionCancellationToken);
 
                 logger.LogDebug($"In der IVU.rail wurden {crewingElements.Count()} Besatzungseinträge zu den Zügen gefunden.");
-                logger.LogDebug(string.Join(@"\r\n\", crewingElements));
+                logger.LogDebug(string.Join(Environment.NewLine, crewingElements));
 
                 if (crewingElements.Any())
                 {
