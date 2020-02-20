@@ -116,17 +116,21 @@ namespace CrewChecker
         {
             if (tripAssignments?.Any() ?? false)
             {
-                foreach (var tripAssignment in tripAssignments)
+                var employeeAssignments = tripAssignments
+                    .Where(a => a.employeeOrigin != default)
+                    .Where(a => a.employeeDestination != default).ToArray();
+
+                foreach (var employeeAssignment in employeeAssignments)
                 {
                     var result = new CrewingElement
                     {
-                        BetriebsstelleVon = tripAssignment.employeeOrigin,
-                        BetriebsstelleNach = tripAssignment.employeeDestination,
-                        DienstKurzname = tripAssignment.duty,
-                        PersonalNachname = tripAssignment.name,
-                        PersonalNummer = tripAssignment.personnelNumber,
-                        Zugnummer = tripAssignment.trip,
-                        ZugnummerVorgaenger = tripAssignment.previousTripNumber,
+                        BetriebsstelleVon = employeeAssignment.employeeOrigin,
+                        BetriebsstelleNach = employeeAssignment.employeeDestination,
+                        DienstKurzname = employeeAssignment.duty,
+                        PersonalNachname = employeeAssignment.name,
+                        PersonalNummer = employeeAssignment.personnelNumber,
+                        Zugnummer = employeeAssignment.trip,
+                        ZugnummerVorgaenger = employeeAssignment.previousTripNumber,
                     };
 
                     yield return result;
