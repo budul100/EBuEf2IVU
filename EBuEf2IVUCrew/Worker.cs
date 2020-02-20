@@ -18,6 +18,8 @@ namespace EBuEf2IVUCrew
     {
         #region Private Fields
 
+        private const string CrewingSeparator = ", ";
+
         private readonly IConfiguration config;
         private readonly ICrewChecker crewChecker;
         private readonly IDatabaseConnector databaseConnector;
@@ -25,6 +27,7 @@ namespace EBuEf2IVUCrew
         private readonly IStateHandler sessionStateHandler;
 
         private IVUCrewChecker checkerSettings;
+        private SessionStates currentState;
         private DateTime ivuSessionDate = DateTime.Now;
         private TimeSpan queryDurationFuture;
         private TimeSpan queryDurationPast;
@@ -49,8 +52,8 @@ namespace EBuEf2IVUCrew
             this.crewChecker = crewChecker;
 
             this.sessionStateHandler = sessionStateHandler;
-            this.sessionStateHandler.SessionStartedEvent += OnSessionStartedAsync;
-            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
+            this.sessionStateHandler.SessionStartedEvent += OnSessionStarted;
+            this.sessionStateHandler.SessionChangedEvent += OnSessionChanged;
         }
 
         #endregion Public Constructors
@@ -59,12 +62,19 @@ namespace EBuEf2IVUCrew
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
+            InitializeStateHandler();
+            sessionStateHandler.Run(workerCancellationToken);
+
+            currentState = SessionStates.IsRunning;
+
             while (!workerCancellationToken.IsCancellationRequested)
             {
+                logger.LogInformation("Die Nachrichtenempfänger, Datenbank-Verbindungen und " +
+                    "IVU-Sender werden zurückgesetzt.");
+
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
                 InitializeService();
-                InitializeStateHandler();
                 InitializeConnector(sessionCancellationToken);
                 InitializeChecker(sessionCancellationToken);
 
@@ -72,13 +82,19 @@ namespace EBuEf2IVUCrew
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
-                    await Task.WhenAny(
-                        sessionStateHandler.RunAsync(sessionCancellationToken),
-                        CheckCrewsAsync(sessionCancellationToken));
+                    if (currentState == SessionStates.IsRunning)
+                    {
+                        await CheckCrewsAsync(sessionCancellationToken);
 
-                    await Task.Delay(
-                        delay: serviceInterval,
-                        cancellationToken: sessionCancellationToken);
+                        try
+                        {
+                            await Task.Delay(
+                                delay: serviceInterval,
+                                cancellationToken: sessionCancellationToken);
+                        }
+                        catch (TaskCanceledException)
+                        { }
+                    }
                 }
             }
         }
@@ -111,13 +127,22 @@ namespace EBuEf2IVUCrew
                     cancellationToken: sessionCancellationToken);
 
                 logger.LogDebug($"In der IVU.rail wurden {crewingElements.Count()} Besatzungseinträge zu den Zügen gefunden.");
-                logger.LogDebug(string.Join(Environment.NewLine, crewingElements));
+                logger.LogDebug(string.Join(
+                    separator: CrewingSeparator,
+                    values: crewingElements));
 
                 if (crewingElements.Any())
                 {
                     await databaseConnector.SetCrewingsAsync(crewingElements);
                 }
             }
+        }
+
+        private CancellationToken GetCancellationToken(CancellationTokenSource source, CancellationToken parentToken)
+        {
+            parentToken.Register(() => source.Cancel());
+
+            return source.Token;
         }
 
         private CancellationToken GetSessionCancellationToken(CancellationToken workerCancellationToken)
@@ -199,28 +224,27 @@ namespace EBuEf2IVUCrew
                 statusPattern: settings.StatusPattern);
         }
 
-        private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
+        private void OnSessionChanged(object sender, StateChangedArgs e)
         {
             if (e.State == SessionStates.IsRunning)
             {
                 logger?.LogInformation("Sessionstart-Nachricht empfangen.");
-
-                await StartIVUSessionAsync();
             }
             else if (e.State == SessionStates.IsPaused)
             {
-                logger.LogInformation("Sessionpause-Nachricht empfangen. Die Nachrichtenempfänger, " +
-                    "Datenbank-Verbindungen und IVU-Sender werden zurückgesetzt.");
+                logger.LogInformation("Sessionpause-Nachricht empfangen.");
 
                 sessionCancellationTokenSource.Cancel();
             }
+
+            currentState = e.State;
         }
 
-        private async void OnSessionStartedAsync(object sender, EventArgs e)
+        private void OnSessionStarted(object sender, EventArgs e)
         {
             logger?.LogInformation("Sessionstart-Nachricht empfangen.");
 
-            await StartIVUSessionAsync();
+            currentState = SessionStates.IsRunning;
         }
 
         private async Task StartIVUSessionAsync()

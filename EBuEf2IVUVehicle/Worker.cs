@@ -29,11 +29,11 @@ namespace EBuEf2IVUVehicle
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
         private readonly IRealtimeSender ivuSender;
         private readonly ILogger logger;
-        private readonly IMessageReceiver messageReceiver;
         private readonly IMessageReceiver positionsReceiver;
         private readonly JsonSerializerSettings positionsReceiverSettings = new JsonSerializerSettings();
         private readonly IStateHandler sessionStateHandler;
 
+        private SessionStates currentState;
         private DateTime ebuefSessionStart = DateTime.Now;
         private DateTime ivuSessionDate = DateTime.Now;
         private CancellationTokenSource sessionCancellationTokenSource;
@@ -54,8 +54,8 @@ namespace EBuEf2IVUVehicle
             logger.LogInformation($"{assemblyInfo.Name} (Version {assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}) wird gestartet.");
 
             this.sessionStateHandler = sessionStateHandler;
-            this.sessionStateHandler.SessionStartedEvent += OnSessionStartedAsync;
-            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
+            this.sessionStateHandler.SessionStartedEvent += OnSessionStarted;
+            this.sessionStateHandler.SessionChangedEvent += OnSessionChanged;
 
             this.positionsReceiver = positionsReceiver;
             this.positionsReceiver.MessageReceivedEvent += OnPositionReceived;
@@ -70,11 +70,18 @@ namespace EBuEf2IVUVehicle
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
+            InitializeStateHandler();
+            sessionStateHandler.Run(workerCancellationToken);
+
+            currentState = SessionStates.IsRunning;
+
             while (!workerCancellationToken.IsCancellationRequested)
             {
+                logger.LogInformation("Die Nachrichtenempfänger, Datenbank-Verbindungen und " +
+                    "IVU-Sender werden zurückgesetzt.");
+
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                InitializeStateHandler();
                 InitializePositionReceiver();
                 InitializeConnector(sessionCancellationToken);
                 InitializeSender();
@@ -83,10 +90,12 @@ namespace EBuEf2IVUVehicle
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
-                    await Task.WhenAny(
-                        sessionStateHandler.RunAsync(sessionCancellationToken),
-                        positionsReceiver.RunAsync(sessionCancellationToken),
-                        ivuSender.RunAsnc(sessionCancellationToken));
+                    if (currentState == SessionStates.IsRunning)
+                    {
+                        await Task.WhenAny(
+                            positionsReceiver.RunAsync(sessionCancellationToken),
+                            ivuSender.RunAsnc(sessionCancellationToken));
+                    }
                 };
             }
         }
@@ -255,35 +264,33 @@ namespace EBuEf2IVUVehicle
             }
         }
 
-        private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
+        private void OnSessionChanged(object sender, StateChangedArgs e)
         {
             if (e.State == SessionStates.IsRunning)
             {
                 logger?.LogInformation("Sessionstart-Nachricht empfangen.");
-
-                await StartIVUSessionAsync();
-                await SetVehicleAllocationsAsync();
             }
             else if (e.State == SessionStates.IsPaused)
             {
-                logger.LogInformation("Sessionpause-Nachricht empfangen. Die Nachrichtenempfänger, " +
-                    "Datenbank-Verbindungen und IVU-Sender werden zurückgesetzt.");
+                logger.LogInformation("Sessionpause-Nachricht empfangen.");
 
                 sessionCancellationTokenSource.Cancel();
             }
+
+            currentState = e.State;
         }
 
-        private async void OnSessionStartedAsync(object sender, EventArgs e)
+        private void OnSessionStarted(object sender, EventArgs e)
         {
             logger?.LogInformation("Sessionstart-Nachricht empfangen.");
 
-            await StartIVUSessionAsync();
-            await SetVehicleAllocationsAsync();
+            currentState = SessionStates.IsRunning;
         }
 
         private async Task SetVehicleAllocationsAsync()
         {
             var allocations = await databaseConnector.GetVehicleAllocationsAsync();
+
             ivuSender.AddAllocations(
                 allocations: allocations,
                 startTime: ebuefSessionStart);
@@ -299,6 +306,8 @@ namespace EBuEf2IVUVehicle
 
             logger.LogDebug($"Die IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um " +
                 $"{ebuefSessionStart:hh:mm:ss}.");
+
+            await SetVehicleAllocationsAsync();
         }
 
         #endregion Private Methods

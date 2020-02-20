@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace StateHandler
 {
@@ -60,9 +59,9 @@ namespace StateHandler
             statusRegex = GetStatusRegex(statusPattern);
         }
 
-        public Task RunAsync(CancellationToken cancellationToken)
+        public void Run(CancellationToken cancellationToken)
         {
-            return stateReceiver.RunAsync(cancellationToken);
+            stateReceiver.RunAsync(cancellationToken);
         }
 
         #endregion Public Methods

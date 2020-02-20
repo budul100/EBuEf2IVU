@@ -1,7 +1,6 @@
 ﻿using Common.EventsArgs;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Common.Interfaces
 {
@@ -19,7 +18,7 @@ namespace Common.Interfaces
 
         void Initialize(string ipAdress, int port, int retryTime, string startPattern, string statusPattern);
 
-        Task RunAsync(CancellationToken cancellationToken);
+        void Run(CancellationToken cancellationToken);
 
         #endregion Public Methods
     }
