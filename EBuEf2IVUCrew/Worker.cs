@@ -27,6 +27,7 @@ namespace EBuEf2IVUCrew
         private readonly IStateHandler sessionStateHandler;
 
         private IVUCrewChecker checkerSettings;
+        private SessionStates currentState;
         private DateTime ivuSessionDate = DateTime.Now;
         private TimeSpan queryDurationFuture;
         private TimeSpan queryDurationPast;
@@ -78,16 +79,19 @@ namespace EBuEf2IVUCrew
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
-                    await CheckCrewsAsync(sessionCancellationToken);
-
-                    try
+                    if (currentState == SessionStates.IsRunning)
                     {
-                        await Task.Delay(
-                            delay: serviceInterval,
-                            cancellationToken: sessionCancellationToken);
+                        await CheckCrewsAsync(sessionCancellationToken);
+
+                        try
+                        {
+                            await Task.Delay(
+                                delay: serviceInterval,
+                                cancellationToken: sessionCancellationToken);
+                        }
+                        catch (TaskCanceledException)
+                        { }
                     }
-                    catch (TaskCanceledException)
-                    { }
                 }
             }
         }
@@ -215,6 +219,16 @@ namespace EBuEf2IVUCrew
             if (e.State == SessionStates.IsRunning)
             {
                 logger?.LogInformation("Sessionstart-Nachricht empfangen.");
+
+                currentState = e.State;
+
+                sessionCancellationTokenSource.Cancel();
+            }
+            else if (e.State == SessionStates.IsEnded)
+            {
+                logger?.LogInformation("Sessionstart-Ende empfangen.");
+
+                currentState = e.State;
 
                 sessionCancellationTokenSource.Cancel();
             }
