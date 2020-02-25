@@ -20,9 +20,7 @@ namespace CrewChecker
         private readonly ILogger logger;
 
         private CheckerChannel channel;
-
         private bool disposed = false;
-
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
@@ -46,8 +44,6 @@ namespace CrewChecker
         public Task<IEnumerable<CrewingElement>> GetCrewingElementsAsync(IEnumerable<string> tripNumbers, DateTime date,
             CancellationToken cancellationToken)
         {
-            cancellationToken.Register(() => channel.Dispose());
-
             var result = retryPolicy.ExecuteAsync(
                 action: (token) => GetAsync(
                     tripNumbers: tripNumbers,

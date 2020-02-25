@@ -64,6 +64,8 @@ namespace EBuEf2IVUCrew
             InitializeStateHandler();
             sessionStateHandler.Run(workerCancellationToken);
 
+            currentState = SessionStates.IsRunning;
+
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 logger.LogInformation("Die Nachrichtenempfänger, Datenbank-Verbindungen und " +
@@ -114,7 +116,8 @@ namespace EBuEf2IVUCrew
             logger.LogDebug(@$"In der EBuEf-DB wurden {trainRuns.Count()} Züge für den " +
                 @$"Zeitraum zwischen {minTime:hh\:mm} und {maxTime:hh\:mm} gefunden.");
 
-            if (trainRuns.Any())
+            if (trainRuns.Any()
+                && !sessionCancellationToken.IsCancellationRequested)
             {
                 var tripNumbers = trainRuns
                     .Select(t => t.Zugnummer).ToArray();
@@ -128,7 +131,8 @@ namespace EBuEf2IVUCrew
                     separator: CrewingSeparator,
                     values: crewingElements));
 
-                if (crewingElements.Any())
+                if (crewingElements.Any()
+                    && !sessionCancellationToken.IsCancellationRequested)
                 {
                     await databaseConnector.SetCrewingsAsync(crewingElements);
                 }
@@ -220,17 +224,21 @@ namespace EBuEf2IVUCrew
             {
                 logger?.LogInformation("Sessionstart-Nachricht empfangen.");
 
-                currentState = e.State;
-
                 sessionCancellationTokenSource.Cancel();
+
+                currentState = e.State;
+            }
+            else if (e.State == SessionStates.IsPaused)
+            {
+                logger?.LogInformation("Sessionpause-Nachricht empfangen.");
+
+                currentState = e.State;
             }
             else if (e.State == SessionStates.IsEnded)
             {
-                logger?.LogInformation("Sessionstart-Ende empfangen.");
+                logger?.LogInformation("Sessionende-Nachricht empfangen.");
 
                 currentState = e.State;
-
-                sessionCancellationTokenSource.Cancel();
             }
         }
 
