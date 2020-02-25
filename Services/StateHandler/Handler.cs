@@ -114,6 +114,12 @@ namespace StateHandler
                         sender: this,
                         e: new StateChangedArgs(SessionStates.IsRunning));
                 }
+                else if (sessionStatus == SessionStates.IsEnded.ToString("D"))
+                {
+                    SessionChangedEvent?.Invoke(
+                        sender: this,
+                        e: new StateChangedArgs(SessionStates.IsEnded));
+                }
                 else if (sessionStatus == SessionStates.IsPaused.ToString("D"))
                 {
                     SessionChangedEvent?.Invoke(
