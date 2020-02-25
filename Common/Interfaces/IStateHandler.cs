@@ -8,9 +8,9 @@ namespace Common.Interfaces
     {
         #region Public Events
 
-        event EventHandler<StateChangedArgs> SessionChangedEvent;
+        event EventHandler AllocationSetEvent;
 
-        event EventHandler SessionStartedEvent;
+        event EventHandler<StateChangedArgs> SessionChangedEvent;
 
         #endregion Public Events
 

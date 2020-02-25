@@ -20,7 +20,7 @@ namespace StateHandler
         private readonly ILogger logger;
         private readonly IMessageReceiver stateReceiver;
 
-        private Regex startRegex;
+        private Regex allocationSetRegex;
         private Regex statusRegex;
 
         #endregion Private Fields
@@ -39,15 +39,16 @@ namespace StateHandler
 
         #region Public Events
 
-        public event EventHandler<StateChangedArgs> SessionChangedEvent;
+        public event EventHandler AllocationSetEvent;
 
-        public event EventHandler SessionStartedEvent;
+        public event EventHandler<StateChangedArgs> SessionChangedEvent;
 
         #endregion Public Events
 
         #region Public Methods
 
-        public void Initialize(string ipAdress, int port, int retryTime, string startPattern, string statusPattern)
+        public void Initialize(string ipAdress, int port, int retryTime, string allocationSetPattern,
+            string statusPattern)
         {
             stateReceiver.Initialize(
                 ipAdress: ipAdress,
@@ -55,7 +56,7 @@ namespace StateHandler
                 retryTime: retryTime,
                 messageType: MessageType);
 
-            startRegex = GetStartRegex(startPattern);
+            allocationSetRegex = GetAllocationSetRegex(allocationSetPattern);
             statusRegex = GetStatusRegex(statusPattern);
         }
 
@@ -68,7 +69,7 @@ namespace StateHandler
 
         #region Private Methods
 
-        private static Regex GetStartRegex(string startPattern)
+        private static Regex GetAllocationSetRegex(string startPattern)
         {
             return new Regex(startPattern);
         }
@@ -90,9 +91,9 @@ namespace StateHandler
         {
             logger?.LogDebug($"Status-Nachricht empfangen: {e.Content}");
 
-            if (startRegex.IsMatch(e.Content))
+            if (allocationSetRegex.IsMatch(e.Content))
             {
-                SessionStartedEvent?.Invoke(
+                AllocationSetEvent?.Invoke(
                     sender: this,
                     e: null);
             }

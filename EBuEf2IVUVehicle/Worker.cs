@@ -33,7 +33,6 @@ namespace EBuEf2IVUVehicle
         private readonly JsonSerializerSettings positionsReceiverSettings = new JsonSerializerSettings();
         private readonly IStateHandler sessionStateHandler;
 
-        private SessionStates currentState;
         private DateTime ebuefSessionStart = DateTime.Now;
         private DateTime ivuSessionDate = DateTime.Now;
         private CancellationTokenSource sessionCancellationTokenSource;
@@ -54,7 +53,7 @@ namespace EBuEf2IVUVehicle
             logger.LogInformation($"{assemblyInfo.Name} (Version {assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}) wird gestartet.");
 
             this.sessionStateHandler = sessionStateHandler;
-            this.sessionStateHandler.SessionStartedEvent += OnSessionStarted;
+            this.sessionStateHandler.AllocationSetEvent += OnAllocationSet;
             this.sessionStateHandler.SessionChangedEvent += OnSessionChanged;
 
             this.positionsReceiver = positionsReceiver;
@@ -73,8 +72,6 @@ namespace EBuEf2IVUVehicle
             InitializeStateHandler();
             sessionStateHandler.Run(workerCancellationToken);
 
-            currentState = SessionStates.IsRunning;
-
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 logger.LogInformation("Die Nachrichtenempfänger, Datenbank-Verbindungen und " +
@@ -90,12 +87,9 @@ namespace EBuEf2IVUVehicle
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
-                    if (currentState == SessionStates.IsRunning)
-                    {
-                        await Task.WhenAny(
-                            positionsReceiver.RunAsync(sessionCancellationToken),
-                            ivuSender.RunAsnc(sessionCancellationToken));
-                    }
+                    await Task.WhenAny(
+                        positionsReceiver.RunAsync(sessionCancellationToken),
+                        ivuSender.RunAsnc(sessionCancellationToken));
                 };
             }
         }
@@ -269,22 +263,16 @@ namespace EBuEf2IVUVehicle
             if (e.State == SessionStates.IsRunning)
             {
                 logger?.LogInformation("Sessionstart-Nachricht empfangen.");
-            }
-            else if (e.State == SessionStates.IsPaused)
-            {
-                logger.LogInformation("Sessionpause-Nachricht empfangen.");
 
                 sessionCancellationTokenSource.Cancel();
             }
-
-            currentState = e.State;
         }
 
-        private void OnSessionStarted(object sender, EventArgs e)
+        private async void OnAllocationSet(object sender, EventArgs e)
         {
-            logger?.LogInformation("Sessionstart-Nachricht empfangen.");
+            logger?.LogInformation("Nachrichte zur fertigen Fahrzeugzuteilung empfangen.");
 
-            currentState = SessionStates.IsRunning;
+            await SetVehicleAllocationsAsync();
         }
 
         private async Task SetVehicleAllocationsAsync()
