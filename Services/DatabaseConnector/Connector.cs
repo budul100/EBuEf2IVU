@@ -4,6 +4,7 @@ using Common.Models;
 using DatabaseConnector.Contexts;
 using DatabaseConnector.Extensions;
 using DatabaseConnector.Models;
+using Epoch.net;
 using Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -84,8 +85,6 @@ namespace DatabaseConnector
 
         public void Initialize(string connectionString, int retryTime, CancellationToken cancellationToken)
         {
-            logger.LogDebug($"Verwendete Datenbankverbindung: {connectionString}.");
-
             this.connectionString = connectionString;
             this.cancellationToken = cancellationToken;
 
