@@ -127,7 +127,7 @@ namespace CrewChecker
                         BetriebsstelleVon = employeeAssignment.employeeOrigin,
                         BetriebsstelleNach = employeeAssignment.employeeDestination,
                         DienstKurzname = employeeAssignment.duty,
-                        PersonalNachname = employeeAssignment.name,
+                        PersonalNachname = employeeAssignment.surname,
                         PersonalNummer = employeeAssignment.personnelNumber,
                         Zugnummer = employeeAssignment.trip,
                         ZugnummerVorgaenger = employeeAssignment.previousTripNumber,
