@@ -2,12 +2,13 @@ using Common.Enums;
 using Common.EventsArgs;
 using Common.Interfaces;
 using Common.Models;
+using ConverterExtensions;
 using EBuEf2IVUVehicle.Settings;
-using Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using RegexExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -120,8 +121,8 @@ namespace EBuEf2IVUVehicle
 
             var mapping = infrastructureMappings
                 .Where(m => m.MessageBetriebsstelle.IsMatch(message.Betriebsstelle))
-                .Where(m => m.MessageStartGleis.IsMatchOrEmptyOrIgnored(message.StartGleis)
-                    && m.MessageEndGleis.IsMatchOrEmptyOrIgnored(message.EndGleis))
+                .Where(m => m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
+                    && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
                 .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
                 .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis))
                 .FirstOrDefault();
@@ -221,6 +222,13 @@ namespace EBuEf2IVUVehicle
                 statusPattern: settings.StatusPattern);
         }
 
+        private async void OnAllocationSet(object sender, EventArgs e)
+        {
+            logger?.LogInformation("Nachrichte zur fertigen Fahrzeugzuteilung empfangen.");
+
+            await SetVehicleAllocationsAsync();
+        }
+
         private void OnPositionReceived(object sender, MessageReceivedArgs e)
         {
             logger.LogDebug($"Positions-Nachricht empfangen: {e.Content}");
@@ -266,13 +274,6 @@ namespace EBuEf2IVUVehicle
 
                 sessionCancellationTokenSource.Cancel();
             }
-        }
-
-        private async void OnAllocationSet(object sender, EventArgs e)
-        {
-            logger?.LogInformation("Nachrichte zur fertigen Fahrzeugzuteilung empfangen.");
-
-            await SetVehicleAllocationsAsync();
         }
 
         private async Task SetVehicleAllocationsAsync()
