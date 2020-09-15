@@ -1,9 +1,8 @@
 @echo off
 
-pushd %1
+pushd ..\..\
 
-git rm -r --cached .
+git rm -r -f --cached .
 git add .
-git commit -m "fixed untracked files"
 
 popd

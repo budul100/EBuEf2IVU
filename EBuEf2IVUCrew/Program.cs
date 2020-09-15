@@ -30,15 +30,15 @@ namespace EBuEf2IVUCrew
                 .WithParsed(options =>
                 {
                     result = Host
-                    .CreateDefaultBuilder(args)
-                    .GetHostBuilder()
-                    .ConfigureAppConfiguration((hostingContext, config) => ConfigureAppConfiguration(
-                        configBuilder: config,
-                        options: options))
-                    .ConfigureServices((hostContext, services) => ConfigureServices(services))
-                    .UseSerilog((hostingContext, loggerConfiguration) => GetSerilogConfiguration(
-                        hostingContext: hostingContext,
-                        loggerConfiguration: loggerConfiguration));
+						.CreateDefaultBuilder(args)
+						.GetHostBuilder()
+						.ConfigureAppConfiguration((hostingContext, config) => ConfigureAppConfiguration(
+							configBuilder: config,
+							options: options))
+						.ConfigureServices((hostContext, services) => ConfigureServices(services))
+						.UseSerilog((hostingContext, loggerConfiguration) => GetSerilogConfiguration(
+							hostingContext: hostingContext,
+							loggerConfiguration: loggerConfiguration));
                 });
 
             return result;
