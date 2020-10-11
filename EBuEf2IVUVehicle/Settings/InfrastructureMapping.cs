@@ -1,4 +1,4 @@
-using Common.Models;
+using Common.Enums;
 
 namespace EBuEf2IVUVehicle.Settings
 {
