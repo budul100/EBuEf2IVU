@@ -14,7 +14,7 @@ namespace Common.Interfaces
             DateTime date, CancellationToken cancellationToken);
 
         void Initialize(string host, int port, string path, string username, string password, bool isHttps,
-            string division, string planningLevel, int retryTime);
+            int retryTime, string division, string planningLevel);
 
         #endregion Public Methods
     }
