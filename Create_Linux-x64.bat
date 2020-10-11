@@ -16,6 +16,8 @@ FOR /F "tokens=*" %%G IN ('DIR /B /AD /S obj') DO RMDIR /S /Q "%%G"
 
 DEL /q %TARGETDIR%\*.deb
 
+REM **********************************************************************************
+
 SET SERVICENAME=EBuEf2IVUCrew
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
 
@@ -23,16 +25,36 @@ echo ***
 echo *** Build %SERVICENAME% ***
 echo ***
 
-dotnet restore .\%SERVICENAME%\%SERVICENAME%.csproj 
-dotnet build -c release -f %FRAMEWORK% .\%SERVICENAME%\%SERVICENAME%.csproj 
+dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
+dotnet build -c release -f %FRAMEWORK% .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 
 BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
-XCOPY /y .\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
-XCOPY /y .\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
 
+REM **********************************************************************************
+
+SET SERVICENAME=EBuEf2IVUPath
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
+
+echo ***
+echo *** Build %SERVICENAME% ***
+echo ***
+
+dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
+dotnet build -c release -f %FRAMEWORK% .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
+
+BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
+
+DEL /q %DROPBOXDIR%\%DEBFILE%
+
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
+
+REM **********************************************************************************
 
 SET SERVICENAME=EBuEf2IVUVehicle
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
@@ -41,15 +63,17 @@ echo ***
 echo *** Build %SERVICENAME% ***
 echo ***
 
-dotnet restore .\%SERVICENAME%\%SERVICENAME%.csproj 
-dotnet build -c release -f %FRAMEWORK% .\%SERVICENAME%\%SERVICENAME%.csproj 
+dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
+dotnet build -c release -f %FRAMEWORK% .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 
 BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
-XCOPY /y .\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
-XCOPY /y .\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
+
+REM **********************************************************************************
 
 dotnet restore
 
