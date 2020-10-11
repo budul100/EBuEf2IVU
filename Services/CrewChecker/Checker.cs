@@ -1,6 +1,7 @@
 ﻿using Common.Interfaces;
 using Common.Models;
-using CrewChecker.Client;
+using CredentialChannelFactory;
+using EnumerableExtensions;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
@@ -19,7 +20,9 @@ namespace CrewChecker
 
         private readonly ILogger logger;
 
-        private CheckerChannel channel;
+        private Factory<CrewOnTripPortTypeChannel> channelFactory;
+        private string division;
+        private string planningLevel;
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
@@ -48,18 +51,19 @@ namespace CrewChecker
         }
 
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
-            string division, string planningLevel, int retryTime)
+            int retryTime, string division, string planningLevel)
         {
-            channel = new CheckerChannel(
+            this.division = division;
+            this.planningLevel = planningLevel;
+
+            channelFactory = new Factory<CrewOnTripPortTypeChannel>(
                 host: host,
                 port: port,
                 path: path,
                 userName: username,
                 password: password,
                 isHttps: isHttps,
-                ignoreCertificateErrors: true,
-                division: division,
-                planningLevel: planningLevel);
+                notIgnoreCertificateErrors: true);
 
             retryPolicy = Policy
                 .Handle<Exception>()
@@ -76,9 +80,24 @@ namespace CrewChecker
 
         private async Task<IEnumerable<CrewingElement>> GetAsync(IEnumerable<string> tripNumbers, DateTime date)
         {
-            var assignments = await channel.GetAssignmentsAsync(
+            var assignments = default(IEnumerable<tripAssignment>);
+
+            var request = GetRequest(
                 tripNumbers: tripNumbers,
                 date: date);
+
+            using (var channel = channelFactory.Get())
+            {
+                var response = await channel.exportCrewAssignmentsForTripsAsync(request);
+
+                if (response.exportCrewAssignmentsResponse.error != default)
+                {
+                    throw new ApplicationException($"Error response received at crew on trip " +
+                        $"request:{response.exportCrewAssignmentsResponse.error.description}");
+                }
+
+                assignments = response.exportCrewAssignmentsResponse.tripAssignment.ToArray();
+            }
 
             var result = GetCrewingElements(assignments).ToArray();
 
@@ -87,7 +106,7 @@ namespace CrewChecker
 
         private IEnumerable<CrewingElement> GetCrewingElements(IEnumerable<tripAssignment> tripAssignments)
         {
-            if (tripAssignments?.Any() ?? false)
+            if (tripAssignments.AnyItem())
             {
                 var employeeAssignments = tripAssignments
                     .Where(a => a.employeeOrigin != default)
@@ -109,6 +128,23 @@ namespace CrewChecker
                     yield return result;
                 }
             }
+        }
+
+        private exportCrewAssignmentsForTrips GetRequest(IEnumerable<string> tripNumbers, DateTime date)
+        {
+            var request = new exportCrewAssignmentsForTripsRequest
+            {
+                division = division,
+                from = date,
+                planningLevel = planningLevel,
+                to = date,
+                tripNumbers = tripNumbers.ToArray(),
+                withPassengers = false,
+            };
+
+            var result = new exportCrewAssignmentsForTrips(request);
+
+            return result;
         }
 
         private void OnRetry(Exception exception, TimeSpan reconnection)

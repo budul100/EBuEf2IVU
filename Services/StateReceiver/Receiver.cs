@@ -89,7 +89,9 @@ namespace StateHandler
 
         private void OnStatusReceived(object sender, MessageReceivedArgs e)
         {
-            logger?.LogDebug($"Status-Nachricht empfangen: {e.Content}");
+            logger.LogDebug(
+                "Status-Nachricht empfangen: {content}",
+                e.Content);
 
             if (allocationSetRegex.IsMatch(e.Content))
             {
@@ -129,7 +131,9 @@ namespace StateHandler
                 }
                 else
                 {
-                    logger.LogError($"Unbekannte Status-Nachricht empfangen: '{e.Content}'.");
+                    logger.LogError(
+                        "Unbekannte Status-Nachricht empfangen: {content}",
+                        e.Content);
                 }
             }
         }
