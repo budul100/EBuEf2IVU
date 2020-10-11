@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Common.Models
 {
@@ -7,6 +8,8 @@ namespace Common.Models
         #region Public Properties
 
         public TimeSpan? Abfahrt { get; set; }
+
+        public IEnumerable<TrainPosition> Positions { get; set; }
 
         public string Zugnummer { get; set; }
 

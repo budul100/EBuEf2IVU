@@ -18,7 +18,7 @@ namespace EBuEf2IVUVehicle.Settings
 
         public string IVUNetzpunkt { get; set; }
 
-        public TrainPositionType IVUTrainPositionType { get; set; }
+        public LegType IVUTrainPositionType { get; set; }
 
         public string IVUVerschiebungSekunden { get; set; }
 

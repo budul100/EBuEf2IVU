@@ -27,15 +27,27 @@ namespace DatabaseConnector.Models
         [Column("ankunft_soll")]
         public TimeSpan? AnkunftSoll { get; set; }
 
+        [Column("bemerkungen")]
+        public string Bemerkungen { get; set; }
+
         [Column("betriebsstelle")]
         public string Betriebsstelle { get; set; }
 
         [Column("gleis_ist")]
         public int? GleisIst { get; set; }
 
+        [Column("gleis_plan")]
+        public int? GleisPlan { get; set; }
+
+        [Column("gleis_soll")]
+        public int? GleisSoll { get; set; }
+
         [Key]
         [Column("id")]
         public int ID { get; set; }
+
+        [Column("sortierzeit")]
+        public TimeSpan SortierZeit { get; set; }
 
         [ForeignKey(nameof(ZugID))]
         public Zug Zug { get; set; }

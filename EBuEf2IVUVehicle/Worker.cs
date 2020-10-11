@@ -115,9 +115,9 @@ namespace EBuEf2IVUVehicle
             return result;
         }
 
-        private TrainPosition GetPosition(RealTimeMessage message)
+        private TrainLeg GetLeg(RealTimeMessage message)
         {
-            var result = default(TrainPosition);
+            var result = default(TrainLeg);
 
             var mapping = infrastructureMappings
                 .Where(m => m.MessageBetriebsstelle.IsMatch(message.Betriebsstelle))
@@ -135,15 +135,15 @@ namespace EBuEf2IVUVehicle
 
                 var ivuZeitpunkt = ivuSessionDate.Add(message.SimulationsZeit.Add(ivuZeit).TimeOfDay);
 
-                if ((message.SignalTyp == SignalType.ESig && mapping.IVUTrainPositionType != TrainPositionType.Ankunft)
-                    || (message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != TrainPositionType.Abfahrt)
-                    || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != TrainPositionType.Durchfahrt))
+                if ((message.SignalTyp == SignalType.ESig && mapping.IVUTrainPositionType != LegType.Ankunft)
+                    || (message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != LegType.Abfahrt)
+                    || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != LegType.Durchfahrt))
                 {
-                    logger.LogWarning($"Der IVUTrainPositionType des Mappings ({mapping.IVUTrainPositionType}) entspricht " +
-                        $"nicht dem SignalTyp der eingegangenen Nachricht ({message.ToString()}).");
+                    logger.LogWarning($"Der IVUTrainPositionType des Mappings ({mapping.IVUTrainPositionType}) " +
+                        $"entspricht nicht dem SignalTyp der eingegangenen Nachricht ({message}).");
                 }
 
-                result = new TrainPosition
+                result = new TrainLeg
                 {
                     EBuEfBetriebsstelleNach = mapping.EBuEfNachBetriebsstelle,
                     EBuEfBetriebsstelleVon = mapping.EBuEfVonBetriebsstelle,
@@ -154,7 +154,7 @@ namespace EBuEf2IVUVehicle
                     Fahrzeuge = GetDecoders(message).ToArray(),
                     IVUGleis = mapping.IVUGleis,
                     IVUNetzpunkt = mapping.IVUNetzpunkt,
-                    IVUTrainPositionTyp = mapping.IVUTrainPositionType,
+                    IVULegTyp = mapping.IVUTrainPositionType,
                     IVUZeitpunkt = ivuZeitpunkt,
                     Zugnummer = message.Zugnummer,
                 };
@@ -241,7 +241,7 @@ namespace EBuEf2IVUVehicle
 
                 if (!string.IsNullOrWhiteSpace(message?.Zugnummer))
                 {
-                    var position = GetPosition(message);
+                    var position = GetLeg(message);
 
                     if (position != null)
                     {

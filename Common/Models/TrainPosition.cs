@@ -1,6 +1,4 @@
-﻿using Common.Enums;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace Common.Models
 {
@@ -8,41 +6,14 @@ namespace Common.Models
     {
         #region Public Properties
 
-        public string EBuEfBetriebsstelleNach { get; set; }
+        public TimeSpan? Abfahrt { get; set; }
 
-        public string EBuEfBetriebsstelleVon { get; set; }
+        public TimeSpan? Ankunft { get; set; }
 
-        public string EBuEfGleisNach { get; set; }
+        public string Betriebsstelle { get; set; }
 
-        public string EBuEfGleisVon { get; set; }
-
-        public TimeSpan EBuEfZeitpunktNach { get; set; }
-
-        public TimeSpan EBuEfZeitpunktVon { get; set; }
-
-        public IEnumerable<string> Fahrzeuge { get; set; }
-
-        public string IVUGleis { get; set; }
-
-        public string IVUNetzpunkt { get; set; }
-
-        public TrainPositionType IVUTrainPositionTyp { get; set; }
-
-        public DateTime IVUZeitpunkt { get; set; }
-
-        public string Zugnummer { get; set; }
+        public string Gleis { get; set; }
 
         #endregion Public Properties
-
-        #region Public Methods
-
-        public override string ToString()
-        {
-            return $@"Zug: {Zugnummer.ToString()} | EBuEf von: {EBuEfBetriebsstelleVon}/{EBuEfGleisVon} um {EBuEfZeitpunktVon:hh\:mm} | " +
-                $@"EBuEf nach: {EBuEfBetriebsstelleNach}/{EBuEfGleisNach} um {EBuEfZeitpunktNach:hh\:mm} | " +
-                $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeitpunkt:HH\:mm} ({IVUTrainPositionTyp.ToString()})";
-        }
-
-        #endregion Public Methods
     }
 }

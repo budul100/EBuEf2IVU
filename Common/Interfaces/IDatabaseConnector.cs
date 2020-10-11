@@ -10,9 +10,11 @@ namespace Common.Interfaces
     {
         #region Public Methods
 
-        Task AddRealtimeAsync(TrainPosition position);
+        Task AddRealtimeAsync(TrainLeg leg);
 
         Task<EBuEfSession> GetEBuEfSessionAsync();
+
+        Task<TrainRun> GetTrainRunAsync(string trainNumber);
 
         Task<IEnumerable<TrainRun>> GetTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime);
 

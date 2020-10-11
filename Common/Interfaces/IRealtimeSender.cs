@@ -12,7 +12,7 @@ namespace Common.Interfaces
 
         void AddAllocations(IEnumerable<VehicleAllocation> allocations, DateTime startTime);
 
-        void AddRealtime(TrainPosition position);
+        void AddRealtime(TrainLeg leg);
 
         void Initialize(string division, string endpoint, int retryTime);
 

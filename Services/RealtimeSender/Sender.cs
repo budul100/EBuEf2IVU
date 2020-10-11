@@ -63,17 +63,17 @@ namespace RealtimeSender
             }
         }
 
-        public void AddRealtime(TrainPosition position)
+        public void AddRealtime(TrainLeg leg)
         {
-            if (position != default)
+            if (leg != default)
             {
                 var info = GetRealtimeInfo(
-                    eventCode: position.GetEventcode(),
-                    tripNumber: position.Zugnummer,
-                    timeStamp: position.IVUZeitpunkt,
-                    stopArea: position.IVUNetzpunkt,
-                    track: position.IVUGleis,
-                    vehicles: position.Fahrzeuge);
+                    eventCode: leg.GetEventcode(),
+                    tripNumber: leg.Zugnummer,
+                    timeStamp: leg.IVUZeitpunkt,
+                    stopArea: leg.IVUNetzpunkt,
+                    track: leg.IVUGleis,
+                    vehicles: leg.Fahrzeuge);
 
                 if (info != default)
                     infosQueue.Enqueue(info);

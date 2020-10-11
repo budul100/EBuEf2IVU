@@ -1,6 +1,6 @@
 ﻿namespace Common.Enums
 {
-    public enum TrainPositionType
+    public enum LegType
     {
         Abfahrt,
         Ankunft,

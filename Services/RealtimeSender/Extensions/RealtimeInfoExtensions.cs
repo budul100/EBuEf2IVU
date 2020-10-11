@@ -31,14 +31,14 @@ namespace RealtimeSender.Extensions
 
         #region Public Methods
 
-        public static int GetEventcode(this TrainPosition trainPosition)
+        public static int GetEventcode(this TrainLeg leg)
         {
-            switch (trainPosition.IVUTrainPositionTyp)
+            switch (leg.IVULegTyp)
             {
-                case TrainPositionType.Abfahrt:
+                case LegType.Abfahrt:
                     return EventCodeDeparture;
 
-                case TrainPositionType.Ankunft:
+                case LegType.Ankunft:
                     return EventCodeArrival;
 
                 default:
