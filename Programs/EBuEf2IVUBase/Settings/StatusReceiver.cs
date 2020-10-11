@@ -1,6 +1,6 @@
-﻿namespace EBuEf2IVUVehicle.Settings
+﻿namespace EBuEf2IVUBase.Settings
 {
-    internal class StatusReceiver
+    public class StatusReceiver
     {
         #region Public Properties
 

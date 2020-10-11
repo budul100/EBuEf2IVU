@@ -1,9 +1,9 @@
 using CommandLine;
 using System;
 
-namespace EBuEf2IVUVehicle.Settings
+namespace EBuEf2IVUBase.Settings
 {
-    internal class CommandLine
+    public class CommandLineArgs
     {
         #region Public Properties
 

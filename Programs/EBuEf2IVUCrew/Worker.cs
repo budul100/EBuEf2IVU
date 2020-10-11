@@ -1,58 +1,42 @@
+#pragma warning disable CA1031 // Do not catch general exception types
+
 using Common.Enums;
-using Common.EventsArgs;
 using Common.Interfaces;
+using EBuEf2IVUBase;
 using EBuEf2IVUCrew.Settings;
+using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace EBuEf2IVUCrew
 {
     internal class Worker
-        : BackgroundService
+        : WorkerBase
     {
         #region Private Fields
 
         private const string CrewingSeparator = ", ";
 
-        private readonly IConfiguration config;
         private readonly ICrewChecker crewChecker;
-        private readonly IDatabaseConnector databaseConnector;
-        private readonly ILogger logger;
-        private readonly IStateHandler sessionStateHandler;
 
         private IVUCrewChecker checkerSettings;
-        private SessionStates currentState;
-        private DateTime ivuSessionDate = DateTime.Now;
         private TimeSpan queryDurationFuture;
         private TimeSpan queryDurationPast;
         private TimeSpan serviceInterval;
-        private CancellationTokenSource sessionCancellationTokenSource;
-        private TimeSpan timeshift;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Worker(IConfiguration config, ILogger<Worker> logger, IStateHandler sessionStateHandler,
-            IDatabaseConnector databaseConnector, ICrewChecker crewChecker)
+        public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
+            ICrewChecker crewChecker, ILogger<Worker> logger)
+            : base(config, sessionStateHandler, databaseConnector, logger)
         {
-            this.config = config;
-            this.logger = logger;
-
-            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
-            logger.LogInformation($"{assemblyInfo.Name} (Version {assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}) wird gestartet.");
-
-            this.databaseConnector = databaseConnector;
             this.crewChecker = crewChecker;
-
-            this.sessionStateHandler = sessionStateHandler;
-            this.sessionStateHandler.SessionChangedEvent += OnSessionChanged;
         }
 
         #endregion Public Constructors
@@ -68,8 +52,8 @@ namespace EBuEf2IVUCrew
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                logger.LogInformation("Die Nachrichtenempfänger, Datenbank-Verbindungen und " +
-                    "IVU-Sender werden zurückgesetzt.");
+                logger.LogInformation(
+                    "Die Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Sender von EBuEf2IVUCrew werden zurückgesetzt.");
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
@@ -92,7 +76,10 @@ namespace EBuEf2IVUCrew
                                 cancellationToken: sessionCancellationToken);
                         }
                         catch (TaskCanceledException)
-                        { }
+                        {
+                            logger.LogInformation(
+                                "EBuEf2IVUCrew wird beendet.");
+                        }
                     }
                 }
             }
@@ -113,8 +100,11 @@ namespace EBuEf2IVUCrew
                 minTime: minTime,
                 maxTime: maxTime);
 
-            logger.LogDebug(@$"In der EBuEf-DB wurden {trainRuns.Count()} Züge für den " +
-                @$"Zeitraum zwischen {minTime:hh\:mm} und {maxTime:hh\:mm} gefunden.");
+            logger.LogDebug(
+                "In der EBuEf-DB wurden {trainsCount} Züge für den Zeitraum zwischen {minTime} und {maxTime} gefunden.",
+                trainRuns.Count(),
+                minTime.ToString(@"hh\:mm"),
+                maxTime.ToString(@"hh\:mm"));
 
             if (trainRuns.Any()
                 && !sessionCancellationToken.IsCancellationRequested)
@@ -126,10 +116,10 @@ namespace EBuEf2IVUCrew
                     date: ivuSessionDate,
                     cancellationToken: sessionCancellationToken);
 
-                logger.LogDebug($"In der IVU.rail wurden {crewingElements.Count()} Besatzungseinträge zu den Zügen gefunden.");
-                logger.LogDebug(string.Join(
-                    separator: CrewingSeparator,
-                    values: crewingElements));
+                logger.LogDebug(
+                    "In der IVU.rail wurden {crewingCount} Besatzungseinträge zu den Zügen gefunden: {crewingElements}",
+                    crewingElements.Count(),
+                    crewingElements.Merge(CrewingSeparator));
 
                 if (crewingElements.Any()
                     && !sessionCancellationToken.IsCancellationRequested)
@@ -137,19 +127,6 @@ namespace EBuEf2IVUCrew
                     await databaseConnector.SetCrewingsAsync(crewingElements);
                 }
             }
-        }
-
-        private CancellationToken GetSessionCancellationToken(CancellationToken workerCancellationToken)
-        {
-            sessionCancellationTokenSource = new CancellationTokenSource();
-            workerCancellationToken.Register(() => sessionCancellationTokenSource.Cancel());
-
-            return sessionCancellationTokenSource.Token;
-        }
-
-        private DateTime GetSimTime()
-        {
-            return DateTime.Now.Add(timeshift);
         }
 
         private void InitializeChecker(CancellationToken sessionCancellationToken)
@@ -168,18 +145,6 @@ namespace EBuEf2IVUCrew
                 division: checkerSettings.Division,
                 planningLevel: checkerSettings.PlanningLevel,
                 retryTime: checkerSettings.RetryTime);
-        }
-
-        private void InitializeConnector(CancellationToken sessionCancellationToken)
-        {
-            var connectorSettings = config
-                .GetSection(nameof(EBuEfDBConnector))
-                .Get<EBuEfDBConnector>();
-
-            databaseConnector.Initialize(
-                connectionString: connectorSettings.ConnectionString,
-                retryTime: connectorSettings.RetryTime,
-                cancellationToken: sessionCancellationToken);
         }
 
         private void InitializeService()
@@ -204,54 +169,8 @@ namespace EBuEf2IVUCrew
                 seconds: serviceSettings.AbfrageIntervalSek);
         }
 
-        private void InitializeStateHandler()
-        {
-            var settings = config
-                .GetSection(nameof(StatusReceiver))
-                .Get<StatusReceiver>();
-
-            sessionStateHandler.Initialize(
-                ipAdress: settings.IpAddress,
-                port: settings.ListenerPort,
-                retryTime: settings.RetryTime,
-                startPattern: settings.StartPattern,
-                statusPattern: settings.StatusPattern);
-        }
-
-        private void OnSessionChanged(object sender, StateChangedArgs e)
-        {
-            if (e.State == SessionStates.IsRunning)
-            {
-                logger?.LogInformation("Sessionstart-Nachricht empfangen.");
-
-                sessionCancellationTokenSource.Cancel();
-
-                currentState = e.State;
-            }
-            else if (e.State == SessionStates.IsPaused)
-            {
-                logger?.LogInformation("Sessionpause-Nachricht empfangen.");
-
-                currentState = e.State;
-            }
-            else if (e.State == SessionStates.IsEnded)
-            {
-                logger?.LogInformation("Sessionende-Nachricht empfangen.");
-
-                currentState = e.State;
-            }
-        }
-
-        private async Task StartIVUSessionAsync()
-        {
-            var currentSession = await databaseConnector.GetEBuEfSessionAsync();
-
-            ivuSessionDate = currentSession.IVUDatum;
-            timeshift = currentSession.Verschiebung;
-
-            logger.LogDebug($"Die IVU-Sitzung läuft am {ivuSessionDate:yyyy-MM-dd}.");
-        }
-
         #endregion Private Methods
     }
 }
+
+#pragma warning restore CA1031 // Do not catch general exception types
