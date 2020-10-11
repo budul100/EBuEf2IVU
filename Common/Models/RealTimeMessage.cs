@@ -1,15 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Common.Enums;
+using Newtonsoft.Json;
 using System;
 
 namespace Common.Models
 {
-    public enum SignalTyp
-    {
-        ASig,
-        BkSig,
-        ESig,
-    }
-
     public class RealTimeMessage
     {
         #region Public Properties
@@ -24,7 +18,7 @@ namespace Common.Models
         public string EndGleis { get; set; }
 
         [JsonProperty("signaltyp")]
-        public SignalTyp SignalTyp { get; set; }
+        public SignalType SignalTyp { get; set; }
 
         [JsonProperty("simulationszeit")]
         public DateTime SimulationsZeit { get; set; }

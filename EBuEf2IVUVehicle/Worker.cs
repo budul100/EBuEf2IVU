@@ -135,9 +135,9 @@ namespace EBuEf2IVUVehicle
 
                 var ivuZeitpunkt = ivuSessionDate.Add(message.SimulationsZeit.Add(ivuZeit).TimeOfDay);
 
-                if ((message.SignalTyp == SignalTyp.ESig && mapping.IVUTrainPositionType != TrainPositionType.Ankunft)
-                    || (message.SignalTyp == SignalTyp.ASig && mapping.IVUTrainPositionType != TrainPositionType.Abfahrt)
-                    || (message.SignalTyp == SignalTyp.BkSig && mapping.IVUTrainPositionType != TrainPositionType.Durchfahrt))
+                if ((message.SignalTyp == SignalType.ESig && mapping.IVUTrainPositionType != TrainPositionType.Ankunft)
+                    || (message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != TrainPositionType.Abfahrt)
+                    || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != TrainPositionType.Durchfahrt))
                 {
                     logger.LogWarning($"Der IVUTrainPositionType des Mappings ({mapping.IVUTrainPositionType}) entspricht " +
                         $"nicht dem SignalTyp der eingegangenen Nachricht ({message.ToString()}).");
