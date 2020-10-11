@@ -26,16 +26,6 @@
     <BumpResetLabel>dev</BumpResetLabel>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(BuildingInsideVisualStudio)'=='Release|AnyCPU|False'">
-    <OutputPath></OutputPath>
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="settings.xml" />
-  </ItemGroup>
-
   <ItemGroup>
     <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
   </ItemGroup>
@@ -61,9 +51,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ebuef2ivu.service">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="ebuef2ivucrew-settings.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
