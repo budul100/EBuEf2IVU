@@ -48,7 +48,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.8" />
-    <PackageReference Include="Packaging.Targets" Version="0.1.175" />
+    <PackageReference Include="Packaging.Targets" Version="0.1.189" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
