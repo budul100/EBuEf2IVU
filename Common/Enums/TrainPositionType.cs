@@ -1,4 +1,4 @@
-﻿namespace Common.Models
+﻿namespace Common.Enums
 {
     public enum TrainPositionType
     {
