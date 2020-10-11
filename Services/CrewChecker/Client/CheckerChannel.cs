@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CredentialChannelFactory;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,10 +7,10 @@ using System.Threading.Tasks;
 namespace CrewChecker.Client
 {
     internal class CheckerChannel
-        : BaseChannel<CrewOnTripPortTypeChannel>
     {
         #region Private Fields
 
+        private readonly Factory<CrewOnTripPortTypeChannel> channelFactory;
         private readonly string division;
         private readonly string planningLevel;
 
@@ -19,10 +20,18 @@ namespace CrewChecker.Client
 
         public CheckerChannel(string host, int port, string path, string userName, string password, bool isHttps,
             bool ignoreCertificateErrors, string division, string planningLevel)
-            : base(host, port, path, userName, password, isHttps, ignoreCertificateErrors)
         {
             this.division = division;
             this.planningLevel = planningLevel;
+
+            channelFactory = new Factory<CrewOnTripPortTypeChannel>(
+                host: host,
+                port: port,
+                path: path,
+                userName: userName,
+                password: password,
+                isHttps: isHttps,
+                notIgnoreCertificateErrors: ignoreCertificateErrors);
         }
 
         #endregion Public Constructors
@@ -31,19 +40,24 @@ namespace CrewChecker.Client
 
         public async Task<IEnumerable<tripAssignment>> GetAssignmentsAsync(IEnumerable<string> tripNumbers, DateTime date)
         {
+            var result = default(IEnumerable<tripAssignment>);
+
             var request = GetRequest(
                 tripNumbers: tripNumbers,
                 date: date);
 
-            var response = await Channel.exportCrewAssignmentsForTripsAsync(request);
-
-            if (response.exportCrewAssignmentsResponse.error != default)
+            using (var channel = channelFactory.Get())
             {
-                throw new ApplicationException($"Error response received at crew on trip " +
-                    $"request:{response.exportCrewAssignmentsResponse.error.description}");
-            }
+                var response = await channel.exportCrewAssignmentsForTripsAsync(request);
 
-            var result = response.exportCrewAssignmentsResponse.tripAssignment.ToArray();
+                if (response.exportCrewAssignmentsResponse.error != default)
+                {
+                    throw new ApplicationException($"Error response received at crew on trip " +
+                        $"request:{response.exportCrewAssignmentsResponse.error.description}");
+                }
+
+                result = response.exportCrewAssignmentsResponse.tripAssignment.ToArray();
+            }
 
             return result;
         }
