@@ -1,66 +1,51 @@
+#pragma warning disable CA1031 // Do not catch general exception types
+
 using Common.Enums;
 using Common.EventsArgs;
 using Common.Interfaces;
 using Common.Models;
 using ConverterExtensions;
+using EBuEf2IVUBase;
 using EBuEf2IVUVehicle.Settings;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RegexExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace EBuEf2IVUVehicle
 {
     internal class Worker
-        : BackgroundService
+        : WorkerBase
     {
         #region Private Fields
 
         private const string MessageTypePositions = "Echtzeit-Positionen";
 
-        private readonly IConfiguration config;
-        private readonly IDatabaseConnector databaseConnector;
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
         private readonly IRealtimeSender ivuSender;
-        private readonly ILogger logger;
         private readonly IMessageReceiver positionsReceiver;
         private readonly JsonSerializerSettings positionsReceiverSettings = new JsonSerializerSettings();
-        private readonly IStateHandler sessionStateHandler;
-
-        private DateTime ebuefSessionStart = DateTime.Now;
-        private DateTime ivuSessionDate = DateTime.Now;
-        private CancellationTokenSource sessionCancellationTokenSource;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Worker(IConfiguration config, ILogger<Worker> logger, IStateHandler sessionStateHandler,
-            IMessageReceiver positionsReceiver, IDatabaseConnector databaseConnector, IRealtimeSender ivuSender)
+        public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
+            IDatabaseConnector databaseConnector, IRealtimeSender ivuSender, ILogger<Worker> logger)
+            : base(config, sessionStateHandler, databaseConnector, logger)
         {
-            this.config = config;
-            this.logger = logger;
-
             infrastructureMappings = GetInfrastructureMappings();
 
-            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
-            logger.LogInformation($"{assemblyInfo.Name} (Version {assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}) wird gestartet.");
-
-            this.sessionStateHandler = sessionStateHandler;
             this.sessionStateHandler.AllocationSetEvent += OnAllocationSet;
-            this.sessionStateHandler.SessionChangedEvent += OnSessionChanged;
 
             this.positionsReceiver = positionsReceiver;
             this.positionsReceiver.MessageReceivedEvent += OnPositionReceived;
 
-            this.databaseConnector = databaseConnector;
             this.ivuSender = ivuSender;
         }
 
@@ -75,8 +60,8 @@ namespace EBuEf2IVUVehicle
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                logger.LogInformation("Die Nachrichtenempfänger, Datenbank-Verbindungen und " +
-                    "IVU-Sender werden zurückgesetzt.");
+                logger.LogInformation(
+                    "Die Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Sender von EBuEf2IVUVehicle werden zurückgesetzt.");
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
@@ -88,9 +73,17 @@ namespace EBuEf2IVUVehicle
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
-                    await Task.WhenAny(
-                        positionsReceiver.RunAsync(sessionCancellationToken),
-                        ivuSender.RunAsnc(sessionCancellationToken));
+                    try
+                    {
+                        await Task.WhenAny(
+                            positionsReceiver.RunAsync(sessionCancellationToken),
+                            ivuSender.RunAsnc(sessionCancellationToken));
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        logger.LogInformation(
+                            "EBuEf2IVUVehicle wird beendet.");
+                    }
                 };
             }
         }
@@ -139,8 +132,10 @@ namespace EBuEf2IVUVehicle
                     || (message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != LegType.Abfahrt)
                     || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != LegType.Durchfahrt))
                 {
-                    logger.LogWarning($"Der IVUTrainPositionType des Mappings ({mapping.IVUTrainPositionType}) " +
-                        $"entspricht nicht dem SignalTyp der eingegangenen Nachricht ({message}).");
+                    logger.LogWarning(
+                        "Der IVUTrainPositionType des Mappings {mappingType} entspricht nicht dem SignalTyp der eingegangenen Nachricht ({message}).",
+                        mapping.IVUTrainPositionType,
+                        message);
                 }
 
                 result = new TrainLeg
@@ -161,26 +156,6 @@ namespace EBuEf2IVUVehicle
             }
 
             return result;
-        }
-
-        private CancellationToken GetSessionCancellationToken(CancellationToken workerCancellationToken)
-        {
-            sessionCancellationTokenSource = new CancellationTokenSource();
-            workerCancellationToken.Register(() => sessionCancellationTokenSource.Cancel());
-
-            return sessionCancellationTokenSource.Token;
-        }
-
-        private void InitializeConnector(CancellationToken sessionCancellationToken)
-        {
-            var settings = config
-                .GetSection(nameof(EBuEfDBConnector))
-                .Get<EBuEfDBConnector>();
-
-            databaseConnector.Initialize(
-                connectionString: settings.ConnectionString,
-                retryTime: settings.RetryTime,
-                cancellationToken: sessionCancellationToken);
         }
 
         private void InitializePositionReceiver()
@@ -208,30 +183,19 @@ namespace EBuEf2IVUVehicle
                 retryTime: settings.RetryTime);
         }
 
-        private void InitializeStateHandler()
-        {
-            var settings = config
-                .GetSection(nameof(StatusReceiver))
-                .Get<StatusReceiver>();
-
-            sessionStateHandler.Initialize(
-                ipAdress: settings.IpAddress,
-                port: settings.ListenerPort,
-                retryTime: settings.RetryTime,
-                startPattern: settings.StartPattern,
-                statusPattern: settings.StatusPattern);
-        }
-
         private async void OnAllocationSet(object sender, EventArgs e)
         {
-            logger?.LogInformation("Nachrichte zur fertigen Fahrzeugzuteilung empfangen.");
+            logger.LogInformation(
+                "Nachrichte zur fertigen Fahrzeugzuteilung empfangen.");
 
             await SetVehicleAllocationsAsync();
         }
 
         private void OnPositionReceived(object sender, MessageReceivedArgs e)
         {
-            logger.LogDebug($"Positions-Nachricht empfangen: {e.Content}");
+            logger.LogDebug(
+                "Positions-Nachricht empfangen: {content}",
+                e.Content);
 
             try
             {
@@ -250,29 +214,22 @@ namespace EBuEf2IVUVehicle
                     }
                     else
                     {
-                        logger.LogDebug($"Zu der gesandten Echtzeitmeldung konnte " +
-                            $"in der aktuellen Sitzung keine Fahrt gefunden werden.");
+                        logger.LogDebug(
+                            "Zu der gesandten Echtzeitmeldung konnte in der aktuellen Sitzung keine Fahrt gefunden werden.");
                     }
                 }
             }
             catch (JsonReaderException readerException)
             {
-                logger.LogError($"Die Nachricht kann nicht gelesen werden: {readerException.Message}");
+                logger.LogError(
+                    "Die Nachricht kann nicht gelesen werden: {message}",
+                    readerException.Message);
             }
             catch (JsonSerializationException serializationException)
             {
-                logger.LogError($"Die Nachricht kann nicht in eine Echtzeitmeldung " +
-                    $"umgeformt werden: {serializationException.Message}");
-            }
-        }
-
-        private void OnSessionChanged(object sender, StateChangedArgs e)
-        {
-            if (e.State == SessionStates.IsRunning)
-            {
-                logger?.LogInformation("Sessionstart-Nachricht empfangen.");
-
-                sessionCancellationTokenSource.Cancel();
+                logger.LogError(
+                    "Die Nachricht kann nicht in eine Echtzeitmeldung umgeformt werden: {message}",
+                    serializationException.Message);
             }
         }
 
@@ -285,20 +242,8 @@ namespace EBuEf2IVUVehicle
                 startTime: ebuefSessionStart);
         }
 
-        private async Task StartIVUSessionAsync()
-        {
-            var currentSession = await databaseConnector.GetEBuEfSessionAsync();
-
-            ivuSessionDate = currentSession.IVUDatum;
-            ebuefSessionStart = ivuSessionDate
-                .Add(currentSession.SessionStart.TimeOfDay);
-
-            logger.LogDebug($"Die IVU-Sitzung beginnt am {ivuSessionDate:yyyy-MM-dd} um " +
-                $"{ebuefSessionStart:hh:mm:ss}.");
-
-            await SetVehicleAllocationsAsync();
-        }
-
         #endregion Private Methods
     }
 }
+
+#pragma warning disable CA1031 // Do not catch general exception types

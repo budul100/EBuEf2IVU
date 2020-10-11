@@ -1,6 +1,6 @@
-﻿namespace EBuEf2IVUVehicle.Settings
+﻿namespace EBuEf2IVUBase.Settings
 {
-    internal class EBuEfDBConnector
+    public class EBuEfDBConnector
     {
         #region Public Properties
 
