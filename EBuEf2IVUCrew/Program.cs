@@ -11,25 +11,25 @@ using System.Runtime.InteropServices;
 
 namespace EBuEf2IVUCrew
 {
-    public static class Program
-    {
-        #region Private Fields
+	public static class Program
+	{
+		#region Private Fields
 
-        private const string SettingsFileName = "ebuef2ivucrew-settings.xml";
+		private const string SettingsFileName = "ebuef2ivucrew-settings.xml";
 
-        #endregion Private Fields
+		#endregion Private Fields
 
-        #region Public Methods
+		#region Public Methods
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            var result = default(IHostBuilder);
+		public static IHostBuilder CreateHostBuilder(string[] args)
+		{
+			var result = default(IHostBuilder);
 
-            Parser.Default
-                .ParseArguments<Settings.CommandLine>(args)
-                .WithParsed(options =>
-                {
-                    result = Host
+			Parser.Default
+				.ParseArguments<Settings.CommandLine>(args)
+				.WithParsed(options =>
+				{
+					result = Host
 						.CreateDefaultBuilder(args)
 						.GetHostBuilder()
 						.ConfigureAppConfiguration((hostingContext, config) => ConfigureAppConfiguration(
@@ -39,66 +39,66 @@ namespace EBuEf2IVUCrew
 						.UseSerilog((hostingContext, loggerConfiguration) => GetSerilogConfiguration(
 							hostingContext: hostingContext,
 							loggerConfiguration: loggerConfiguration));
-                });
+				});
 
-            return result;
-        }
+			return result;
+		}
 
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+		public static void Main(string[] args)
+		{
+			CreateHostBuilder(args).Build().Run();
+		}
 
-        #endregion Public Methods
+		#endregion Public Methods
 
-        #region Private Methods
+		#region Private Methods
 
-        private static void ConfigureAppConfiguration(IConfigurationBuilder configBuilder, Settings.CommandLine options)
-        {
-            configBuilder.AddXmlFile(
-                path: GetSettingsPath(options),
-                optional: false,
-                reloadOnChange: true);
-        }
+		private static void ConfigureAppConfiguration(IConfigurationBuilder configBuilder, Settings.CommandLine options)
+		{
+			configBuilder.AddXmlFile(
+				path: GetSettingsPath(options),
+				optional: false,
+				reloadOnChange: true);
+		}
 
-        private static void ConfigureServices(IServiceCollection services)
-        {
-            services.AddHostedService<Worker>();
+		private static void ConfigureServices(IServiceCollection services)
+		{
+			services.AddHostedService<Worker>();
 
-            services.AddScoped<IMessageReceiver, MessageReceiver.Receiver>();
-            services.AddSingleton<IStateHandler, StateHandler.Handler>();
-            services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
-            services.AddSingleton<ICrewChecker, CrewChecker.Checker>();
-        }
+			services.AddScoped<IMessageReceiver, MessageReceiver.Receiver>();
+			services.AddSingleton<IStateHandler, StateHandler.Handler>();
+			services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
+			services.AddSingleton<ICrewChecker, CrewChecker.Checker>();
+		}
 
-        private static IHostBuilder GetHostBuilder(this IHostBuilder defaultBuilder)
-        {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? WindowsServiceLifetimeHostBuilderExtensions.UseWindowsService(defaultBuilder)
-                : SystemdHostBuilderExtensions.UseSystemd(defaultBuilder);
-        }
+		private static IHostBuilder GetHostBuilder(this IHostBuilder defaultBuilder)
+		{
+			return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+				? WindowsServiceLifetimeHostBuilderExtensions.UseWindowsService(defaultBuilder)
+				: SystemdHostBuilderExtensions.UseSystemd(defaultBuilder);
+		}
 
-        private static LoggerConfiguration GetSerilogConfiguration(HostBuilderContext hostingContext,
-            LoggerConfiguration loggerConfiguration)
-        {
-            var result = loggerConfiguration
-                .ReadFrom.Configuration(hostingContext.Configuration)
-                .WriteTo.Console(theme: SystemConsoleTheme.Literate);
+		private static LoggerConfiguration GetSerilogConfiguration(HostBuilderContext hostingContext,
+			LoggerConfiguration loggerConfiguration)
+		{
+			var result = loggerConfiguration
+				.ReadFrom.Configuration(hostingContext.Configuration)
+				.WriteTo.Console(theme: SystemConsoleTheme.Literate);
 
-            return result;
-        }
+			return result;
+		}
 
-        private static string GetSettingsPath(Settings.CommandLine options)
-        {
-            var result = !string.IsNullOrWhiteSpace(options?.SettingsPath)
-                ? options.SettingsPath
-                : Path.Combine(
-                    path1: Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    path2: SettingsFileName);
+		private static string GetSettingsPath(Settings.CommandLine options)
+		{
+			var result = !string.IsNullOrWhiteSpace(options?.SettingsPath)
+				? options.SettingsPath
+				: Path.Combine(
+					path1: Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+					path2: SettingsFileName);
 
-            return result;
-        }
+			return result;
+		}
 
-        #endregion Private Methods
-    }
+		#endregion Private Methods
+	}
 }
