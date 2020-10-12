@@ -1,8 +1,14 @@
 ﻿namespace EBuEf2IVUCrew.Settings
 {
-    public class IVUCrewChecker
+    public class CrewChecker
     {
         #region Public Properties
+
+        public int AbfrageIntervalSek { get; set; }
+
+        public int AbfrageVergangenheitMin { get; set; }
+
+        public int AbfrageZukunftMin { get; set; }
 
         public string Division { get; set; }
 

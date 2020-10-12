@@ -3,7 +3,6 @@
 using Common.Enums;
 using Common.Interfaces;
 using EBuEf2IVUBase;
-using EBuEf2IVUCrew.Settings;
 using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -23,7 +22,6 @@ namespace EBuEf2IVUCrew
 
         private readonly ICrewChecker crewChecker;
 
-        private IVUCrewChecker checkerSettings;
         private TimeSpan queryDurationFuture;
         private TimeSpan queryDurationPast;
         private TimeSpan serviceInterval;
@@ -59,7 +57,6 @@ namespace EBuEf2IVUCrew
 
                 InitializeService();
                 InitializeConnector(sessionCancellationToken);
-                InitializeChecker(sessionCancellationToken);
 
                 await StartIVUSessionAsync();
 
@@ -129,44 +126,37 @@ namespace EBuEf2IVUCrew
             }
         }
 
-        private void InitializeChecker(CancellationToken sessionCancellationToken)
-        {
-            checkerSettings = config
-                .GetSection(nameof(IVUCrewChecker))
-                .Get<IVUCrewChecker>();
-
-            crewChecker.Initialize(
-                host: checkerSettings.Host,
-                port: checkerSettings.Port,
-                path: checkerSettings.Path,
-                username: checkerSettings.Username,
-                password: checkerSettings.Password,
-                isHttps: checkerSettings.IsHttps,
-                division: checkerSettings.Division,
-                planningLevel: checkerSettings.PlanningLevel,
-                retryTime: checkerSettings.RetryTime);
-        }
-
         private void InitializeService()
         {
             var serviceSettings = config
-                .GetSection(nameof(ServiceSettings))
-                .Get<ServiceSettings>();
+                .GetSection(nameof(CrewChecker))
+                .Get<Settings.CrewChecker>();
 
             queryDurationPast = new TimeSpan(
                 hours: 0,
-                minutes: serviceSettings.AbfrageInVergangenheitMin * -1,
+                minutes: serviceSettings.AbfrageVergangenheitMin * -1,
                 seconds: 0);
 
             queryDurationFuture = new TimeSpan(
                 hours: 0,
-                minutes: serviceSettings.AbfrageInZukunftMin,
+                minutes: serviceSettings.AbfrageZukunftMin,
                 seconds: 0);
 
             serviceInterval = new TimeSpan(
                 hours: 0,
                 minutes: 0,
                 seconds: serviceSettings.AbfrageIntervalSek);
+
+            crewChecker.Initialize(
+                host: serviceSettings.Host,
+                port: serviceSettings.Port,
+                path: serviceSettings.Path,
+                username: serviceSettings.Username,
+                password: serviceSettings.Password,
+                isHttps: serviceSettings.IsHttps,
+                division: serviceSettings.Division,
+                planningLevel: serviceSettings.PlanningLevel,
+                retryTime: serviceSettings.RetryTime);
         }
 
         #endregion Private Methods
