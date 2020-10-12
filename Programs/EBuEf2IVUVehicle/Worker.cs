@@ -33,7 +33,7 @@ namespace EBuEf2IVUVehicle
             IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
         {
-            this.sessionStateHandler.AllocationSetEvent += OnAllocationSet;
+            this.sessionStateHandler.SessionStartedEvent += OnSessionStart;
 
             this.positionsReceiver = positionsReceiver;
             this.positionsReceiver.MessageReceivedEvent += OnPositionReceived;
@@ -97,7 +97,7 @@ namespace EBuEf2IVUVehicle
                 .Get<PositionsReceiver>();
 
             positionsReceiver.Initialize(
-                ipAdress: settings.Host,
+                host: settings.Host,
                 port: settings.Port,
                 retryTime: settings.RetryTime,
                 messageType: MessageTypePositions);
@@ -114,16 +114,6 @@ namespace EBuEf2IVUVehicle
                 endpoint: settings.Endpoint,
                 retryTime: settings.RetryTime,
                 sessionStart: ebuefSessionStart);
-        }
-
-        private async void OnAllocationSet(object sender, EventArgs e)
-        {
-            logger.LogDebug(
-                "Nachricht zum Setzen der Fahrzeug-Grundaufstellung empfangen.");
-
-            var allocations = await databaseConnector.GetVehicleAllocationsAsync();
-
-            realtimeSender.AddAllocations(allocations);
         }
 
         private async void OnPositionReceived(object sender, MessageReceivedArgs e)
@@ -164,6 +154,16 @@ namespace EBuEf2IVUVehicle
                     "Die Nachricht kann nicht in eine Echtzeitmeldung umgeformt werden: {message}",
                     serializationException.Message);
             }
+        }
+
+        private async void OnSessionStart(object sender, EventArgs e)
+        {
+            logger.LogDebug(
+                "Nachricht zum Setzen der Fahrzeug-Grundaufstellung empfangen.");
+
+            var allocations = await databaseConnector.GetVehicleAllocationsAsync();
+
+            realtimeSender.AddAllocations(allocations);
         }
 
         #endregion Private Methods

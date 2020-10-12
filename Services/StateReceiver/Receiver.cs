@@ -20,8 +20,8 @@ namespace StateHandler
         private readonly ILogger logger;
         private readonly IMessageReceiver stateReceiver;
 
-        private Regex allocationSetRegex;
-        private Regex statusRegex;
+        private Regex sessionStartRegex;
+        private Regex sessionStatusRegex;
 
         #endregion Private Fields
 
@@ -39,25 +39,25 @@ namespace StateHandler
 
         #region Public Events
 
-        public event EventHandler AllocationSetEvent;
-
         public event EventHandler<StateChangedArgs> SessionChangedEvent;
+
+        public event EventHandler SessionStartedEvent;
 
         #endregion Public Events
 
         #region Public Methods
 
-        public void Initialize(string ipAdress, int port, int retryTime, string allocationSetPattern,
-            string statusPattern)
+        public void Initialize(string host, int port, int retryTime, string sessionStartPattern,
+            string sessionStatusPattern)
         {
             stateReceiver.Initialize(
-                ipAdress: ipAdress,
+                host: host,
                 port: port,
                 retryTime: retryTime,
                 messageType: MessageTypeState);
 
-            allocationSetRegex = GetAllocationSetRegex(allocationSetPattern);
-            statusRegex = GetStatusRegex(statusPattern);
+            sessionStartRegex = GetSessionStartRegex(sessionStartPattern);
+            sessionStatusRegex = GetSessionStatusRegex(sessionStatusPattern);
         }
 
         public void Run(CancellationToken cancellationToken)
@@ -69,12 +69,12 @@ namespace StateHandler
 
         #region Private Methods
 
-        private static Regex GetAllocationSetRegex(string startPattern)
+        private static Regex GetSessionStartRegex(string startPattern)
         {
             return new Regex(startPattern);
         }
 
-        private Regex GetStatusRegex(string statusPattern)
+        private Regex GetSessionStatusRegex(string statusPattern)
         {
             // The new value cannot be created with \d!
 
@@ -93,16 +93,16 @@ namespace StateHandler
                 "Status-Nachricht empfangen: {content}",
                 e.Content);
 
-            if (allocationSetRegex.IsMatch(e.Content))
+            if (sessionStartRegex.IsMatch(e.Content))
             {
-                AllocationSetEvent?.Invoke(
+                SessionStartedEvent?.Invoke(
                     sender: this,
                     e: null);
             }
             else
             {
-                var sessionStatus = statusRegex.IsMatch(e.Content)
-                    ? statusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
+                var sessionStatus = sessionStatusRegex.IsMatch(e.Content)
+                    ? sessionStatusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
                     : default;
 
                 if (sessionStatus == SessionStates.InPreparation.ToString("D"))

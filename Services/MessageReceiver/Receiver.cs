@@ -22,7 +22,7 @@ namespace MessageReceiver
 
         private readonly ILogger logger;
 
-        private string ipAdress;
+        private string host;
         private string messageType;
         private int port;
         private AsyncRetryPolicy retryPolicy;
@@ -46,9 +46,9 @@ namespace MessageReceiver
 
         #region Public Methods
 
-        public void Initialize(string ipAdress, int port, int retryTime, string messageType)
+        public void Initialize(string host, int port, int retryTime, string messageType)
         {
-            this.ipAdress = ipAdress;
+            this.host = host;
             this.port = port;
             this.messageType = messageType;
 
@@ -83,7 +83,7 @@ namespace MessageReceiver
                 logger.LogError(
                     "Fehler beim Nachrichtenempfänger an {address}: {message} (Code: {code})\r\n" +
                     "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
-                    $"{ipAdress}:{port}",
+                    $"{host}:{port}",
                     socketException.SocketErrorCode,
                     exception.Message,
                     reconnection.TotalSeconds);
@@ -95,7 +95,7 @@ namespace MessageReceiver
                 logger.LogError(
                     "Fehler beim Nachrichtenempfänger an {address}: {message}\r\n" +
                     "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
-                    $"{ipAdress}:{port}",
+                    $"{host}:{port}",
                     exception.Message,
                     reconnection.TotalSeconds);
             }
@@ -103,7 +103,7 @@ namespace MessageReceiver
 
         private async Task RunReceiverAsync(CancellationToken cancellationToken)
         {
-            var multicastAddress = IPAddress.Parse(ipAdress);
+            var multicastAddress = IPAddress.Parse(host);
             var localEp = new IPEndPoint(
                 address: IPAddress.Any,
                 port: port);
@@ -122,7 +122,7 @@ namespace MessageReceiver
 
             logger.LogDebug(
                 "Lausche auf {address} nach Nachrichten vom Typ {type}.",
-                $"{ipAdress}:{port}",
+                $"{host}:{port}",
                 messageType);
 
             while (!cancellationToken.IsCancellationRequested)

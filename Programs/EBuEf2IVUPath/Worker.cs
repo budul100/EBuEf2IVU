@@ -88,8 +88,8 @@ namespace EBuEf2IVUPath
                 .Get<Settings.TrainPathReceiver>();
 
             trainPathReceiver.Initialize(
-                ipAdress: receiverSettings.IpAddress,
-                port: receiverSettings.ListenerPort,
+                host: receiverSettings.Host,
+                port: receiverSettings.Port,
                 retryTime: receiverSettings.RetryTime,
                 messageType: MessageTypePaths);
         }

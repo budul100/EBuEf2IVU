@@ -8,15 +8,15 @@ namespace Common.Interfaces
     {
         #region Public Events
 
-        event EventHandler AllocationSetEvent;
-
         event EventHandler<StateChangedArgs> SessionChangedEvent;
+
+        event EventHandler SessionStartedEvent;
 
         #endregion Public Events
 
         #region Public Methods
 
-        void Initialize(string ipAdress, int port, int retryTime, string startPattern, string statusPattern);
+        void Initialize(string host, int port, int retryTime, string startPattern, string statusPattern);
 
         void Run(CancellationToken cancellationToken);
 
