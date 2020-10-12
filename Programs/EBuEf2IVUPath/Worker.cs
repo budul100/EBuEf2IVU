@@ -135,7 +135,7 @@ namespace EBuEf2IVUPath
                 if (!string.IsNullOrWhiteSpace(message?.TrainId))
                 {
                     var trainRuns = await databaseConnector.GetTrainRunsAsync(
-                        trainNumber: message.TrainId,
+                        trainId: message.TrainId,
                         preferPrognosis: preferPrognosis);
 
                     if (trainRuns.AnyItem())

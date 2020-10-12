@@ -64,11 +64,11 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainNumber, bool preferPrognosis)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainId, bool preferPrognosis)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (token) => QueryTrainRunsAsync(
-                    trainNumber: trainNumber,
+                    trainId: trainId,
                     preferPrognosis: preferPrognosis,
                     cancellationToken: token),
                 cancellationToken: cancellationToken);
@@ -80,7 +80,7 @@ namespace DatabaseConnector
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (token) => QueryTrainRunsAsync(
-                    trainNumber: default,
+                    trainId: default,
                     preferPrognosis: preferPrognosis,
                     cancellationToken: token),
                 cancellationToken: cancellationToken);
@@ -337,24 +337,32 @@ namespace DatabaseConnector
             return result;
         }
 
-        private async Task<IEnumerable<TrainRun>> QueryTrainRunsAsync(string trainNumber, bool preferPrognosis,
+        private async Task<IEnumerable<TrainRun>> QueryTrainRunsAsync(string trainId, bool preferPrognosis,
             CancellationToken cancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
 
             if (!cancellationToken.IsCancellationRequested)
             {
-                logger.LogDebug(
-                    "Suche nach Zugnummer {trainNumber}.",
-                    trainNumber);
+                if (!trainId.IsEmpty())
+                {
+                    logger.LogDebug(
+                        "Suche nach Zug-ID {trainId}.",
+                        trainId);
+                }
+                else
+                {
+                    logger.LogDebug(
+                        "Suche nach allen Zügen.");
+                }
 
                 using var context = new HalteContext(connectionString);
 
-                var zugnummer = trainNumber.ToNullableInt();
+                var zugId = trainId.ToNullableInt();
 
                 var halte = await context.Halte
                     .Include(h => h.Zug)
-                    .Where(h => !zugnummer.HasValue || h.Zug.Zugnummer == zugnummer)
+                    .Where(h => !zugId.HasValue || h.ZugID == zugId)
                     .ToArrayAsync(cancellationToken);
 
                 result = GetTrainRuns(
