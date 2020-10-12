@@ -17,6 +17,8 @@ namespace EBuEf2IVUPath
     {
         #region Private Fields
 
+        private readonly ITrainPathSender trainPathSender;
+
         private TimeSpan serviceInterval;
 
         #endregion Private Fields
@@ -24,9 +26,11 @@ namespace EBuEf2IVUPath
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
-            ILogger<Worker> logger)
+            ITrainPathSender trainPathSender, ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
-        { }
+        {
+            this.trainPathSender = trainPathSender;
+        }
 
         #endregion Public Constructors
 
@@ -76,6 +80,15 @@ namespace EBuEf2IVUPath
         #endregion Protected Methods
 
         #region Private Methods
+
+        private void InitializeSender()
+        {
+            var senderSettings = config
+                .GetSection(nameof(TrainPathSender))
+                .Get<TrainPathSender>();
+
+            trainPathSender.Initialize(senderSettings.ho)
+        }
 
         private void InitializeService()
         {

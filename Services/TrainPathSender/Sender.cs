@@ -1,9 +1,11 @@
 ﻿#pragma warning disable CA1031 // Do not catch general exception types
 
 using Common.Extensions;
+using Common.Interfaces;
 using Common.Models;
 using CredentialChannelFactory;
 using DateTimeExtensions;
+using EnumerableExtensions;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
@@ -15,28 +17,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using TrainPathImportService;
 
-namespace TrainPathExchanger
+namespace TrainPathSender
 {
     public class Sender
+        : ITrainPathSender
     {
         #region Private Fields
 
-        private const string InfrastructureManager = "InfrastructureManager";
-        private const string IVUImportProfile = "ImportProfile";
-        private const string OrderingTransportationCompany = "orderingTransportationCompany";
         private const string SingleDayBitmask = "1";
-        private const string StoppingReasonPass = "Passing";
-        private const string StoppingReasonStop = "Stopping";
-        private const string TimetableVersionId = "TimetableVersionId";
-        private const string TrainPathState = "TrainPathState";
+        private const string TimetableVersionId = "Timetable";
 
+        private readonly ConcurrentQueue<importTrainPaths> importsQueue = new ConcurrentQueue<importTrainPaths>();
         private readonly ILogger<Sender> logger;
-        private readonly ConcurrentQueue<TrainRun> runsQueue = new ConcurrentQueue<TrainRun>();
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
+        private string importProfile;
+        private string infrastructureManager;
+        private string orderingTransportationCompany;
         private AsyncRetryPolicy retryPolicy;
         private DateTime sessionDate;
+        private string stoppingReasonPass;
+        private string stoppingReasonStop;
         private TimetableVersion timetableVersion;
+        private TrainPathKeyTimetableVersion timetableVersionKey;
+        private string trainPathState;
 
         #endregion Private Fields
 
@@ -51,12 +55,40 @@ namespace TrainPathExchanger
 
         #region Public Methods
 
+        public void AddTrain(TrainRun trainRun)
+        {
+            if (trainRun != default)
+            {
+                AddTrains(trainRun.AsEnumerable());
+            }
+        }
+
+        public void AddTrains(IEnumerable<TrainRun> trainRuns)
+        {
+            if (trainRuns.AnyItem())
+            {
+                var imports = GetImportTrainPaths(trainRuns);
+
+                if (imports != default)
+                    importsQueue.Enqueue(imports);
+            }
+        }
+
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
-            int retryTime, DateTime sessionDate)
+            int retryTime, DateTime sessionDate, string infrastructureManager, string orderingTransportationCompany,
+            string trainPathState, string stoppingReasonStop, string stoppingReasonPass, string importProfile)
         {
             this.sessionDate = sessionDate;
+            this.infrastructureManager = infrastructureManager;
+            this.orderingTransportationCompany = orderingTransportationCompany;
+
+            this.trainPathState = trainPathState;
+            this.stoppingReasonStop = stoppingReasonStop;
+            this.stoppingReasonPass = stoppingReasonPass;
+            this.importProfile = importProfile;
 
             timetableVersion = GetTimetableVersion();
+            timetableVersionKey = GetTimetableVersionKey();
 
             channelFactory = new Factory<TrainPathImportWebFacadeChannel>(
                 host: host,
@@ -89,20 +121,20 @@ namespace TrainPathExchanger
 
         #region Private Methods
 
-        private importTrainPaths GetImportTrainPaths(TrainRun trainRun)
+        private importTrainPaths GetImportTrainPaths(IEnumerable<TrainRun> trainRuns)
         {
             var result = default(importTrainPaths);
 
-            if (trainRun != default)
+            if (trainRuns.AnyItem())
             {
-                var stopPoints = GetNetworkPointKeys(trainRun).ToArray();
-                var trainPaths = GetTrainPaths(trainRun).ToArray();
+                var stopPoints = GetNetworkPointKeys(trainRuns).ToArray();
+                var trainPaths = GetTrainPaths(trainRuns).ToArray();
 
                 var request = new TrainPathImportRequest
                 {
-                    importProfile = IVUImportProfile,
+                    importProfile = importProfile,
                     stopPoints = stopPoints,
-                    timetableVersions = GetTimetableVersions().ToArray(),
+                    timetableVersions = timetableVersion.AsArray(),
                     trainPaths = trainPaths,
                 };
 
@@ -115,9 +147,13 @@ namespace TrainPathExchanger
             return result;
         }
 
-        private IEnumerable<NetworkPointKey> GetNetworkPointKeys(TrainRun trainRun)
+        private IEnumerable<NetworkPointKey> GetNetworkPointKeys(IEnumerable<TrainRun> trainRuns)
         {
-            foreach (var position in trainRun.Positions)
+            var positions = trainRuns
+                .SelectMany(r => r.Positions)
+                .Distinct().ToArray();
+
+            foreach (var position in positions)
             {
                 var result = new NetworkPointKey
                 {
@@ -132,8 +168,8 @@ namespace TrainPathExchanger
         private IEnumerable<string> GetStoppingReasons(TrainPosition position)
         {
             var result = position.IstDurchfahrt
-                ? StoppingReasonPass
-                : StoppingReasonStop;
+                ? stoppingReasonPass
+                : stoppingReasonStop;
 
             yield return result;
         }
@@ -155,36 +191,45 @@ namespace TrainPathExchanger
             return result;
         }
 
-        private IEnumerable<TimetableVersion> GetTimetableVersions()
+        private TrainPathKeyTimetableVersion GetTimetableVersionKey()
         {
-            yield return timetableVersion;
-        }
-
-        private IEnumerable<TrainPath> GetTrainPaths(TrainRun trainRun)
-        {
-            var keyTimetableVersion = new TrainPathKeyTimetableVersion
+            var result = new TrainPathKeyTimetableVersion
             {
                 @ref = timetableVersion.id,
             };
 
-            var trainPathKey = new TrainPathKey
+            return result;
+        }
+
+        private TrainPathKey GetTrainPathKey(TrainRun trainRun)
+        {
+            var result = new TrainPathKey
             {
-                infrastructureManager = InfrastructureManager,
-                timetableVersion = keyTimetableVersion,
+                infrastructureManager = infrastructureManager,
+                timetableVersion = timetableVersionKey,
                 trainPathId = trainRun.Zugnummer,
             };
 
-            var trainPathVariants = GetTrainPathVariants(trainRun).ToArray();
+            return result;
+        }
 
-            var result = new TrainPath
+        private IEnumerable<TrainPath> GetTrainPaths(IEnumerable<TrainRun> trainRuns)
+        {
+            foreach (var trainRun in trainRuns.IfAny())
             {
-                importValidityFrame = GetValidities().ToArray(),
-                infrastructureManagerTrainPathId = trainRun.Zugnummer,
-                trainPathKey = trainPathKey,
-                trainPathVariants = trainPathVariants,
-            };
+                var trainPathKey = GetTrainPathKey(trainRun);
+                var trainPathVariants = GetTrainPathVariants(trainRun).ToArray();
 
-            yield return result;
+                var result = new TrainPath
+                {
+                    importValidityFrame = timetableVersion.validity.AsArray(),
+                    infrastructureManagerTrainPathId = trainRun.Zugnummer,
+                    trainPathKey = trainPathKey,
+                    trainPathVariants = trainPathVariants,
+                };
+
+                yield return result;
+            }
         }
 
         private IEnumerable<TrainPathStop> GetTrainPathStops(TrainRun trainRun)
@@ -193,9 +238,9 @@ namespace TrainPathExchanger
             {
                 var times = new Times
                 {
-                    operationalArrivalTime = position.Ankunft?.ToDateTime() ?? DateTime.Now,
+                    operationalArrivalTime = position.Ankunft.ToDateTime() ?? DateTime.Now,
                     operationalArrivalTimeSpecified = position.Ankunft.HasValue,
-                    operationalDepartureTime = position.Abfahrt?.ToDateTime() ?? DateTime.Now,
+                    operationalDepartureTime = position.Abfahrt.ToDateTime() ?? DateTime.Now,
                     operationalDepartureTimeSpecified = position.Abfahrt.HasValue,
                 };
 
@@ -226,19 +271,14 @@ namespace TrainPathExchanger
 
             var result = new TrainPathVariant
             {
-                orderingTransportationCompany = OrderingTransportationCompany,
-                state = TrainPathState,
+                orderingTransportationCompany = orderingTransportationCompany,
+                state = trainPathState,
                 trainDescription = trainRun.Bemerkungen,
                 trainPathItinerary = trainPathItinerary,
-                validity = GetValidities().ToArray(),
+                validity = timetableVersion.validity.AsArray(),
             };
 
             yield return result;
-        }
-
-        private IEnumerable<DateInterval> GetValidities()
-        {
-            yield return timetableVersion.validity;
         }
 
         private void OnRetry(Exception exception, TimeSpan reconnection)
@@ -256,25 +296,23 @@ namespace TrainPathExchanger
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                if (!runsQueue.IsEmpty)
+                if (!importsQueue.IsEmpty)
                 {
-                    var currentRun = runsQueue.GetFirst().FirstOrDefault();
-                    var importPaths = GetImportTrainPaths(currentRun);
+                    var currentImport = importsQueue.GetFirst().FirstOrDefault();
 
-                    if (importPaths != default)
+                    if (currentImport != default)
                     {
                         using var channel = channelFactory.Get();
-                        var response = await channel.importTrainPathsAsync(importPaths);
+                        var response = await channel.importTrainPathsAsync(currentImport);
 
                         if (response.trainPathImportResponse != default)
                         {
                             logger.LogDebug(
-                                "Trasse {trainNumber} wurde erfolgreich an IVU.rail mit folgender id gesendet: {id}",
-                                currentRun.Zugnummer,
+                                "Trassen wurden mit folgender ID an IVU.rail gesendet: {id}",
                                 response.trainPathImportResponse.protocolTransactionId);
                         }
 
-                        runsQueue.TryDequeue(out TrainRun _);
+                        importsQueue.TryDequeue(out importTrainPaths _);
                     }
                 }
             }
