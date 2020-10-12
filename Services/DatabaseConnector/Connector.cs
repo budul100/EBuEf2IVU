@@ -64,23 +64,24 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainNumber)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainNumber, bool preferPrognosis)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => QueryTrainRunAsync(
+                action: (token) => QueryTrainRunsAsync(
                     trainNumber: trainNumber,
+                    preferPrognosis: preferPrognosis,
                     cancellationToken: token),
                 cancellationToken: cancellationToken);
 
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync()
+        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(bool preferPrognosis)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (token) => QueryTrainRunsAsync(
-                    minTime: TimeSpan.MinValue,
-                    maxTime: TimeSpan.MaxValue,
+                    trainNumber: default,
+                    preferPrognosis: preferPrognosis,
                     cancellationToken: token),
                 cancellationToken: cancellationToken);
 
@@ -166,7 +167,7 @@ namespace DatabaseConnector
             }
         }
 
-        private IEnumerable<TrainPosition> GetTrainPositions(IEnumerable<Halt> halte)
+        private IEnumerable<TrainPosition> GetTrainPositions(IEnumerable<Halt> halte, bool preferPrognosis)
         {
             if (halte.AnyItem())
             {
@@ -174,8 +175,8 @@ namespace DatabaseConnector
                 {
                     var result = new TrainPosition
                     {
-                        Abfahrt = halt.AbfahrtPlan,
-                        Ankunft = halt.AnkunftPlan,
+                        Abfahrt = halt.GetAbfahrtPath(preferPrognosis),
+                        Ankunft = halt.GetAnkunftPath(preferPrognosis),
                         Bemerkungen = halt.Bemerkungen,
                         Betriebsstelle = halt.Betriebsstelle,
                         Gleis = halt.GleisPlan.ToString(),
@@ -187,7 +188,7 @@ namespace DatabaseConnector
             }
         }
 
-        private IEnumerable<TrainRun> GetTrainRuns(IEnumerable<Halt> halte)
+        private IEnumerable<TrainRun> GetTrainRuns(IEnumerable<Halt> halte, bool preferPrognosis)
         {
             if (halte.AnyItem())
             {
@@ -199,7 +200,9 @@ namespace DatabaseConnector
                     var ordered = halteGroup
                         .OrderBy(h => h.SortierZeit).ToArray();
 
-                    var positions = GetTrainPositions(ordered).ToArray();
+                    var positions = GetTrainPositions(
+                        halte: ordered,
+                        preferPrognosis: preferPrognosis).ToArray();
 
                     var relevant = ordered.First();
 
@@ -334,7 +337,8 @@ namespace DatabaseConnector
             return result;
         }
 
-        private async Task<IEnumerable<TrainRun>> QueryTrainRunAsync(string trainNumber, CancellationToken cancellationToken)
+        private async Task<IEnumerable<TrainRun>> QueryTrainRunsAsync(string trainNumber, bool preferPrognosis,
+            CancellationToken cancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
 
@@ -346,14 +350,16 @@ namespace DatabaseConnector
 
                 using var context = new HalteContext(connectionString);
 
-                var zugnummer = trainNumber.ToInt();
+                var zugnummer = trainNumber.ToNullableInt();
 
                 var halte = await context.Halte
                     .Include(h => h.Zug)
-                    .Where(h => h.Zug.Zugnummer == zugnummer)
+                    .Where(h => !zugnummer.HasValue || h.Zug.Zugnummer == zugnummer)
                     .ToArrayAsync(cancellationToken);
 
-                result = GetTrainRuns(halte).ToArray();
+                result = GetTrainRuns(
+                    halte: halte,
+                    preferPrognosis: preferPrognosis).ToArray();
             }
 
             return result;
@@ -378,7 +384,9 @@ namespace DatabaseConnector
                     .Where(h => h.GetAbfahrt() <= maxTime)
                     .ToArrayAsync(cancellationToken);
 
-                result = GetTrainRuns(halte).ToArray();
+                result = GetTrainRuns(
+                    halte: halte,
+                    preferPrognosis: false).ToArray();
             }
 
             return result;

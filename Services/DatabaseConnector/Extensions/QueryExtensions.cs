@@ -10,7 +10,27 @@ namespace DatabaseConnector.Extensions
 
         public static TimeSpan? GetAbfahrt(this Halt halt)
         {
-            return halt.AbfahrtIst ?? halt.AbfahrtSoll ?? halt.AbfahrtPlan;
+            var result = halt.AbfahrtIst ?? halt.AbfahrtSoll ?? halt.AbfahrtPlan;
+
+            return result;
+        }
+
+        public static TimeSpan? GetAbfahrtPath(this Halt halt, bool preferPrognosis)
+        {
+            var result = preferPrognosis
+                ? halt.AbfahrtPrognose ?? halt.AbfahrtSoll
+                : halt.AbfahrtSoll;
+
+            return result;
+        }
+
+        public static TimeSpan? GetAnkunftPath(this Halt halt, bool preferPrognosis)
+        {
+            var result = preferPrognosis
+                ? halt.AnkunftPrognose ?? halt.AnkunftSoll
+                : halt.AnkunftSoll;
+
+            return result;
         }
 
         public static string GetName(this bool istVon)

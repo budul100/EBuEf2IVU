@@ -15,6 +15,9 @@ namespace DatabaseConnector.Models
         [Column("abfahrt_plan")]
         public TimeSpan? AbfahrtPlan { get; set; }
 
+        [Column("abfahrt_prognose")]
+        public TimeSpan? AbfahrtPrognose { get; set; }
+
         [Column("abfahrt_soll")]
         public TimeSpan? AbfahrtSoll { get; set; }
 
@@ -23,6 +26,9 @@ namespace DatabaseConnector.Models
 
         [Column("ankunft_plan")]
         public TimeSpan? AnkunftPlan { get; set; }
+
+        [Column("ankunft_prognose")]
+        public TimeSpan? AnkunftPrognose { get; set; }
 
         [Column("ankunft_soll")]
         public TimeSpan? AnkunftSoll { get; set; }
