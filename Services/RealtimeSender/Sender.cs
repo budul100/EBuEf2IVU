@@ -6,7 +6,7 @@ using Common.Models;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
-using RealtimeSender.Extensions;
+using RealtimeSender.Converters;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,17 +22,10 @@ namespace RealtimeSender
     {
         #region Private Fields
 
-        private const string EnvironmentComputer = "COMPUTERNAME";
-
-        private const int EventCodeAllocation = 9;
-        private const int ShuntingTrip = 0;
-        private const int TrackPosition = 0;
-
         private readonly ConcurrentQueue<RealTimeInfoTO> infosQueue = new ConcurrentQueue<RealTimeInfoTO>();
         private readonly ILogger logger;
 
-        private string deviceID;
-        private string division;
+        private Messages2RealtimeInfo converter;
         private EndpointAddress endpointAddress;
         private AsyncRetryPolicy retryPolicy;
 
@@ -49,46 +42,36 @@ namespace RealtimeSender
 
         #region Public Methods
 
-        public void AddAllocations(IEnumerable<VehicleAllocation> allocations, DateTime sessionDate)
+        public void AddAllocations(IEnumerable<VehicleAllocation> trainAllocations)
         {
-            foreach (var allocation in allocations)
+            foreach (var allocation in trainAllocations)
             {
-                var info = GetRealtimeInfo(
-                    eventCode: EventCodeAllocation,
-                    tripNumber: allocation.Zugnummer,
-                    timeStamp: sessionDate,
-                    stopArea: allocation.Betriebsstelle,
-                    track: allocation.Gleis,
-                    vehicles: allocation.Fahrzeuge);
+                var info = converter.Get(allocation);
 
                 if (info != default)
                     infosQueue.Enqueue(info);
             }
         }
 
-        public void AddRealtime(TrainLeg leg)
+        public void AddRealtime(TrainLeg trainLeg)
         {
-            if (leg != default)
+            if (trainLeg != default)
             {
-                var info = GetRealtimeInfo(
-                    eventCode: leg.GetEventcode(),
-                    tripNumber: leg.Zugnummer,
-                    timeStamp: leg.IVUZeitpunkt,
-                    stopArea: leg.IVUNetzpunkt,
-                    track: leg.IVUGleis,
-                    vehicles: leg.Fahrzeuge);
+                var info = converter.Get(trainLeg);
 
                 if (info != default)
                     infosQueue.Enqueue(info);
             }
         }
 
-        public void Initialize(string division, string endpoint, int retryTime)
+        public void Initialize(string division, string endpoint, int retryTime, DateTime sessionStart)
         {
-            this.division = division;
+            converter = new Messages2RealtimeInfo(
+                logger: logger,
+                division: division,
+                sessionStart: sessionStart);
 
             endpointAddress = new EndpointAddress(endpoint);
-            deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
 
             retryPolicy = Policy
                 .Handle<Exception>()
@@ -113,76 +96,6 @@ namespace RealtimeSender
         #endregion Public Methods
 
         #region Private Methods
-
-        private static IEnumerable<VehicleTO> GetVehicleTOs(IEnumerable<string> vehicles)
-        {
-            var position = 0;
-            foreach (string vehicle in vehicles)
-            {
-                if (!string.IsNullOrEmpty(vehicle))
-                {
-                    var result = new VehicleTO
-                    {
-                        orientation = 0,
-                        position = ++position,
-                        positionSpecified = true,
-                        number = vehicle
-                    };
-
-                    yield return result;
-                }
-            }
-        }
-
-        private RealTimeInfoTO GetRealtimeInfo(int eventCode, string tripNumber, DateTime timeStamp,
-            string stopArea, string track, IEnumerable<string> vehicles)
-        {
-            var result = default(RealTimeInfoTO);
-
-            if (!string.IsNullOrWhiteSpace(stopArea))
-            {
-                try
-                {
-                    var unixTimeStamp = timeStamp.ToUnixTimestamp();
-
-                    result = new RealTimeInfoTO
-                    {
-                        deviceId = deviceID,
-                        division = division,
-                        //employeeId = this.config.User,
-                        eventCode = eventCode,
-                        stopArea = stopArea,
-                        timeStamp = unixTimeStamp,
-                        trainCombinationCompleteSpecified = true,
-                        tripIdentificationDate = unixTimeStamp,
-                        tripIdentificationDateSpecified = true,
-                        tripNumber = tripNumber,
-                    };
-
-                    if (!string.IsNullOrEmpty(track))
-                    {
-                        result.track = track;
-                        result.trackposition = TrackPosition;
-                        result.trackpositionSpecified = true;
-                        result.shuntingTrip = ShuntingTrip;
-                        result.shuntingTripSpecified = true;
-                    }
-
-                    result.vehicles = GetVehicleTOs(vehicles).ToArray();
-                    result.trainCombinationComplete = result.vehicles.GetTrainCombinationComplete();
-
-                    return result;
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(
-                        "Fehler beim Erzeugen einer Ist-Zeit-Nachrichten für IVU.rail: {message}",
-                        ex.Message);
-                }
-            }
-
-            return result;
-        }
 
         private void OnRetry(Exception exception, TimeSpan reconnection)
         {
