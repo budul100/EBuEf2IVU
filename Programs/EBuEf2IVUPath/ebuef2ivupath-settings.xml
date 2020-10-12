@@ -18,6 +18,14 @@
     <ConnectionString>SERVER=db.ebuef;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
     <RetryTime>30</RetryTime>
   </EBuEfDBConnector>
+  <TrainPathSender>
+    <ImportProfile>Standard Train Path Import</ImportProfile>
+    <InfrastructureManager>EBuEf</InfrastructureManager>
+    <OrderingTransportationCompany>EBuEf</OrderingTransportationCompany>
+    <StoppingReasonPass>Pass</StoppingReasonPass>
+    <StoppingReasonStop>Stop</StoppingReasonStop>
+    <TrainPathState>REQUESTED</TrainPathState>
+  </TrainPathSender>
   <StatusReceiver>
     <IpAddress>224.0.0.8</IpAddress>
     <ListenerPort>4454</ListenerPort>
