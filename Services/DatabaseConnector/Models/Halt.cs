@@ -46,6 +46,9 @@ namespace DatabaseConnector.Models
         [Column("id")]
         public int ID { get; set; }
 
+        [Column("ist_Durchfahrt")]
+        public bool IstDurchfahrt { get; set; }
+
         [Column("sortierzeit")]
         public TimeSpan SortierZeit { get; set; }
 

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace RealtimeSender.Extensions
 {
-    internal static class RealtimeInfoExtensions
+    internal static class SenderExtensions
     {
         #region Private Fields
 
@@ -22,7 +22,7 @@ namespace RealtimeSender.Extensions
 
         #region Public Constructors
 
-        static RealtimeInfoExtensions()
+        static SenderExtensions()
         {
             timestampSubtract = GetTimestampSubtract();
         }

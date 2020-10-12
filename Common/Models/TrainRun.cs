@@ -9,6 +9,8 @@ namespace Common.Models
 
         public TimeSpan? Abfahrt { get; set; }
 
+        public string Bemerkungen { get; set; }
+
         public IEnumerable<TrainPosition> Positions { get; set; }
 
         public string Zugnummer { get; set; }
