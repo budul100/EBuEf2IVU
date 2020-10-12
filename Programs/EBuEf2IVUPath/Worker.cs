@@ -7,6 +7,7 @@ using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,8 +32,10 @@ namespace EBuEf2IVUPath
             IDatabaseConnector databaseConnector, ITrainPathSender trainPathSender, ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
         {
+            this.sessionStateHandler.SessionStartedEvent += OnSessionStart;
+
             this.trainPathReceiver = trainPathReceiver;
-            this.trainPathReceiver.MessageReceivedEvent += OnPathsReceived;
+            this.trainPathReceiver.MessageReceivedEvent += OnMessageReceived;
 
             this.trainPathSender = trainPathSender;
         }
@@ -119,7 +122,7 @@ namespace EBuEf2IVUPath
                 importProfile: senderSettings.ImportProfile);
         }
 
-        private async void OnPathsReceived(object sender, Common.EventsArgs.MessageReceivedArgs e)
+        private async void OnMessageReceived(object sender, Common.EventsArgs.MessageReceivedArgs e)
         {
             logger.LogDebug(
                 "Zugtrassen-Nachricht empfangen: {content}",
@@ -158,6 +161,16 @@ namespace EBuEf2IVUPath
                     "Die Nachricht kann nicht in eine Zugtrasse umgeformt werden: {message}",
                     serializationException.Message);
             }
+        }
+
+        private async void OnSessionStart(object sender, EventArgs e)
+        {
+            logger.LogDebug(
+                "Nachricht zum Import aller Zugtrassen empfangen.");
+
+            var trainRuns = await databaseConnector.GetTrainRunsAsync(preferPrognosis);
+
+            trainPathSender.AddTrains(trainRuns);
         }
 
         #endregion Private Methods
