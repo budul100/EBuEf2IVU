@@ -10,9 +10,13 @@ namespace Common.Models
 
         public TimeSpan? Ankunft { get; set; }
 
+        public string Bemerkungen { get; set; }
+
         public string Betriebsstelle { get; set; }
 
         public string Gleis { get; set; }
+
+        public bool IstDurchfahrt { get; set; }
 
         #endregion Public Properties
     }

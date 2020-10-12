@@ -8,6 +8,9 @@ namespace DatabaseConnector.Models
     {
         #region Public Properties
 
+        [Column("bemerkungen")]
+        public string Bemerkungen { get; set; }
+
         [Key]
         [Column("id")]
         public int ID { get; set; }

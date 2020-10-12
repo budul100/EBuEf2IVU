@@ -1,4 +1,7 @@
-﻿using Common.Interfaces;
+﻿#pragma warning disable CA1031 // Do not catch general exception types
+
+using Common.Extensions;
+using Common.Interfaces;
 using Common.Models;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -131,17 +134,6 @@ namespace RealtimeSender
             }
         }
 
-        private IEnumerable<RealTimeInfoTO> GetFirstInQueue()
-        {
-            if (!infosQueue.IsEmpty)
-            {
-                infosQueue.TryPeek(out RealTimeInfoTO info);
-
-                if (info != null)
-                    yield return info;
-            }
-        }
-
         private RealTimeInfoTO GetRealtimeInfo(int eventCode, string tripNumber, DateTime timeStamp,
             string stopArea, string track, IEnumerable<string> vehicles)
         {
@@ -183,7 +175,9 @@ namespace RealtimeSender
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError($"Fehler beim Erzeugen einer Ist-Zeit-Nachrichten für IVU.rail: {ex.Message}");
+                    logger.LogError(
+                        "Fehler beim Erzeugen einer Ist-Zeit-Nachrichten für IVU.rail: {message}",
+                        ex.Message);
                 }
             }
 
@@ -195,8 +189,10 @@ namespace RealtimeSender
             while (exception.InnerException != null) exception = exception.InnerException;
 
             logger.LogError(
-                $"Fehler beim Senden der Ist-Zeiten an IVU.rail: {exception.Message}\r\n" +
-                $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
+                "Fehler beim Senden der Ist-Zeiten an IVU.rail: {message}\r\n" +
+                "Die Verbindung wird in {reconection} Sekunden wieder versucht.",
+                exception.Message,
+                reconnection.TotalSeconds);
         }
 
         private async Task RunSenderAsync(CancellationToken cancellationToken)
@@ -205,7 +201,7 @@ namespace RealtimeSender
             {
                 if (!infosQueue.IsEmpty)
                 {
-                    var currentMessage = GetFirstInQueue().ToArray();
+                    var currentMessage = infosQueue.GetFirst().ToArray();
 
                     using var client = new RealTimeInformationImportFacadeClient();
                     client.Endpoint.Address = endpointAddress;
@@ -220,18 +216,22 @@ namespace RealtimeSender
 
                         if (relevantValiditation.code == 0)
                         {
-                            logger.LogDebug($"Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet " +
-                                $"(Zug: {relevantMessage.tripNumber}, " +
-                                $"Betriebsstelle: {relevantMessage.stopArea}, " +
-                                $"Decoder: {relevantMessage.vehicles.FirstOrDefault()?.number})");
+                            logger.LogDebug(
+                                "Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet " +
+                                "(Zug: {trainNumber}, Betriebsstelle: {location}, Decoder: {decoder}).",
+                                relevantMessage.tripNumber,
+                                relevantMessage.stopArea,
+                                relevantMessage.vehicles.FirstOrDefault()?.number);
                         }
                         else
                         {
-                            logger.LogError($"Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen: " +
-                                $"{relevantValiditation.message} " +
-                                $"(Zug: {relevantMessage.tripNumber}, " +
-                                $"Betriebsstelle: {relevantMessage.stopArea}, " +
-                                $"Decoder: {relevantMessage.vehicles.FirstOrDefault()?.number})");
+                            logger.LogError(
+                                "Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen " +
+                                "(Zug: {trainNumber}, Betriebsstelle: {location}, Decoder: {decoder}): {message}.",
+                                relevantValiditation.message,
+                                relevantMessage.tripNumber,
+                                relevantMessage.stopArea,
+                                relevantMessage.vehicles.FirstOrDefault()?.number);
                         }
                     }
 
@@ -243,3 +243,5 @@ namespace RealtimeSender
         #endregion Private Methods
     }
 }
+
+#pragma warning disable CA1031 // Do not catch general exception types

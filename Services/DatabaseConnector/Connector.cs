@@ -223,8 +223,10 @@ namespace DatabaseConnector
                     {
                         Abfahrt = halt.AbfahrtPlan,
                         Ankunft = halt.AnkunftPlan,
+                        Bemerkungen = halt.Bemerkungen,
                         Betriebsstelle = halt.Betriebsstelle,
                         Gleis = halt.GleisPlan.ToString(),
+                        IstDurchfahrt = halt.IstDurchfahrt,
                     };
 
                     yield return result;
@@ -234,14 +236,15 @@ namespace DatabaseConnector
 
         private TrainRun GetTrainRun(IEnumerable<Halt> halte)
         {
-            var positions = GetTrainPositions(halte).ToArray();
-
             var relevant = halte
                 .OrderBy(h => h.SortierZeit).First();
+
+            var positions = GetTrainPositions(halte).ToArray();
 
             var result = new TrainRun
             {
                 Abfahrt = relevant.GetAbfahrt(),
+                Bemerkungen = relevant.Zug.Bemerkungen,
                 Positions = positions,
                 Zugnummer = relevant.Zug?.Zugnummer.ToString(),
             };
