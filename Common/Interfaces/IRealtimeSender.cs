@@ -10,11 +10,11 @@ namespace Common.Interfaces
     {
         #region Public Methods
 
-        void AddAllocations(IEnumerable<VehicleAllocation> allocations, DateTime startTime);
+        void AddAllocations(IEnumerable<VehicleAllocation> trainAllocations);
 
-        void AddRealtime(TrainLeg leg);
+        void AddRealtime(TrainLeg trainLeg);
 
-        void Initialize(string division, string endpoint, int retryTime);
+        void Initialize(string division, string endpoint, int retryTime, DateTime sessionStart);
 
         Task RunAsnc(CancellationToken cancellationToken);
 
