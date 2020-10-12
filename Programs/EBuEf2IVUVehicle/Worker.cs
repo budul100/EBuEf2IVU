@@ -21,7 +21,7 @@ namespace EBuEf2IVUVehicle
 
         private const string MessageTypePositions = "Echtzeit-Positionen";
 
-        private readonly Realtime2TrainLeg converter;
+        private readonly Message2TrainLeg converter;
         private readonly IMessageReceiver positionsReceiver;
         private readonly IRealtimeSender realtimeSender;
 
@@ -40,7 +40,7 @@ namespace EBuEf2IVUVehicle
 
             this.realtimeSender = realtimeSender;
 
-            converter = new Realtime2TrainLeg(
+            converter = new Message2TrainLeg(
                 config: config,
                 logger: logger,
                 ivuSessionDate: ivuSessionDate);
@@ -112,7 +112,8 @@ namespace EBuEf2IVUVehicle
             realtimeSender.Initialize(
                 division: settings.Division,
                 endpoint: settings.Endpoint,
-                retryTime: settings.RetryTime);
+                retryTime: settings.RetryTime,
+                sessionStart: ebuefSessionStart);
         }
 
         private async void OnAllocationSet(object sender, EventArgs e)
@@ -122,9 +123,7 @@ namespace EBuEf2IVUVehicle
 
             var allocations = await databaseConnector.GetVehicleAllocationsAsync();
 
-            realtimeSender.AddAllocations(
-                allocations: allocations,
-                startTime: ebuefSessionStart);
+            realtimeSender.AddAllocations(allocations);
         }
 
         private async void OnPositionReceived(object sender, MessageReceivedArgs e)
