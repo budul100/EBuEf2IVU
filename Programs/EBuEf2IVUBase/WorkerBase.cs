@@ -72,7 +72,7 @@ namespace EBuEf2IVUBase
             return DateTime.Now.Add(ebuefTimeshift);
         }
 
-        protected void InitializeConnector(CancellationToken sessionCancellationToken)
+        protected void InitializeDatabaseConnector(CancellationToken sessionCancellationToken)
         {
             var connectorSettings = config
                 .GetSection(nameof(EBuEfDBConnector))
@@ -84,7 +84,7 @@ namespace EBuEf2IVUBase
                 cancellationToken: sessionCancellationToken);
         }
 
-        protected void InitializeStateHandler()
+        protected void InitializeStateReceiver()
         {
             var settings = config
                 .GetSection(nameof(StatusReceiver))

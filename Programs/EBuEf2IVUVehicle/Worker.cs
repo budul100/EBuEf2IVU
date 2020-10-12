@@ -6,7 +6,9 @@ using Common.Interfaces;
 using Common.Models;
 using ConverterExtensions;
 using EBuEf2IVUBase;
+using EBuEf2IVUVehicle.Extensions;
 using EBuEf2IVUVehicle.Settings;
+using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -27,26 +29,25 @@ namespace EBuEf2IVUVehicle
         private const string MessageTypePositions = "Echtzeit-Positionen";
 
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
-        private readonly IRealtimeSender ivuSender;
         private readonly IMessageReceiver positionsReceiver;
-        private readonly JsonSerializerSettings positionsReceiverSettings = new JsonSerializerSettings();
+        private readonly IRealtimeSender realtimeSender;
 
         #endregion Private Fields
 
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
-            IDatabaseConnector databaseConnector, IRealtimeSender ivuSender, ILogger<Worker> logger)
+            IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
         {
-            infrastructureMappings = GetInfrastructureMappings();
-
             this.sessionStateHandler.AllocationSetEvent += OnAllocationSet;
 
             this.positionsReceiver = positionsReceiver;
             this.positionsReceiver.MessageReceivedEvent += OnPositionReceived;
 
-            this.ivuSender = ivuSender;
+            this.realtimeSender = realtimeSender;
+
+            infrastructureMappings = config.GetInfrastructureMappings();
         }
 
         #endregion Public Constructors
@@ -55,7 +56,7 @@ namespace EBuEf2IVUVehicle
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            InitializeStateHandler();
+            InitializeStateReceiver();
             sessionStateHandler.Run(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
@@ -66,8 +67,9 @@ namespace EBuEf2IVUVehicle
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
                 InitializePositionReceiver();
-                InitializeConnector(sessionCancellationToken);
-                InitializeSender();
+                InitializeRealtimeSender();
+
+                InitializeDatabaseConnector(sessionCancellationToken);
 
                 await StartIVUSessionAsync();
 
@@ -77,7 +79,7 @@ namespace EBuEf2IVUVehicle
                     {
                         await Task.WhenAny(
                             positionsReceiver.RunAsync(sessionCancellationToken),
-                            ivuSender.RunAsnc(sessionCancellationToken));
+                            realtimeSender.RunAsnc(sessionCancellationToken));
                     }
                     catch (TaskCanceledException)
                     {
@@ -92,23 +94,7 @@ namespace EBuEf2IVUVehicle
 
         #region Private Methods
 
-        private IEnumerable<string> GetDecoders(RealTimeMessage message)
-        {
-            if (!string.IsNullOrWhiteSpace(message?.Decoder))
-                yield return message.Decoder;
-        }
-
-        private IEnumerable<InfrastructureMapping> GetInfrastructureMappings()
-        {
-            var result = config
-                .GetSection(nameof(InfrastructureMappings))
-                .Get<InfrastructureMappings>()
-                .InfrastructureMapping;
-
-            return result;
-        }
-
-        private TrainLeg GetLeg(RealTimeMessage message)
+        private TrainLeg GetTrainLeg(RealTimeMessage message)
         {
             var result = default(TrainLeg);
 
@@ -117,17 +103,10 @@ namespace EBuEf2IVUVehicle
                 .Where(m => m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
                     && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
                 .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
-                .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis))
-                .FirstOrDefault();
+                .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis)).FirstOrDefault();
 
             if (mapping != null)
             {
-                var ebuefVonZeit = TimeSpan.FromSeconds(mapping.EBuEfVonVerschiebungSekunden.ToInt());
-                var ebuefNachZeit = TimeSpan.FromSeconds(mapping.EBuEfNachVerschiebungSekunden.ToInt());
-                var ivuZeit = TimeSpan.FromSeconds(mapping.IVUVerschiebungSekunden.ToInt());
-
-                var ivuZeitpunkt = ivuSessionDate.Add(message.SimulationsZeit.Add(ivuZeit).TimeOfDay);
-
                 if ((message.SignalTyp == SignalType.ESig && mapping.IVUTrainPositionType != LegType.Ankunft)
                     || (message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != LegType.Abfahrt)
                     || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != LegType.Durchfahrt))
@@ -138,6 +117,14 @@ namespace EBuEf2IVUVehicle
                         message);
                 }
 
+                var ebuefVonZeit = TimeSpan.FromSeconds(mapping.EBuEfVonVerschiebungSekunden.ToInt());
+                var ebuefNachZeit = TimeSpan.FromSeconds(mapping.EBuEfNachVerschiebungSekunden.ToInt());
+
+                var ivuZeit = TimeSpan.FromSeconds(mapping.IVUVerschiebungSekunden.ToInt());
+                var ivuZeitpunkt = ivuSessionDate.Add(message.SimulationsZeit.Add(ivuZeit).TimeOfDay);
+
+                var fahrzeuge = message?.Decoder.AsEnumerable();
+
                 result = new TrainLeg
                 {
                     EBuEfBetriebsstelleNach = mapping.EBuEfNachBetriebsstelle,
@@ -146,7 +133,7 @@ namespace EBuEf2IVUVehicle
                     EBuEfGleisVon = message.StartGleis,
                     EBuEfZeitpunktNach = message.SimulationsZeit.Add(ebuefNachZeit).TimeOfDay,
                     EBuEfZeitpunktVon = message.SimulationsZeit.Add(ebuefVonZeit).TimeOfDay,
-                    Fahrzeuge = GetDecoders(message).ToArray(),
+                    Fahrzeuge = fahrzeuge,
                     IVUGleis = mapping.IVUGleis,
                     IVUNetzpunkt = mapping.IVUNetzpunkt,
                     IVULegTyp = mapping.IVUTrainPositionType,
@@ -171,13 +158,13 @@ namespace EBuEf2IVUVehicle
                 messageType: MessageTypePositions);
         }
 
-        private void InitializeSender()
+        private void InitializeRealtimeSender()
         {
             var settings = config
-                .GetSection(nameof(RealtimeSender))
-                .Get<RealtimeSender>();
+                .GetSection(nameof(Settings.RealtimeSender))
+                .Get<Settings.RealtimeSender>();
 
-            ivuSender.Initialize(
+            realtimeSender.Initialize(
                 division: settings.Division,
                 endpoint: settings.Endpoint,
                 retryTime: settings.RetryTime);
@@ -185,13 +172,17 @@ namespace EBuEf2IVUVehicle
 
         private async void OnAllocationSet(object sender, EventArgs e)
         {
-            logger.LogInformation(
-                "Nachrichte zur fertigen Fahrzeugzuteilung empfangen.");
+            logger.LogDebug(
+                "Nachricht zum Setzen der Fahrzeug-Grundaufstellung empfangen.");
 
-            await SetVehicleAllocationsAsync();
+            var allocations = await databaseConnector.GetVehicleAllocationsAsync();
+
+            realtimeSender.AddAllocations(
+                allocations: allocations,
+                startTime: ebuefSessionStart);
         }
 
-        private void OnPositionReceived(object sender, MessageReceivedArgs e)
+        private async void OnPositionReceived(object sender, MessageReceivedArgs e)
         {
             logger.LogDebug(
                 "Positions-Nachricht empfangen: {content}",
@@ -199,23 +190,21 @@ namespace EBuEf2IVUVehicle
 
             try
             {
-                var message = JsonConvert.DeserializeObject<RealTimeMessage>(
-                    value: e.Content,
-                    settings: positionsReceiverSettings);
+                var message = JsonConvert.DeserializeObject<RealTimeMessage>(e.Content);
 
                 if (!string.IsNullOrWhiteSpace(message?.Zugnummer))
                 {
-                    var position = GetLeg(message);
+                    var trainLeg = GetTrainLeg(message);
 
-                    if (position != null)
+                    if (trainLeg != default)
                     {
-                        databaseConnector.AddRealtimeAsync(position);
-                        ivuSender.AddRealtime(position);
+                        realtimeSender.AddRealtime(trainLeg);
+                        await databaseConnector.AddRealtimeAsync(trainLeg);
                     }
                     else
                     {
                         logger.LogDebug(
-                            "Zu der gesandten Echtzeitmeldung konnte in der aktuellen Sitzung keine Fahrt gefunden werden.");
+                            "Zur Positions-Nachricht konnte in der aktuellen Sitzung keine Fahrt gefunden werden.");
                     }
                 }
             }
@@ -231,15 +220,6 @@ namespace EBuEf2IVUVehicle
                     "Die Nachricht kann nicht in eine Echtzeitmeldung umgeformt werden: {message}",
                     serializationException.Message);
             }
-        }
-
-        private async Task SetVehicleAllocationsAsync()
-        {
-            var allocations = await databaseConnector.GetVehicleAllocationsAsync();
-
-            ivuSender.AddAllocations(
-                allocations: allocations,
-                startTime: ebuefSessionStart);
         }
 
         #endregion Private Methods

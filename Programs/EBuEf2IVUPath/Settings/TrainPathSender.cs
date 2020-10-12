@@ -10,6 +10,8 @@
 
         public string InfrastructureManager { get; set; }
 
+        public bool IsHttps { get; set; }
+
         public string OrderingTransportationCompany { get; set; }
 
         public string Password { get; set; }

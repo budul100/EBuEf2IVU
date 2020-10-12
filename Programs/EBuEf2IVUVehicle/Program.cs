@@ -5,6 +5,7 @@ using EBuEf2IVUBase.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using StringExtensions;
 using System.IO;
 using System.Reflection;
 
@@ -55,16 +56,20 @@ namespace EBuEf2IVUVehicle
             services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
+
             services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();
         }
 
         private static string GetSettingsPath(CommandLineArgs args)
         {
-            var result = !string.IsNullOrWhiteSpace(args?.SettingsPath)
-                ? args.SettingsPath
-                : Path.Combine(
+            var result = args.SettingsPath;
+
+            if (result.IsEmpty())
+            {
+                result = Path.Combine(
                     path1: Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                     path2: SettingsFileName);
+            }
 
             return result;
         }

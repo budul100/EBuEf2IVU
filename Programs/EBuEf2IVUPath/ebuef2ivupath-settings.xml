@@ -19,12 +19,19 @@
     <RetryTime>30</RetryTime>
   </EBuEfDBConnector>
   <TrainPathSender>
+    <Host>192.168.17.52</Host>
     <ImportProfile>Standard Train Path Import</ImportProfile>
     <InfrastructureManager>EBuEf</InfrastructureManager>
+    <IsHttps>false</IsHttps>
     <OrderingTransportationCompany>EBuEf</OrderingTransportationCompany>
+    <Password>crewontrip</Password>
+    <Path>intf.crewontrip.impl/CrewOnTripWebFacadeBean</Path>
+    <Port>20000</Port>
+    <RetryTime>30</RetryTime>
     <StoppingReasonPass>Pass</StoppingReasonPass>
     <StoppingReasonStop>Stop</StoppingReasonStop>
     <TrainPathState>REQUESTED</TrainPathState>
+    <Username>crewontrip</Username>
   </TrainPathSender>
   <StatusReceiver>
     <IpAddress>224.0.0.8</IpAddress>
@@ -33,7 +40,4 @@
     <StartPattern>ZN SET DISPATCH</StartPattern>
     <StatusPattern>SESSION NEW STATUS $</StatusPattern>
   </StatusReceiver>
-  <ServiceSettings>
-    <AbfrageIntervalSek>60</AbfrageIntervalSek>
-  </ServiceSettings>
 </Configuration>

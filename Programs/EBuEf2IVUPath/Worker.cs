@@ -1,12 +1,12 @@
 #pragma warning disable CA1031 // Do not catch general exception types
 
-using Common.Enums;
 using Common.Interfaces;
+using Common.Models;
 using EBuEf2IVUBase;
-using EBuEf2IVUPath.Settings;
+using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
+using Newtonsoft.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,18 +17,22 @@ namespace EBuEf2IVUPath
     {
         #region Private Fields
 
-        private readonly ITrainPathSender trainPathSender;
+        private const string MessageTypePaths = "Zugtrassen";
 
-        private TimeSpan serviceInterval;
+        private readonly IMessageReceiver trainPathReceiver;
+        private readonly ITrainPathSender trainPathSender;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
-            ITrainPathSender trainPathSender, ILogger<Worker> logger)
+        public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver trainPathReceiver,
+            IDatabaseConnector databaseConnector, ITrainPathSender trainPathSender, ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
         {
+            this.trainPathReceiver = trainPathReceiver;
+            this.trainPathReceiver.MessageReceivedEvent += OnPathsReceived;
+
             this.trainPathSender = trainPathSender;
         }
 
@@ -38,10 +42,8 @@ namespace EBuEf2IVUPath
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            InitializeStateHandler();
+            InitializeStateReceiver();
             sessionStateHandler.Run(workerCancellationToken);
-
-            currentState = SessionStates.IsRunning;
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
@@ -50,30 +52,27 @@ namespace EBuEf2IVUPath
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                InitializeService();
-                InitializeConnector(sessionCancellationToken);
+                InitializePathReceiver();
+                InitializePathSender();
+
+                InitializeDatabaseConnector(sessionCancellationToken);
 
                 await StartIVUSessionAsync();
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
-                    if (currentState == SessionStates.IsRunning)
+                    try
                     {
-                        //await CheckCrewsAsync(sessionCancellationToken);
-
-                        try
-                        {
-                            await Task.Delay(
-                                delay: serviceInterval,
-                                cancellationToken: sessionCancellationToken);
-                        }
-                        catch (TaskCanceledException)
-                        {
-                            logger.LogInformation(
-                                "EBuEf2IVUPath wird beendet.");
-                        }
+                        await Task.WhenAny(
+                            trainPathReceiver.RunAsync(sessionCancellationToken),
+                            trainPathSender.RunAsnc(sessionCancellationToken));
                     }
-                }
+                    catch (TaskCanceledException)
+                    {
+                        logger.LogInformation(
+                            "EBuEf2IVUPath wird beendet.");
+                    }
+                };
             }
         }
 
@@ -81,25 +80,79 @@ namespace EBuEf2IVUPath
 
         #region Private Methods
 
-        private void InitializeSender()
+        private void InitializePathReceiver()
         {
-            var senderSettings = config
-                .GetSection(nameof(TrainPathSender))
-                .Get<TrainPathSender>();
+            var receiverSettings = config
+                .GetSection(nameof(Settings.TrainPathReceiver))
+                .Get<Settings.TrainPathReceiver>();
 
-            trainPathSender.Initialize(senderSettings.ho)
+            trainPathReceiver.Initialize(
+                ipAdress: receiverSettings.IpAddress,
+                port: receiverSettings.ListenerPort,
+                retryTime: receiverSettings.RetryTime,
+                messageType: MessageTypePaths);
         }
 
-        private void InitializeService()
+        private void InitializePathSender()
         {
-            var serviceSettings = config
-                .GetSection(nameof(ServiceSettings))
-                .Get<ServiceSettings>();
+            var senderSettings = config
+                .GetSection(nameof(Settings.TrainPathSender))
+                .Get<Settings.TrainPathSender>();
 
-            serviceInterval = new TimeSpan(
-                hours: 0,
-                minutes: 0,
-                seconds: serviceSettings.AbfrageIntervalSek);
+            trainPathSender.Initialize(
+                host: senderSettings.Host,
+                port: senderSettings.Port,
+                path: senderSettings.Path,
+                username: senderSettings.Username,
+                password: senderSettings.Password,
+                isHttps: senderSettings.IsHttps,
+                retryTime: senderSettings.RetryTime,
+                sessionDate: ivuSessionDate,
+                infrastructureManager: senderSettings.InfrastructureManager,
+                orderingTransportationCompany: senderSettings.OrderingTransportationCompany,
+                trainPathState: senderSettings.TrainPathState,
+                stoppingReasonStop: senderSettings.StoppingReasonStop,
+                stoppingReasonPass: senderSettings.StoppingReasonPass,
+                importProfile: senderSettings.ImportProfile);
+        }
+
+        private async void OnPathsReceived(object sender, Common.EventsArgs.MessageReceivedArgs e)
+        {
+            logger.LogDebug(
+                "Zugtrassen-Nachricht empfangen: {content}",
+                e.Content);
+
+            try
+            {
+                var message = JsonConvert.DeserializeObject<TrainPathMessage>(e.Content);
+
+                if (!string.IsNullOrWhiteSpace(message?.TrainId))
+                {
+                    var trainRuns = await databaseConnector.GetTrainRunsAsync(message.TrainId);
+
+                    if (trainRuns.AnyItem())
+                    {
+                        trainPathSender.AddTrains(trainRuns);
+                    }
+                    else
+                    {
+                        logger.LogDebug(
+                            "Zur Zugtrassen-Nachricht konnte in der aktuellen Sitzung keine Fahrt gefunden werden.");
+                    }
+                }
+            }
+            catch (JsonReaderException readerException)
+            {
+                logger.LogError(
+                    "Die Nachricht kann nicht gelesen werden: {message}",
+                    readerException.Message);
+            }
+            catch (JsonSerializationException serializationException)
+            {
+                logger.LogError(
+                    "Die Nachricht kann nicht in eine Zugtrasse umgeformt werden: {message}",
+                    serializationException.Message);
+            }
         }
 
         #endregion Private Methods

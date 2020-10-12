@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
+using StringExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,17 +58,29 @@ namespace DatabaseConnector
         public Task<EBuEfSession> GetEBuEfSessionAsync()
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => GetSessionDateAsync(token),
+                action: (token) => QuerySessionDateAsync(token),
                 cancellationToken: cancellationToken);
 
             return result;
         }
 
-        public Task<TrainRun> GetTrainRunAsync(string trainNumber)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainNumber)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => GetTrainRunAsync(
+                action: (token) => QueryTrainRunAsync(
                     trainNumber: trainNumber,
+                    cancellationToken: token),
+                cancellationToken: cancellationToken);
+
+            return result;
+        }
+
+        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync()
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (token) => QueryTrainRunsAsync(
+                    minTime: TimeSpan.MinValue,
+                    maxTime: TimeSpan.MaxValue,
                     cancellationToken: token),
                 cancellationToken: cancellationToken);
 
@@ -77,7 +90,7 @@ namespace DatabaseConnector
         public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => GetTrainRunsAsync(
+                action: (token) => QueryTrainRunsAsync(
                     minTime: minTime,
                     maxTime: maxTime,
                     cancellationToken: token),
@@ -89,7 +102,7 @@ namespace DatabaseConnector
         public Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync()
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => GetVehicleAllocationsAsync(token),
+                action: (token) => QueryVehicleAllocationsAsync(token),
                 cancellationToken: cancellationToken);
 
             return result;
@@ -130,11 +143,11 @@ namespace DatabaseConnector
             {
                 foreach (var crewingElement in crewingElements)
                 {
-                    var trainId = GetTrainId(crewingElement.Zugnummer);
+                    var trainId = QueryTrainId(crewingElement.Zugnummer);
 
                     if (trainId.HasValue)
                     {
-                        var predecessorTrainId = GetTrainId(crewingElement.ZugnummerVorgaenger);
+                        var predecessorTrainId = QueryTrainId(crewingElement.ZugnummerVorgaenger);
 
                         var result = new Besatzung
                         {
@@ -151,66 +164,6 @@ namespace DatabaseConnector
                     }
                 }
             }
-        }
-
-        private async Task<EBuEfSession> GetSessionDateAsync(CancellationToken cancellationToken)
-        {
-            var result = default(EBuEfSession);
-
-            if (!cancellationToken.IsCancellationRequested)
-            {
-                logger.LogDebug($"Suche in der EBuEf-DB nach der aktuellen Fahrplan-Session.");
-
-                using var context = new SitzungenContext(connectionString);
-
-                var sitzung = await context.Sitzungen
-                    .Where(s => s.Status == Convert.ToByte(SessionStates.InPreparation)
-                        || s.Status == Convert.ToByte(SessionStates.IsRunning)
-                        || s.Status == Convert.ToByte(SessionStates.IsPaused))
-                    .OrderByDescending(s => s.Status == Convert.ToByte(SessionStates.IsRunning))
-                    .ThenByDescending(s => s.Status == Convert.ToByte(SessionStates.IsPaused))
-                    .FirstOrDefaultAsync(cancellationToken);
-
-                if (sitzung != default)
-                {
-                    var timeshift = new TimeSpan(
-                        hours: 0,
-                        minutes: 0,
-                        seconds: sitzung.Verschiebung * -1);
-
-                    result = new EBuEfSession
-                    {
-                        IVUDatum = sitzung.IvuDate ?? DateTime.Today,
-                        SessionStart = sitzung.SimulationStartzeit.ToDateTime(),
-                        Verschiebung = timeshift,
-                    };
-
-                    logger.LogDebug($"Aktuelle EBuEf-Sitzung gefunden: {result}");
-                }
-                else
-                {
-                    logger.LogError($"Es wurde keine EBuEf-Session gefunden.");
-                }
-            }
-
-            return result;
-        }
-
-        private int? GetTrainId(string zugnummer)
-        {
-            var result = default(int?);
-
-            if (!string.IsNullOrWhiteSpace(zugnummer))
-            {
-                using var context = new ZuegeContext(connectionString);
-
-                var trainNumber = zugnummer.ToInt();
-
-                result = context.Zuege
-                    .FirstOrDefault(z => z.Zugnummer == trainNumber)?.ID;
-            }
-
-            return result;
         }
 
         private IEnumerable<TrainPosition> GetTrainPositions(IEnumerable<Halt> halte)
@@ -234,33 +187,162 @@ namespace DatabaseConnector
             }
         }
 
-        private TrainRun GetTrainRun(IEnumerable<Halt> halte)
+        private IEnumerable<TrainRun> GetTrainRuns(IEnumerable<Halt> halte)
         {
-            var relevant = halte
-                .OrderBy(h => h.SortierZeit).First();
-
-            var positions = GetTrainPositions(halte).ToArray();
-
-            var result = new TrainRun
+            if (halte.AnyItem())
             {
-                Abfahrt = relevant.GetAbfahrt(),
-                Bemerkungen = relevant.Zug.Bemerkungen,
-                Positions = positions,
-                Zugnummer = relevant.Zug?.Zugnummer.ToString(),
-            };
+                var halteGroups = halte
+                    .GroupBy(h => h.ZugID).ToArray();
 
-            return result;
+                foreach (var halteGroup in halteGroups)
+                {
+                    var ordered = halteGroup
+                        .OrderBy(h => h.SortierZeit).ToArray();
+
+                    var positions = GetTrainPositions(ordered).ToArray();
+
+                    var relevant = ordered.First();
+
+                    var result = new TrainRun
+                    {
+                        Abfahrt = relevant.GetAbfahrt(),
+                        Bemerkungen = relevant.Zug.Bemerkungen,
+                        Positions = positions,
+                        Zugnummer = relevant.Zug?.Zugnummer.ToString(),
+                    };
+
+                    yield return result;
+                }
+            }
         }
 
-        private async Task<TrainRun> GetTrainRunAsync(string trainNumber, CancellationToken cancellationToken)
+        private IEnumerable<VehicleAllocation> GetVehicleAllocations(IEnumerable<Aufstellung> aufstellungen)
         {
-            var result = default(TrainRun);
+            if (aufstellungen.Any())
+            {
+                var aufstellungenGroups = aufstellungen
+                    .GroupBy(a => new
+                    {
+                        a.Feld.Betriebsstelle,
+                        a.Feld.Gleis,
+                        a.Decoder,
+                        a.Zugnummer
+                    }).ToArray();
+
+                logger.LogDebug(
+                    "Es wurden {numberTrains} Züge in der Grundaufstellungen gefunden.",
+                    aufstellungenGroups.Count());
+
+                foreach (var aufstellungenGroup in aufstellungenGroups)
+                {
+                    var relevantAufstellung = aufstellungenGroup.First();
+
+                    var fahrzeuge = relevantAufstellung.Decoder.ToString().AsEnumerable();
+
+                    var result = new VehicleAllocation
+                    {
+                        Betriebsstelle = relevantAufstellung.Feld?.Betriebsstelle,
+                        Fahrzeuge = fahrzeuge,
+                        Gleis = relevantAufstellung.Feld?.Gleis.ToString(),
+                        Zugnummer = relevantAufstellung.Zugnummer?.ToString(),
+                    };
+
+                    logger.LogDebug(
+                        "Zug in Grundaufstellung: {train}",
+                        relevantAufstellung);
+
+                    yield return result;
+                }
+            }
+            else
+            {
+                logger.LogInformation(
+                    "In der Grundaufstellung sind keine Fahrzeuge eingetragen.");
+            }
+        }
+
+        private void OnRetry(Exception exception, TimeSpan reconnection)
+        {
+            while (exception.InnerException != null) exception = exception.InnerException;
+
+            logger.LogError(
+                "Fehler beim Verbinden mit der EBuEf-Datenbank: {message}\r\n" +
+                "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
+                exception.Message,
+                reconnection.TotalSeconds);
+        }
+
+        private async Task<EBuEfSession> QuerySessionDateAsync(CancellationToken cancellationToken)
+        {
+            var result = default(EBuEfSession);
 
             if (!cancellationToken.IsCancellationRequested)
             {
                 logger.LogDebug(
-                    message: "Suche nach Zug {trainNumber}.",
-                    args: trainNumber);
+                    "Suche in der EBuEf-DB nach der aktuellen Fahrplan-Session.");
+
+                using var context = new SitzungenContext(connectionString);
+
+                var sitzung = await context.Sitzungen
+                    .Where(s => s.HasRelevantStatus())
+                    .OrderByDescending(s => s.Status == Convert.ToByte(SessionStates.IsRunning))
+                    .ThenByDescending(s => s.Status == Convert.ToByte(SessionStates.IsPaused))
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (sitzung != default)
+                {
+                    var timeshift = new TimeSpan(
+                        hours: 0,
+                        minutes: 0,
+                        seconds: sitzung.Verschiebung * -1);
+
+                    result = new EBuEfSession
+                    {
+                        IVUDatum = sitzung.IvuDate ?? DateTime.Today,
+                        SessionStart = sitzung.SimulationStartzeit.ToDateTime(),
+                        Verschiebung = timeshift,
+                    };
+
+                    logger.LogDebug(
+                        "Aktuelle EBuEf-Sitzung gefunden: {session}",
+                        result);
+                }
+                else
+                {
+                    logger.LogError(
+                        "Es wurde keine EBuEf-Session gefunden.");
+                }
+            }
+
+            return result;
+        }
+
+        private int? QueryTrainId(string zugnummer)
+        {
+            var result = default(int?);
+
+            if (!zugnummer.IsEmpty())
+            {
+                using var context = new ZuegeContext(connectionString);
+
+                var trainNumber = zugnummer.ToInt();
+
+                result = context.Zuege
+                    .FirstOrDefault(z => z.Zugnummer == trainNumber)?.ID;
+            }
+
+            return result;
+        }
+
+        private async Task<IEnumerable<TrainRun>> QueryTrainRunAsync(string trainNumber, CancellationToken cancellationToken)
+        {
+            var result = Enumerable.Empty<TrainRun>();
+
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                logger.LogDebug(
+                    "Suche nach Zugnummer {trainNumber}.",
+                    trainNumber);
 
                 using var context = new HalteContext(connectionString);
 
@@ -271,44 +353,29 @@ namespace DatabaseConnector
                     .Where(h => h.Zug.Zugnummer == zugnummer)
                     .ToArrayAsync(cancellationToken);
 
-                result = GetTrainRun(halte);
+                result = GetTrainRuns(halte).ToArray();
             }
 
             return result;
         }
 
-        private IEnumerable<TrainRun> GetTrainRuns(IEnumerable<Halt> halte)
-        {
-            if (halte.AnyItem())
-            {
-                var halteGroups = halte
-                    .GroupBy(h => h.ZugID).ToArray();
-
-                foreach (var halteGroup in halteGroups)
-                {
-                    var result = GetTrainRun(halteGroup);
-
-                    yield return result;
-                }
-            }
-        }
-
-        private async Task<IEnumerable<TrainRun>> GetTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime,
+        private async Task<IEnumerable<TrainRun>> QueryTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime,
             CancellationToken cancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
 
             if (!cancellationToken.IsCancellationRequested)
             {
-                logger.LogDebug($"Suche nach aktuellen Fahrplaneinträgen.");
+                logger.LogDebug(
+                    "Suche nach aktuellen Fahrplaneinträgen.");
 
                 using var context = new HalteContext(connectionString);
 
                 var halte = await context.Halte
                     .Include(h => h.Zug)
-                    .Where(h => h.AbfahrtIst.HasValue || h.AbfahrtSoll.HasValue || h.AbfahrtPlan.HasValue)
-                    .Where(h => (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan ?? TimeSpan.MinValue) >= minTime)
-                    .Where(h => (h.AbfahrtSoll ?? h.AbfahrtPlan ?? TimeSpan.MaxValue) <= maxTime)
+                    .Where(h => h.HasAbfahrt())
+                    .Where(h => h.GetAbfahrt() >= minTime)
+                    .Where(h => h.GetAbfahrt() <= maxTime)
                     .ToArrayAsync(cancellationToken);
 
                 result = GetTrainRuns(halte).ToArray();
@@ -317,45 +384,14 @@ namespace DatabaseConnector
             return result;
         }
 
-        private IEnumerable<VehicleAllocation> GetVehicleAllocations(IEnumerable<Aufstellung> aufstellungen)
-        {
-            if (aufstellungen.Any())
-            {
-                var aufstellungenGroups = aufstellungen
-                    .GroupBy(a => new { a.Feld.Betriebsstelle, a.Feld.Gleis, a.Decoder, a.Zugnummer }).ToArray();
-
-                logger.LogDebug($"Es wurden {aufstellungenGroups.Count()} Züge in der Grundaufstellungen gefunden.");
-
-                foreach (var aufstellungenGroup in aufstellungenGroups)
-                {
-                    var relevantAufstellung = aufstellungenGroup.First();
-
-                    var result = new VehicleAllocation
-                    {
-                        Betriebsstelle = relevantAufstellung.Feld?.Betriebsstelle,
-                        Fahrzeuge = GetVehicles(relevantAufstellung).ToArray(),
-                        Gleis = relevantAufstellung.Feld?.Gleis.ToString(),
-                        Zugnummer = relevantAufstellung.Zugnummer?.ToString(),
-                    };
-
-                    logger.LogDebug($"Zug in Grundaufstellung gefunden: {relevantAufstellung}");
-
-                    yield return result;
-                }
-            }
-            else
-            {
-                logger.LogInformation($"In der Grundaufstellung sind keine Fahrzeuge eingetragen.");
-            }
-        }
-
-        private async Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync(CancellationToken cancellationToken)
+        private async Task<IEnumerable<VehicleAllocation>> QueryVehicleAllocationsAsync(CancellationToken cancellationToken)
         {
             var result = Enumerable.Empty<VehicleAllocation>();
 
             if (!cancellationToken.IsCancellationRequested)
             {
-                logger.LogDebug($"Suche nach allen Fahrzeugen der Grundaufstellung.");
+                logger.LogDebug(
+                    "Suche nach allen Fahrzeugen der Grundaufstellung.");
 
                 using var context = new AufstellungenContext(connectionString);
 
@@ -370,19 +406,6 @@ namespace DatabaseConnector
             return result;
         }
 
-        private IEnumerable<string> GetVehicles(Aufstellung aufstellung)
-        {
-            yield return aufstellung.Decoder.ToString();
-        }
-
-        private void OnRetry(Exception exception, TimeSpan reconnection)
-        {
-            while (exception.InnerException != null) exception = exception.InnerException;
-
-            logger.LogError($"Fehler beim Verbinden mit der EBuEf-Datenbank: {exception.Message}\r\n" +
-                $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
-        }
-
         private async Task SaveCrewingsAsync(IEnumerable<CrewingElement> crewingElements, CancellationToken cancellationToken)
         {
             if (crewingElements?.Any() ?? false)
@@ -395,17 +418,21 @@ namespace DatabaseConnector
 
                 if (besatzungen.Any())
                 {
-                    logger.LogDebug($"Die vorhandenen Crewing-Einträge in der EBuEf-DB werden gelöscht.");
+                    logger.LogDebug(
+                        "Die vorhandenen Crewing-Einträge in der EBuEf-DB werden gelöscht.");
 
                     context.Besatzungen.RemoveRange(context.Besatzungen);
 
-                    logger.LogDebug($"Es werden {besatzungen.Count()} Crewing-Einträge in der EBuEf-DB gespeichert.");
+                    logger.LogDebug(
+                        "Es werden {crewsNumber} Crewing-Einträge in der EBuEf-DB gespeichert.",
+                        besatzungen.Count());
 
                     context.Besatzungen.AddRange(besatzungen);
 
                     await context.SaveChangesAsync(cancellationToken);
 
-                    logger.LogDebug("Die Crewing-Einträge wurden gespeichert.");
+                    logger.LogDebug(
+                        "Die Crewing-Einträge wurden gespeichert.");
                 }
 
                 context.Database.CloseConnection();
@@ -420,8 +447,10 @@ namespace DatabaseConnector
 
             if (!string.IsNullOrWhiteSpace(betriebsstelle))
             {
-                logger.LogDebug($"Suche in der EBuEf-DB nach dem letzten Halt von " +
-                    $"Zug {leg.Zugnummer} in {betriebsstelle}.");
+                logger.LogDebug(
+                    "Suche in der EBuEf-DB nach dem letzten Halt von Zug {train} in {location}.",
+                    leg.Zugnummer,
+                    betriebsstelle);
 
                 using var context = new HalteContext(connectionString);
 
@@ -432,14 +461,11 @@ namespace DatabaseConnector
 
                 if (halt != null)
                 {
-                    logger.LogDebug($@"Schreibe {(istVon ? "Von" : "Nach")}-Position in Session-Fahrplan.");
+                    logger.LogDebug(
+                        "Schreibe {positionType}-Position in Session-Fahrplan.",
+                        istVon.GetName());
 
-                    if (!string.IsNullOrWhiteSpace(istVon ? leg.EBuEfGleisVon : leg.EBuEfGleisNach))
-                    {
-                        halt.GleisIst = istVon
-                            ? leg.EBuEfGleisVon.ToInt()
-                            : leg.EBuEfGleisNach.ToInt();
-                    }
+                    halt.GleisIst = leg.GetEBuEfGleis(istVon);
 
                     if (istVon)
                     {
@@ -452,11 +478,14 @@ namespace DatabaseConnector
 
                     await context.SaveChangesAsync(cancellationToken);
 
-                    logger.LogDebug("Das Update des Halts wurde gespeichert.");
+                    logger.LogDebug(
+                        "Das Update des Halts wurde gespeichert.");
                 }
                 else
                 {
-                    logger.LogDebug($"In Session-Fahrplan wurde {(istVon ? "Von" : "Nach")}-Position nicht gefunden.");
+                    logger.LogDebug(
+                        "In Session-Fahrplan wurde {positionType}-Position nicht gefunden.",
+                        istVon.GetName());
                 }
             }
         }
@@ -465,7 +494,9 @@ namespace DatabaseConnector
         {
             if (leg != null && !cancellationToken.IsCancellationRequested)
             {
-                logger.LogDebug($"Suche in Session-Fahrplan nach: {leg}");
+                logger.LogDebug(
+                    "Suche in Session-Fahrplan nach: {leg}",
+                    leg);
 
                 await SaveTrainPositionAsync(
                     leg: leg,

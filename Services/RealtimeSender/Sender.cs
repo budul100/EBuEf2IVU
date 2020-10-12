@@ -190,7 +190,7 @@ namespace RealtimeSender
 
             logger.LogError(
                 "Fehler beim Senden der Ist-Zeiten an IVU.rail: {message}\r\n" +
-                "Die Verbindung wird in {reconection} Sekunden wieder versucht.",
+                "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
                 exception.Message,
                 reconnection.TotalSeconds);
         }
