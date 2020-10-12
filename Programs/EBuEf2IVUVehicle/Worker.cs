@@ -1,21 +1,14 @@
 #pragma warning disable CA1031 // Do not catch general exception types
 
-using Common.Enums;
 using Common.EventsArgs;
 using Common.Interfaces;
 using Common.Models;
-using ConverterExtensions;
 using EBuEf2IVUBase;
-using EBuEf2IVUVehicle.Extensions;
 using EBuEf2IVUVehicle.Settings;
-using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using RegexExtensions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,7 +21,7 @@ namespace EBuEf2IVUVehicle
 
         private const string MessageTypePositions = "Echtzeit-Positionen";
 
-        private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
+        private readonly Realtime2TrainLeg converter;
         private readonly IMessageReceiver positionsReceiver;
         private readonly IRealtimeSender realtimeSender;
 
@@ -47,7 +40,10 @@ namespace EBuEf2IVUVehicle
 
             this.realtimeSender = realtimeSender;
 
-            infrastructureMappings = config.GetInfrastructureMappings();
+            converter = new Realtime2TrainLeg(
+                config: config,
+                logger: logger,
+                ivuSessionDate: ivuSessionDate);
         }
 
         #endregion Public Constructors
@@ -93,57 +89,6 @@ namespace EBuEf2IVUVehicle
         #endregion Protected Methods
 
         #region Private Methods
-
-        private TrainLeg GetTrainLeg(RealTimeMessage message)
-        {
-            var result = default(TrainLeg);
-
-            var mapping = infrastructureMappings
-                .Where(m => m.MessageBetriebsstelle.IsMatch(message.Betriebsstelle))
-                .Where(m => m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
-                    && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
-                .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
-                .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis)).FirstOrDefault();
-
-            if (mapping != null)
-            {
-                if ((message.SignalTyp == SignalType.ESig && mapping.IVUTrainPositionType != LegType.Ankunft)
-                    || (message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != LegType.Abfahrt)
-                    || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != LegType.Durchfahrt))
-                {
-                    logger.LogWarning(
-                        "Der IVUTrainPositionType des Mappings {mappingType} entspricht nicht dem SignalTyp der eingegangenen Nachricht ({message}).",
-                        mapping.IVUTrainPositionType,
-                        message);
-                }
-
-                var ebuefVonZeit = TimeSpan.FromSeconds(mapping.EBuEfVonVerschiebungSekunden.ToInt());
-                var ebuefNachZeit = TimeSpan.FromSeconds(mapping.EBuEfNachVerschiebungSekunden.ToInt());
-
-                var ivuZeit = TimeSpan.FromSeconds(mapping.IVUVerschiebungSekunden.ToInt());
-                var ivuZeitpunkt = ivuSessionDate.Add(message.SimulationsZeit.Add(ivuZeit).TimeOfDay);
-
-                var fahrzeuge = message?.Decoder.AsEnumerable();
-
-                result = new TrainLeg
-                {
-                    EBuEfBetriebsstelleNach = mapping.EBuEfNachBetriebsstelle,
-                    EBuEfBetriebsstelleVon = mapping.EBuEfVonBetriebsstelle,
-                    EBuEfGleisNach = message.EndGleis,
-                    EBuEfGleisVon = message.StartGleis,
-                    EBuEfZeitpunktNach = message.SimulationsZeit.Add(ebuefNachZeit).TimeOfDay,
-                    EBuEfZeitpunktVon = message.SimulationsZeit.Add(ebuefVonZeit).TimeOfDay,
-                    Fahrzeuge = fahrzeuge,
-                    IVUGleis = mapping.IVUGleis,
-                    IVUNetzpunkt = mapping.IVUNetzpunkt,
-                    IVULegTyp = mapping.IVUTrainPositionType,
-                    IVUZeitpunkt = ivuZeitpunkt,
-                    Zugnummer = message.Zugnummer,
-                };
-            }
-
-            return result;
-        }
 
         private void InitializePositionReceiver()
         {
@@ -194,7 +139,7 @@ namespace EBuEf2IVUVehicle
 
                 if (!string.IsNullOrWhiteSpace(message?.Zugnummer))
                 {
-                    var trainLeg = GetTrainLeg(message);
+                    var trainLeg = converter.Convert(message);
 
                     if (trainLeg != default)
                     {
