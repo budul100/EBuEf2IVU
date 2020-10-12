@@ -43,10 +43,8 @@ namespace EBuEf2IVUCrew
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            InitializeStateHandler();
+            InitializeStateReceiver();
             sessionStateHandler.Run(workerCancellationToken);
-
-            currentState = SessionStates.IsRunning;
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
@@ -55,8 +53,9 @@ namespace EBuEf2IVUCrew
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                InitializeService();
-                InitializeConnector(sessionCancellationToken);
+                InitializeCrewChecker();
+
+                InitializeDatabaseConnector(sessionCancellationToken);
 
                 await StartIVUSessionAsync();
 
@@ -126,10 +125,10 @@ namespace EBuEf2IVUCrew
             }
         }
 
-        private void InitializeService()
+        private void InitializeCrewChecker()
         {
             var serviceSettings = config
-                .GetSection(nameof(CrewChecker))
+                .GetSection(nameof(Settings.CrewChecker))
                 .Get<Settings.CrewChecker>();
 
             queryDurationPast = new TimeSpan(

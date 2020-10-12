@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="budul.StringExtensions" Version="1.9.0" />
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.8" />
@@ -46,7 +47,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj" />
     <ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
+    <ProjectReference Include="..\..\Services\MessageReceiver\MessageReceiver.csproj" />
     <ProjectReference Include="..\..\Services\StateReceiver\StateReceiver.csproj" />
+    <ProjectReference Include="..\..\Services\TrainPathSender\TrainPathSender.csproj" />
     <ProjectReference Include="..\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
   </ItemGroup>
 

@@ -55,14 +55,6 @@ namespace TrainPathSender
 
         #region Public Methods
 
-        public void AddTrain(TrainRun trainRun)
-        {
-            if (trainRun != default)
-            {
-                AddTrains(trainRun.AsEnumerable());
-            }
-        }
-
         public void AddTrains(IEnumerable<TrainRun> trainRuns)
         {
             if (trainRuns.AnyItem())

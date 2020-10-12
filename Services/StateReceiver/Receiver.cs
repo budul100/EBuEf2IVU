@@ -13,7 +13,7 @@ namespace StateHandler
     {
         #region Private Fields
 
-        private const string MessageType = "Sessionstatus";
+        private const string MessageTypeState = "Sessionstatus";
         private const string StatusRegexGroupName = "status";
         private const string StatusRegexGroupWildcard = "$";
 
@@ -54,7 +54,7 @@ namespace StateHandler
                 ipAdress: ipAdress,
                 port: port,
                 retryTime: retryTime,
-                messageType: MessageType);
+                messageType: MessageTypeState);
 
             allocationSetRegex = GetAllocationSetRegex(allocationSetPattern);
             statusRegex = GetStatusRegex(statusPattern);

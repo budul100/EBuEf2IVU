@@ -46,7 +46,7 @@ namespace MessageReceiver
 
         #region Public Methods
 
-        public void Initialize(string ipAdress, int port, int retryTime, string messageType = default)
+        public void Initialize(string ipAdress, int port, int retryTime, string messageType)
         {
             this.ipAdress = ipAdress;
             this.port = port;
@@ -81,17 +81,23 @@ namespace MessageReceiver
                 var socketException = exception as SocketException;
 
                 logger.LogError(
-                    $"Fehler beim Nachrichtenempfänger an {ipAdress}:{port} " +
-                    $"(Code: {socketException.SocketErrorCode}): {exception.Message}\r\n" +
-                    $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
+                    "Fehler beim Nachrichtenempfänger an {address}: {message} (Code: {code})\r\n" +
+                    "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
+                    $"{ipAdress}:{port}",
+                    socketException.SocketErrorCode,
+                    exception.Message,
+                    reconnection.TotalSeconds);
             }
             else
             {
                 while (exception.InnerException != null) exception = exception.InnerException;
 
                 logger.LogError(
-                    $"Fehler beim Nachrichtenempfänger an {ipAdress}:{port}: {exception.Message}\r\n" +
-                    $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
+                    "Fehler beim Nachrichtenempfänger an {address}: {message}\r\n" +
+                    "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
+                    $"{ipAdress}:{port}",
+                    exception.Message,
+                    reconnection.TotalSeconds);
             }
         }
 
@@ -114,8 +120,10 @@ namespace MessageReceiver
             udpClient.Client.Bind(localEp);
             udpClient.JoinMulticastGroup(multicastAddress);
 
-            logger.LogDebug($"Lausche auf {ipAdress}:{port} nach Nachrichten" +
-                (!string.IsNullOrWhiteSpace(messageType) ? $" vom Typ {messageType}." : "."));
+            logger.LogDebug(
+                "Lausche auf {address} nach Nachrichten vom Typ {type}.",
+                $"{ipAdress}:{port}",
+                messageType);
 
             while (!cancellationToken.IsCancellationRequested)
             {

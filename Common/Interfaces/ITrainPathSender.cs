@@ -10,8 +10,6 @@ namespace Common.Interfaces
     {
         #region Public Methods
 
-        void AddTrain(TrainRun trainRun);
-
         void AddTrains(IEnumerable<TrainRun> trainRuns);
 
         void Initialize(string host, int port, string path, string username, string password, bool isHttps,
