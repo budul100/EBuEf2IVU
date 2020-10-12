@@ -20,6 +20,8 @@
 
         public int Port { get; set; }
 
+        public bool PreferPrognosis { get; set; }
+
         public int RetryTime { get; set; }
 
         public string StoppingReasonPass { get; set; }

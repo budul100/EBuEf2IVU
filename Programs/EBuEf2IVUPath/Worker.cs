@@ -21,6 +21,7 @@ namespace EBuEf2IVUPath
 
         private readonly IMessageReceiver trainPathReceiver;
         private readonly ITrainPathSender trainPathSender;
+        private bool preferPrognosis;
 
         #endregion Private Fields
 
@@ -99,6 +100,8 @@ namespace EBuEf2IVUPath
                 .GetSection(nameof(Settings.TrainPathSender))
                 .Get<Settings.TrainPathSender>();
 
+            preferPrognosis = senderSettings.PreferPrognosis;
+
             trainPathSender.Initialize(
                 host: senderSettings.Host,
                 port: senderSettings.Port,
@@ -128,7 +131,9 @@ namespace EBuEf2IVUPath
 
                 if (!string.IsNullOrWhiteSpace(message?.TrainId))
                 {
-                    var trainRuns = await databaseConnector.GetTrainRunsAsync(message.TrainId);
+                    var trainRuns = await databaseConnector.GetTrainRunsAsync(
+                        trainNumber: message.TrainId,
+                        preferPrognosis: preferPrognosis);
 
                     if (trainRuns.AnyItem())
                     {
