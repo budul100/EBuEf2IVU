@@ -174,8 +174,8 @@ namespace EBuEf2IVUVehicle
         private void InitializeSender()
         {
             var settings = config
-                .GetSection(nameof(IVURealtimeSender))
-                .Get<IVURealtimeSender>();
+                .GetSection(nameof(RealtimeSender))
+                .Get<RealtimeSender>();
 
             ivuSender.Initialize(
                 division: settings.Division,
