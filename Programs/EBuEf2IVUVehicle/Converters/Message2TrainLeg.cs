@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace EBuEf2IVUVehicle
 {
-    internal class Realtime2TrainLeg
+    internal class Message2TrainLeg
     {
         #region Private Fields
 
@@ -25,7 +25,7 @@ namespace EBuEf2IVUVehicle
 
         #region Public Constructors
 
-        public Realtime2TrainLeg(IConfiguration config, ILogger logger, DateTime ivuSessionDate)
+        public Message2TrainLeg(IConfiguration config, ILogger logger, DateTime ivuSessionDate)
         {
             this.logger = logger;
             this.ivuSessionDate = ivuSessionDate;
