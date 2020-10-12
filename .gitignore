@@ -1,5 +1,6 @@
 *.deb
 ebuef2ivucrew-settings.xml
+ebuef2ivupath-settings.xml
 ebuef2ivuvehicle-settings.xml
 
 ## Ignore Visual Studio temporary files, build results, and

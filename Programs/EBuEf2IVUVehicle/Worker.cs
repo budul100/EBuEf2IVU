@@ -97,8 +97,8 @@ namespace EBuEf2IVUVehicle
                 .Get<PositionsReceiver>();
 
             positionsReceiver.Initialize(
-                ipAdress: settings.IpAddress,
-                port: settings.ListenerPort,
+                ipAdress: settings.Host,
+                port: settings.Port,
                 retryTime: settings.RetryTime,
                 messageType: MessageTypePositions);
         }

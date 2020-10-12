@@ -4,9 +4,9 @@
     {
         #region Public Properties
 
-        public string IpAddress { get; set; }
+        public string Host { get; set; }
 
-        public int ListenerPort { get; set; }
+        public int Port { get; set; }
 
         public int RetryTime { get; set; }
 
