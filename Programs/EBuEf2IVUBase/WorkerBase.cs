@@ -91,8 +91,8 @@ namespace EBuEf2IVUBase
                 .Get<StatusReceiver>();
 
             sessionStateHandler.Initialize(
-                ipAdress: settings.IpAddress,
-                port: settings.ListenerPort,
+                ipAdress: settings.Host,
+                port: settings.Port,
                 retryTime: settings.RetryTime,
                 startPattern: settings.StartPattern,
                 statusPattern: settings.StatusPattern);
