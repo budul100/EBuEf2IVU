@@ -36,7 +36,7 @@ namespace EBuEf2IVUVehicle
             this.sessionStateHandler.SessionStartedEvent += OnSessionStart;
 
             this.positionsReceiver = positionsReceiver;
-            this.positionsReceiver.MessageReceivedEvent += OnPositionReceived;
+            this.positionsReceiver.MessageReceivedEvent += OnMessageReceived;
 
             this.realtimeSender = realtimeSender;
 
@@ -116,7 +116,7 @@ namespace EBuEf2IVUVehicle
                 sessionStart: ebuefSessionStart);
         }
 
-        private async void OnPositionReceived(object sender, MessageReceivedArgs e)
+        private async void OnMessageReceived(object sender, MessageReceivedArgs e)
         {
             logger.LogDebug(
                 "Positions-Nachricht empfangen: {content}",
