@@ -26,9 +26,9 @@ namespace EBuEf2IVUPath
 
         #region Public Constructors
 
-        public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver trainPathReceiver,
-            ITrainPathSender trainPathSender, ILogger<Worker> logger)
-            : base(config, sessionStateHandler, logger)
+        public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
+            IMessageReceiver trainPathReceiver, ITrainPathSender trainPathSender, ILogger<Worker> logger)
+            : base(config, sessionStateHandler, databaseConnector, logger)
         {
             this.trainPathReceiver = trainPathReceiver;
             this.trainPathReceiver.MessageReceivedEvent += OnMessageReceived;
@@ -54,6 +54,8 @@ namespace EBuEf2IVUPath
 
                 InitializePathReceiver();
                 InitializePathSender();
+
+                InitializeDatabaseConnector(sessionCancellationToken);
 
                 await StartIVUSessionAsync();
 
