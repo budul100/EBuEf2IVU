@@ -22,6 +22,7 @@ namespace EBuEf2IVUPath
 
         private readonly IMessageReceiver trainPathReceiver;
         private readonly ITrainPathSender trainPathSender;
+
         private bool preferPrognosis;
 
         #endregion Private Fields
@@ -29,7 +30,7 @@ namespace EBuEf2IVUPath
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver trainPathReceiver,
-            IDatabaseConnector databaseConnector, ITrainPathSender trainPathSender, ILogger<Worker> logger)
+            IDatabaseConnector databaseConnector, ITrainPathSender trainPathSender, ILogger logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
         {
             this.sessionStateHandler.SessionStartedEvent += OnSessionStart;

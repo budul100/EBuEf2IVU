@@ -18,8 +18,6 @@ namespace EBuEf2IVUCrew
     {
         #region Private Fields
 
-        private const string CrewingSeparator = ", ";
-
         private readonly ICrewChecker crewChecker;
 
         private TimeSpan queryDurationFuture;
@@ -31,7 +29,7 @@ namespace EBuEf2IVUCrew
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
-            ICrewChecker crewChecker, ILogger<Worker> logger)
+            ICrewChecker crewChecker, ILogger logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
         {
             this.crewChecker = crewChecker;
@@ -115,7 +113,7 @@ namespace EBuEf2IVUCrew
                 logger.LogDebug(
                     "In der IVU.rail wurden {crewingCount} Besatzungseinträge zu den Zügen gefunden: {crewingElements}",
                     crewingElements.Count(),
-                    crewingElements.Merge(CrewingSeparator));
+                    crewingElements.Merge());
 
                 if (crewingElements.Any()
                     && !sessionCancellationToken.IsCancellationRequested)

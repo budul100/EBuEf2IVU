@@ -30,7 +30,7 @@ namespace EBuEf2IVUVehicle
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
-            IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, ILogger<Worker> logger)
+            IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, ILogger logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
         {
             this.sessionStateHandler.SessionStartedEvent += OnSessionStart;
