@@ -27,7 +27,7 @@ namespace EBuEf2IVUPath
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver trainPathReceiver,
-            ITrainPathSender trainPathSender, ILogger logger)
+            ITrainPathSender trainPathSender, ILogger<Worker> logger)
             : base(config, sessionStateHandler, logger)
         {
             this.trainPathReceiver = trainPathReceiver;
@@ -48,7 +48,7 @@ namespace EBuEf2IVUPath
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 logger.LogInformation(
-                    "Die Nachrichtenempfänger und IVU-Sender von EBuEf2IVUPath werden zurückgesetzt.");
+                    "Die Nachrichtenempfänger und IVU-Sender von EBuEf2IVUPath werden gestartet.");
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 

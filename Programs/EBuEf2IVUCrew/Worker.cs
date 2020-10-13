@@ -29,7 +29,7 @@ namespace EBuEf2IVUCrew
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
-            ICrewChecker crewChecker, ILogger logger)
+            ICrewChecker crewChecker, ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
         {
             this.crewChecker = crewChecker;
@@ -47,7 +47,7 @@ namespace EBuEf2IVUCrew
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 logger.LogInformation(
-                    "Die Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Sender von EBuEf2IVUCrew werden zurückgesetzt.");
+                    "Die Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Connector von EBuEf2IVUCrew werden gestartet.");
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 

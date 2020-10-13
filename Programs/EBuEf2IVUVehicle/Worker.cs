@@ -30,7 +30,7 @@ namespace EBuEf2IVUVehicle
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
-            IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, ILogger logger)
+            IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
         {
             this.sessionStateHandler.SessionStartedEvent += OnSessionStart;
@@ -58,7 +58,7 @@ namespace EBuEf2IVUVehicle
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 logger.LogInformation(
-                    "Die Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Sender von EBuEf2IVUVehicle werden zurückgesetzt.");
+                    "Die Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Sender von EBuEf2IVUVehicle werden gestartet.");
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
