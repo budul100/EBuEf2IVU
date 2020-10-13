@@ -28,7 +28,7 @@ namespace TrainPathSender
         private readonly ILogger<Sender> logger;
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
-        private TrainRuns2ImportPaths converter;
+        private Message2ImportPaths converter;
         private AsyncRetryPolicy retryPolicy;
         private string trainPathState;
 
@@ -45,12 +45,12 @@ namespace TrainPathSender
 
         #region Public Methods
 
-        public void AddTrains(IEnumerable<TrainRun> trainRuns)
+        public void AddMessages(IEnumerable<TrainPathMessage> messages)
         {
-            if (trainRuns.AnyItem())
+            if (messages.AnyItem())
             {
                 var imports = converter.Get(
-                    trainRuns: trainRuns,
+                    messages: messages,
                     trainPathState: trainPathState);
 
                 if (imports != default)
@@ -60,17 +60,19 @@ namespace TrainPathSender
 
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
             int retryTime, DateTime sessionDate, string infrastructureManager, string orderingTransportationCompany,
-            string trainPathState, string stoppingReasonStop, string stoppingReasonPass, string importProfile)
+            string trainPathState, string stoppingReasonStop, string stoppingReasonPass, string importProfile,
+            bool preferPrognosis)
         {
             this.trainPathState = trainPathState;
 
-            converter = new TrainRuns2ImportPaths(
+            converter = new Message2ImportPaths(
                 sessionDate: sessionDate,
                 infrastructureManager: infrastructureManager,
                 orderingTransportationCompany: orderingTransportationCompany,
                 stoppingReasonStop: stoppingReasonStop,
                 stoppingReasonPass: stoppingReasonPass,
-                importProfile: importProfile);
+                importProfile: importProfile,
+                preferPrognosis: preferPrognosis);
 
             channelFactory = new Factory<TrainPathImportWebFacadeChannel>(
                 host: host,

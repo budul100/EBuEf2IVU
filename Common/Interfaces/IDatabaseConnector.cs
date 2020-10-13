@@ -14,9 +14,9 @@ namespace Common.Interfaces
 
         Task<EBuEfSession> GetEBuEfSessionAsync();
 
-        Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainId, bool preferPrognosis);
+        Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainId, bool preferPrognosis = false);
 
-        Task<IEnumerable<TrainRun>> GetTrainRunsAsync(bool preferPrognosis);
+        Task<IEnumerable<TrainRun>> GetTrainRunsAsync(bool preferPrognosis = false);
 
         Task<IEnumerable<TrainRun>> GetTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime);
 

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace RealtimeSender.Converters
 {
-    internal class Messages2RealtimeInfo
+    internal class Message2RealtimeInfo
     {
         #region Private Fields
 
@@ -26,7 +26,7 @@ namespace RealtimeSender.Converters
 
         #region Public Constructors
 
-        public Messages2RealtimeInfo(ILogger logger, string division, DateTime sessionStart)
+        public Message2RealtimeInfo(ILogger logger, string division, DateTime sessionStart)
         {
             this.logger = logger;
             this.division = division;

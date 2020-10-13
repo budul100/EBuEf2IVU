@@ -1,20 +1,22 @@
 ﻿using Common.Models;
-using DateTimeExtensions;
 using EnumerableExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TrainPathImportService;
+using TrainPathSender.Extensions;
 
 namespace TrainPathSender.Converters
 {
-    internal class TrainRuns2ImportPaths
+    internal class Message2ImportPaths
     {
         #region Private Fields
 
         private const string SingleDayBitmask = "1";
         private const string TimetableVersionId = "Timetable";
 
+        private readonly Func<TrainPathMessage, DateTime> abfahrtGetter;
+        private readonly Func<TrainPathMessage, DateTime> ankunftGetter;
         private readonly string importProfile;
         private readonly string infrastructureManager;
         private readonly string orderingTransportationCompany;
@@ -28,9 +30,9 @@ namespace TrainPathSender.Converters
 
         #region Public Constructors
 
-        public TrainRuns2ImportPaths(DateTime sessionDate, string infrastructureManager,
+        public Message2ImportPaths(DateTime sessionDate, string infrastructureManager,
             string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
-            string importProfile)
+            string importProfile, bool preferPrognosis)
         {
             this.sessionDate = sessionDate;
             this.infrastructureManager = infrastructureManager;
@@ -40,6 +42,9 @@ namespace TrainPathSender.Converters
             this.stoppingReasonPass = stoppingReasonPass;
             this.importProfile = importProfile;
 
+            abfahrtGetter = GetAbfahrtGetter(preferPrognosis);
+            ankunftGetter = GetAnkunftGetter(preferPrognosis);
+
             timetableVersion = GetTimetableVersion();
             timetableVersionKey = GetTimetableVersionKey();
         }
@@ -48,15 +53,15 @@ namespace TrainPathSender.Converters
 
         #region Public Methods
 
-        public importTrainPaths Get(IEnumerable<TrainRun> trainRuns, string trainPathState)
+        public importTrainPaths Get(IEnumerable<TrainPathMessage> messages, string trainPathState)
         {
             var result = default(importTrainPaths);
 
-            if (trainRuns.AnyItem())
+            if (messages.AnyItem())
             {
-                var stopPoints = GetNetworkPointKeys(trainRuns).ToArray();
+                var stopPoints = GetNetworkPointKeys(messages).ToArray();
                 var trainPaths = GetTrainPaths(
-                    trainRuns: trainRuns,
+                    messages: messages,
                     trainPathState: trainPathState).ToArray();
 
                 var request = new TrainPathImportRequest
@@ -80,27 +85,45 @@ namespace TrainPathSender.Converters
 
         #region Private Methods
 
-        private IEnumerable<NetworkPointKey> GetNetworkPointKeys(IEnumerable<TrainRun> trainRuns)
+        private static Func<TrainPathMessage, DateTime> GetAbfahrtGetter(bool preferPrognosis)
         {
-            var positions = trainRuns
-                .SelectMany(r => r.Positions)
+            var result = preferPrognosis
+                ? (Func<TrainPathMessage, DateTime>)(m => m.AbfahrtPrognose ?? m.AbfahrtSoll ?? DateTime.MinValue)
+                : (Func<TrainPathMessage, DateTime>)(m => m.AbfahrtSoll ?? DateTime.MinValue);
+
+            return result;
+        }
+
+        private static Func<TrainPathMessage, DateTime> GetAnkunftGetter(bool preferPrognosis)
+        {
+            var result = preferPrognosis
+                ? (Func<TrainPathMessage, DateTime>)(m => m.AnkunftPrognose ?? m.AnkunftSoll ?? DateTime.MinValue)
+                : (Func<TrainPathMessage, DateTime>)(m => m.AnkunftSoll ?? DateTime.MinValue);
+
+            return result;
+        }
+
+        private IEnumerable<NetworkPointKey> GetNetworkPointKeys(IEnumerable<TrainPathMessage> messages)
+        {
+            var networkPoints = messages
+                .Select(m => m.Betriebsstelle)
                 .Distinct().ToArray();
 
-            foreach (var position in positions)
+            foreach (var networkPoint in networkPoints)
             {
                 var result = new NetworkPointKey
                 {
-                    abbreviation = position.Betriebsstelle,
-                    id = position.Betriebsstelle,
+                    abbreviation = networkPoint,
+                    id = networkPoint,
                 };
 
                 yield return result;
             }
         }
 
-        private IEnumerable<string> GetStoppingReasons(TrainPosition position)
+        private IEnumerable<string> GetStoppingReasons(TrainPathMessage message)
         {
-            var result = position.IstDurchfahrt
+            var result = message.IstDurchfahrt
                 ? stoppingReasonPass
                 : stoppingReasonStop;
 
@@ -134,31 +157,36 @@ namespace TrainPathSender.Converters
             return result;
         }
 
-        private TrainPathKey GetTrainPathKey(TrainRun trainRun)
+        private TrainPathKey GetTrainPathKey(IEnumerable<TrainPathMessage> messages)
         {
+            var relevant = messages.First();
+
             var result = new TrainPathKey
             {
                 infrastructureManager = infrastructureManager,
                 timetableVersion = timetableVersionKey,
-                trainPathId = trainRun.Zugnummer,
+                trainPathId = relevant.Zugnummer,
             };
 
             return result;
         }
 
-        private IEnumerable<TrainPath> GetTrainPaths(IEnumerable<TrainRun> trainRuns, string trainPathState)
+        private IEnumerable<TrainPath> GetTrainPaths(IEnumerable<TrainPathMessage> messages, string trainPathState)
         {
-            foreach (var trainRun in trainRuns.IfAny())
+            var trainGroups = messages
+                .GroupBy(m => m.Zugnummer).ToArray();
+
+            foreach (var trainGroup in trainGroups)
             {
-                var trainPathKey = GetTrainPathKey(trainRun);
+                var trainPathKey = GetTrainPathKey(trainGroup);
                 var trainPathVariants = GetTrainPathVariants(
-                    trainRun: trainRun,
+                    messages: trainGroup,
                     trainPathState: trainPathState).ToArray();
 
                 var result = new TrainPath
                 {
                     importValidityFrame = timetableVersion.validity.AsArray(),
-                    infrastructureManagerTrainPathId = trainRun.Zugnummer,
+                    infrastructureManagerTrainPathId = trainGroup.Key,
                     trainPathKey = trainPathKey,
                     trainPathVariants = trainPathVariants,
                 };
@@ -167,32 +195,27 @@ namespace TrainPathSender.Converters
             }
         }
 
-        private IEnumerable<TrainPathStop> GetTrainPathStops(TrainRun trainRun)
+        private IEnumerable<TrainPathStop> GetTrainPathStops(IEnumerable<TrainPathMessage> messages)
         {
-            foreach (var position in trainRun.Positions)
+            foreach (var message in messages)
             {
                 var times = new Times
                 {
-                    operationalArrivalTime = position.Ankunft.ToDateTime() ?? DateTime.Now,
-                    operationalArrivalTimeSpecified = position.Ankunft.HasValue,
-                    operationalDepartureTime = position.Abfahrt.ToDateTime() ?? DateTime.Now,
-                    operationalDepartureTimeSpecified = position.Abfahrt.HasValue,
+                    operationalArrivalTime = ankunftGetter.Invoke(message),
+                    operationalArrivalTimeSpecified = message.AnkunftSoll.HasValue,
+                    operationalDepartureTime = abfahrtGetter.Invoke(message),
+                    operationalDepartureTimeSpecified = message.AbfahrtSoll.HasValue,
                 };
 
-                var stopPoint = new TrainPathStopStopPoint
-                {
-                    @ref = position.Betriebsstelle,
-                };
-
-                var stoppingReasons = GetStoppingReasons(position).ToArray();
+                var stoppingReasons = GetStoppingReasons(message).ToArray();
 
                 var result = new TrainPathStop
                 {
-                    arrivalTrack = position.Gleis,
-                    departureTrack = position.Gleis,
+                    arrivalTrack = message.GleisSoll?.ToString(),
+                    departureTrack = message.GleisSoll?.ToString(),
                     running = true,
                     stoppingReasons = stoppingReasons,
-                    stopPoint = stopPoint,
+                    stopPoint = message.GetStopPoint(),
                     times = times,
                 };
 
@@ -200,20 +223,26 @@ namespace TrainPathSender.Converters
             }
         }
 
-        private IEnumerable<TrainPathVariant> GetTrainPathVariants(TrainRun trainRun, string trainPathState)
+        private IEnumerable<TrainPathVariant> GetTrainPathVariants(IEnumerable<TrainPathMessage> messages, string trainPathState)
         {
-            var trainPathItinerary = GetTrainPathStops(trainRun).ToArray();
+            var variantGroups = messages
+                .GroupBy(m => m.ZugId).ToArray();
 
-            var result = new TrainPathVariant
+            foreach (var variantGroup in variantGroups)
             {
-                orderingTransportationCompany = orderingTransportationCompany,
-                state = trainPathState,
-                trainDescription = trainRun.Bemerkungen,
-                trainPathItinerary = trainPathItinerary,
-                validity = timetableVersion.validity.AsArray(),
-            };
+                var trainPathItinerary = GetTrainPathStops(variantGroup).ToArray();
 
-            yield return result;
+                var result = new TrainPathVariant
+                {
+                    orderingTransportationCompany = orderingTransportationCompany,
+                    state = trainPathState,
+                    trainDescription = variantGroup.First().Bemerkungen,
+                    trainPathItinerary = trainPathItinerary,
+                    validity = timetableVersion.validity.AsArray(),
+                };
+
+                yield return result;
+            }
         }
 
         #endregion Private Methods

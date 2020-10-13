@@ -7,7 +7,6 @@ using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,18 +22,14 @@ namespace EBuEf2IVUPath
         private readonly IMessageReceiver trainPathReceiver;
         private readonly ITrainPathSender trainPathSender;
 
-        private bool preferPrognosis;
-
         #endregion Private Fields
 
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver trainPathReceiver,
-            IDatabaseConnector databaseConnector, ITrainPathSender trainPathSender, ILogger logger)
-            : base(config, sessionStateHandler, databaseConnector, logger)
+            ITrainPathSender trainPathSender, ILogger logger)
+            : base(config, sessionStateHandler, logger)
         {
-            this.sessionStateHandler.SessionStartedEvent += OnSessionStart;
-
             this.trainPathReceiver = trainPathReceiver;
             this.trainPathReceiver.MessageReceivedEvent += OnMessageReceived;
 
@@ -53,14 +48,12 @@ namespace EBuEf2IVUPath
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 logger.LogInformation(
-                    "Die Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Sender von EBuEf2IVUPath werden zurückgesetzt.");
+                    "Die Nachrichtenempfänger und IVU-Sender von EBuEf2IVUPath werden zurückgesetzt.");
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
                 InitializePathReceiver();
                 InitializePathSender();
-
-                InitializeDatabaseConnector(sessionCancellationToken);
 
                 await StartIVUSessionAsync();
 
@@ -104,8 +97,6 @@ namespace EBuEf2IVUPath
                 .GetSection(nameof(Settings.TrainPathSender))
                 .Get<Settings.TrainPathSender>();
 
-            preferPrognosis = senderSettings.PreferPrognosis;
-
             trainPathSender.Initialize(
                 host: senderSettings.Host,
                 port: senderSettings.Port,
@@ -120,10 +111,11 @@ namespace EBuEf2IVUPath
                 trainPathState: senderSettings.TrainPathState,
                 stoppingReasonStop: senderSettings.StoppingReasonStop,
                 stoppingReasonPass: senderSettings.StoppingReasonPass,
-                importProfile: senderSettings.ImportProfile);
+                importProfile: senderSettings.ImportProfile,
+                preferPrognosis: senderSettings.PreferPrognosis);
         }
 
-        private async void OnMessageReceived(object sender, Common.EventsArgs.MessageReceivedArgs e)
+        private void OnMessageReceived(object sender, Common.EventsArgs.MessageReceivedArgs e)
         {
             logger.LogDebug(
                 "Zugtrassen-Nachricht empfangen: {content}",
@@ -131,23 +123,16 @@ namespace EBuEf2IVUPath
 
             try
             {
-                var message = JsonConvert.DeserializeObject<TrainPathMessage>(e.Content);
+                var messages = JsonConvert.DeserializeObject<TrainPathMessage[]>(e.Content);
 
-                if (!string.IsNullOrWhiteSpace(message?.TrainId))
+                if (messages.AnyItem())
                 {
-                    var trainRuns = await databaseConnector.GetTrainRunsAsync(
-                        trainId: message.TrainId,
-                        preferPrognosis: preferPrognosis);
-
-                    if (trainRuns.AnyItem())
-                    {
-                        trainPathSender.AddTrains(trainRuns);
-                    }
-                    else
-                    {
-                        logger.LogDebug(
-                            "Zur Zugtrassen-Nachricht konnte in der aktuellen Sitzung keine Fahrt gefunden werden.");
-                    }
+                    trainPathSender.AddMessages(messages);
+                }
+                else
+                {
+                    logger.LogDebug(
+                        "Die Zugtrassen-Nachricht hat keine Fahrten enthalten.");
                 }
             }
             catch (JsonReaderException readerException)
@@ -162,16 +147,6 @@ namespace EBuEf2IVUPath
                     "Die Nachricht kann nicht in eine Zugtrasse umgeformt werden: {message}",
                     serializationException.Message);
             }
-        }
-
-        private async void OnSessionStart(object sender, EventArgs e)
-        {
-            logger.LogDebug(
-                "Nachricht zum Import aller Zugtrassen empfangen.");
-
-            var trainRuns = await databaseConnector.GetTrainRunsAsync(preferPrognosis);
-
-            trainPathSender.AddTrains(trainRuns);
         }
 
         #endregion Private Methods

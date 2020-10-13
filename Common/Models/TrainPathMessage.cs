@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace Common.Models
 {
@@ -7,40 +8,40 @@ namespace Common.Models
         #region Public Properties
 
         [JsonProperty("abfahrt")]
-        public string Abfahrt { get; set; }
+        public DateTime? Abfahrt { get; set; }
 
         [JsonProperty("abfahrt_exakt")]
-        public string AbfahrtExakt { get; set; }
+        public DateTime? AbfahrtExakt { get; set; }
 
         [JsonProperty("abfahrt_ist")]
-        public object AbfahrtIst { get; set; }
+        public DateTime? AbfahrtIst { get; set; }
 
         [JsonProperty("abfahrt_plan")]
-        public string AbfahrtPlan { get; set; }
+        public DateTime? AbfahrtPlan { get; set; }
 
         [JsonProperty("abfahrt_prognose")]
-        public object AbfahrtPrognose { get; set; }
+        public DateTime? AbfahrtPrognose { get; set; }
 
         [JsonProperty("abfahrt_soll")]
-        public string AbfahrtSoll { get; set; }
+        public DateTime? AbfahrtSoll { get; set; }
 
         [JsonProperty("ankunft")]
-        public string Ankunft { get; set; }
+        public DateTime? Ankunft { get; set; }
 
         [JsonProperty("ankunft_exakt")]
-        public string AnkunftExakt { get; set; }
+        public DateTime? AnkunftExakt { get; set; }
 
         [JsonProperty("ankunft_ist")]
-        public object AnkunftIst { get; set; }
+        public DateTime? AnkunftIst { get; set; }
 
         [JsonProperty("ankunft_plan")]
-        public string AnkunftPlan { get; set; }
+        public DateTime? AnkunftPlan { get; set; }
 
         [JsonProperty("ankunft_prognose")]
-        public object AnkunftPrognose { get; set; }
+        public DateTime? AnkunftPrognose { get; set; }
 
         [JsonProperty("ankunft_soll")]
-        public string AnkunftSoll { get; set; }
+        public DateTime? AnkunftSoll { get; set; }
 
         [JsonProperty("bemerkungen")]
         public string Bemerkungen { get; set; }
@@ -58,25 +59,25 @@ namespace Common.Models
         public string FzmId { get; set; }
 
         [JsonProperty("gleis")]
-        public object Gleis { get; set; }
+        public int? Gleis { get; set; }
 
         [JsonProperty("gleis_ist")]
-        public object GleisIst { get; set; }
+        public int? GleisIst { get; set; }
 
         [JsonProperty("gleis_plan")]
-        public object GleisPlan { get; set; }
+        public int? GleisPlan { get; set; }
 
         [JsonProperty("gleis_soll")]
-        public object GleisSoll { get; set; }
+        public int? GleisSoll { get; set; }
 
         [JsonProperty("ins_gegengleis")]
-        public string InsGegengleis { get; set; }
+        public bool InsGegengleis { get; set; }
 
         [JsonProperty("ist_durchfahrt")]
-        public string IstDurchfahrt { get; set; }
+        public bool IstDurchfahrt { get; set; }
 
         [JsonProperty("ist_kurzeinfahrt")]
-        public string IstKurzeinfahrt { get; set; }
+        public bool IstKurzeinfahrt { get; set; }
 
         [JsonProperty("mbr")]
         public string Mbr { get; set; }
@@ -88,10 +89,10 @@ namespace Common.Models
         public string TriebfahrzeugIst { get; set; }
 
         [JsonProperty("uebergang_nach_zug_id")]
-        public string UebergangNachZugId { get; set; }
+        public int UebergangNachZugId { get; set; }
 
         [JsonProperty("uebergang_von_zug_id")]
-        public object UebergangVonZugId { get; set; }
+        public int UebergangVonZugId { get; set; }
 
         [JsonProperty("verkehrstage")]
         public string Verkehrstage { get; set; }
@@ -100,10 +101,10 @@ namespace Common.Models
         public string VerkehrstageBin { get; set; }
 
         [JsonProperty("vmax")]
-        public string Vmax { get; set; }
+        public int Vmax { get; set; }
 
         [JsonProperty("vmax_ist")]
-        public string VmaxIst { get; set; }
+        public int VmaxIst { get; set; }
 
         [JsonProperty("wendezug")]
         public string Wendezug { get; set; }
@@ -118,7 +119,7 @@ namespace Common.Models
         public string ZuggattungId { get; set; }
 
         [JsonProperty("zug_id")]
-        public string ZugId { get; set; }
+        public int ZugId { get; set; }
 
         [JsonProperty("zugnummer")]
         public string Zugnummer { get; set; }

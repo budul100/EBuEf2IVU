@@ -25,7 +25,7 @@ namespace RealtimeSender
         private readonly ConcurrentQueue<RealTimeInfoTO> infosQueue = new ConcurrentQueue<RealTimeInfoTO>();
         private readonly ILogger logger;
 
-        private Messages2RealtimeInfo converter;
+        private Message2RealtimeInfo converter;
         private EndpointAddress endpointAddress;
         private AsyncRetryPolicy retryPolicy;
 
@@ -66,7 +66,7 @@ namespace RealtimeSender
 
         public void Initialize(string division, string endpoint, int retryTime, DateTime sessionStart)
         {
-            converter = new Messages2RealtimeInfo(
+            converter = new Message2RealtimeInfo(
                 logger: logger,
                 division: division,
                 sessionStart: sessionStart);

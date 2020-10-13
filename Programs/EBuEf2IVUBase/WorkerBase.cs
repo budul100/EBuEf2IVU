@@ -37,8 +37,7 @@ namespace EBuEf2IVUBase
 
         #region Protected Constructors
 
-        protected WorkerBase(IConfiguration config, IStateHandler sessionStateHandler,
-            IDatabaseConnector databaseConnector, ILogger logger)
+        protected WorkerBase(IConfiguration config, IStateHandler sessionStateHandler, ILogger logger)
         {
             var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
             logger.LogInformation(
@@ -49,10 +48,15 @@ namespace EBuEf2IVUBase
             this.config = config;
             this.logger = logger;
 
-            this.databaseConnector = databaseConnector;
-
             this.sessionStateHandler = sessionStateHandler;
             this.sessionStateHandler.SessionChangedEvent += OnSessionChanged;
+        }
+
+        protected WorkerBase(IConfiguration config, IStateHandler sessionStateHandler,
+            IDatabaseConnector databaseConnector, ILogger logger)
+            : this(config, sessionStateHandler, logger)
+        {
+            this.databaseConnector = databaseConnector;
         }
 
         #endregion Protected Constructors

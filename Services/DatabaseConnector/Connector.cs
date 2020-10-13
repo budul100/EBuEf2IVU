@@ -64,7 +64,7 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainId, bool preferPrognosis)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainId, bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (token) => QueryTrainRunsAsync(
@@ -76,7 +76,7 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(bool preferPrognosis)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (token) => QueryTrainRunsAsync(
