@@ -287,7 +287,9 @@ namespace DatabaseConnector
                 using var context = new SitzungenContext(connectionString);
 
                 var sitzung = await context.Sitzungen
-                    .Where(s => s.HasRelevantStatus())
+                    .Where(s => s.Status == Convert.ToByte(SessionStates.InPreparation)
+                        || s.Status == Convert.ToByte(SessionStates.IsRunning)
+                        || s.Status == Convert.ToByte(SessionStates.IsPaused))
                     .OrderByDescending(s => s.Status == Convert.ToByte(SessionStates.IsRunning))
                     .ThenByDescending(s => s.Status == Convert.ToByte(SessionStates.IsPaused))
                     .FirstOrDefaultAsync(cancellationToken);
