@@ -159,7 +159,7 @@ namespace EBuEf2IVUVehicle
         private async void OnSessionStart(object sender, EventArgs e)
         {
             logger.LogDebug(
-                "Nachricht zum Setzen der Fahrzeug-Grundaufstellung empfangen.");
+                "Nachricht zum initialen Setzen der Fahrzeug-Grundaufstellung empfangen.");
 
             var allocations = await databaseConnector.GetVehicleAllocationsAsync();
 
