@@ -211,7 +211,8 @@ namespace DatabaseConnector
                         Abfahrt = relevant.GetAbfahrt(),
                         Bemerkungen = relevant.Zug.Bemerkungen,
                         Positions = positions,
-                        Zugnummer = relevant.Zug?.Zugnummer.ToString(),
+                        ZugId = relevant.ZugID,
+                        Zugnummer = relevant.Zug.Zugnummer,
                     };
 
                     yield return result;

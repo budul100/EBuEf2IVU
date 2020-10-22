@@ -14,22 +14,22 @@ namespace DatabaseConnector.Extensions
             return result;
         }
 
-        public static TimeSpan? GetAbfahrtPath(this Halt halt, bool preferPrognosis)
+        public static DateTime? GetAbfahrtPath(this Halt halt, bool preferPrognosis)
         {
             var result = preferPrognosis
                 ? halt.AbfahrtPrognose ?? halt.AbfahrtSoll
                 : halt.AbfahrtSoll;
 
-            return result;
+            return result.ToDateTime();
         }
 
-        public static TimeSpan? GetAnkunftPath(this Halt halt, bool preferPrognosis)
+        public static DateTime? GetAnkunftPath(this Halt halt, bool preferPrognosis)
         {
             var result = preferPrognosis
                 ? halt.AnkunftPrognose ?? halt.AnkunftSoll
                 : halt.AnkunftSoll;
 
-            return result;
+            return result.ToDateTime();
         }
 
         public static string GetName(this bool istVon)
@@ -45,5 +45,21 @@ namespace DatabaseConnector.Extensions
         }
 
         #endregion Public Methods
+
+        #region Private Methods
+
+        private static DateTime? ToDateTime(this TimeSpan? time)
+        {
+            var result = default(DateTime?);
+
+            if (time.HasValue)
+            {
+                result = new DateTime(time.Value.Ticks);
+            }
+
+            return result;
+        }
+
+        #endregion Private Methods
     }
 }

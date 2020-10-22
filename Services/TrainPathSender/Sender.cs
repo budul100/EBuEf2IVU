@@ -28,9 +28,10 @@ namespace TrainPathSender
         private readonly ILogger<Sender> logger;
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
-        private Message2ImportPaths converter;
+        private Message2ImportPaths messageConverter;
         private AsyncRetryPolicy retryPolicy;
         private string trainPathState;
+        private TrainRun2ImportPaths trainRunConverter;
 
         #endregion Private Fields
 
@@ -45,12 +46,25 @@ namespace TrainPathSender
 
         #region Public Methods
 
-        public void AddMessages(IEnumerable<TrainPathMessage> messages)
+        public void Add(IEnumerable<TrainPathMessage> messages)
         {
             if (messages.AnyItem())
             {
-                var imports = converter.Get(
+                var imports = messageConverter.Get(
                     messages: messages,
+                    trainPathState: trainPathState);
+
+                if (imports != default)
+                    importsQueue.Enqueue(imports);
+            }
+        }
+
+        public void Add(IEnumerable<TrainRun> trainRuns)
+        {
+            if (trainRuns.AnyItem())
+            {
+                var imports = trainRunConverter.Get(
+                    trainRuns: trainRuns,
                     trainPathState: trainPathState);
 
                 if (imports != default)
@@ -65,7 +79,7 @@ namespace TrainPathSender
         {
             this.trainPathState = trainPathState;
 
-            converter = new Message2ImportPaths(
+            messageConverter = new Message2ImportPaths(
                 sessionDate: sessionDate,
                 infrastructureManager: infrastructureManager,
                 orderingTransportationCompany: orderingTransportationCompany,
@@ -73,6 +87,14 @@ namespace TrainPathSender
                 stoppingReasonPass: stoppingReasonPass,
                 importProfile: importProfile,
                 preferPrognosis: preferPrognosis);
+
+            trainRunConverter = new TrainRun2ImportPaths(
+                sessionDate: sessionDate,
+                infrastructureManager: infrastructureManager,
+                orderingTransportationCompany: orderingTransportationCompany,
+                stoppingReasonStop: stoppingReasonStop,
+                stoppingReasonPass: stoppingReasonPass,
+                importProfile: importProfile);
 
             channelFactory = new Factory<TrainPathImportWebFacadeChannel>(
                 host: host,

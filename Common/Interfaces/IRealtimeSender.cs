@@ -10,9 +10,9 @@ namespace Common.Interfaces
     {
         #region Public Methods
 
-        void AddAllocations(IEnumerable<VehicleAllocation> trainAllocations);
+        void Add(IEnumerable<VehicleAllocation> trainAllocations);
 
-        void AddRealtime(TrainLeg trainLeg);
+        void Add(TrainLeg trainLeg);
 
         void Initialize(string division, string endpoint, int retryTime, DateTime sessionStart);
 

@@ -10,7 +10,9 @@ namespace Common.Interfaces
     {
         #region Public Methods
 
-        void AddMessages(IEnumerable<TrainPathMessage> messages);
+        void Add(IEnumerable<TrainPathMessage> messages);
+
+        void Add(IEnumerable<TrainRun> trainRuns);
 
         void Initialize(string host, int port, string path, string username, string password, bool isHttps,
             int retryTime, DateTime sessionDate, string infrastructureManager, string orderingTransportationCompany,

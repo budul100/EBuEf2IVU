@@ -13,7 +13,9 @@ namespace Common.Models
 
         public IEnumerable<TrainPosition> Positions { get; set; }
 
-        public string Zugnummer { get; set; }
+        public int ZugId { get; set; }
+
+        public int Zugnummer { get; set; }
 
         #endregion Public Properties
 
@@ -21,7 +23,7 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return @$"Zug: {Zugnummer} | Abfahrt: {Abfahrt:hh\:mm\:ss}";
+            return @$"Zug: {Zugnummer} ({ZugId}) | Abfahrt: {Abfahrt:hh\:mm\:ss}";
         }
 
         #endregion Public Methods

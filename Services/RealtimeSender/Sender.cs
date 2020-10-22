@@ -42,7 +42,7 @@ namespace RealtimeSender
 
         #region Public Methods
 
-        public void AddAllocations(IEnumerable<VehicleAllocation> trainAllocations)
+        public void Add(IEnumerable<VehicleAllocation> trainAllocations)
         {
             foreach (var allocation in trainAllocations)
             {
@@ -53,7 +53,7 @@ namespace RealtimeSender
             }
         }
 
-        public void AddRealtime(TrainLeg trainLeg)
+        public void Add(TrainLeg trainLeg)
         {
             if (trainLeg != default)
             {

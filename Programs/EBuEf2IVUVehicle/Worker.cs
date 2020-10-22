@@ -132,7 +132,7 @@ namespace EBuEf2IVUVehicle
 
                     if (trainLeg != default)
                     {
-                        realtimeSender.AddRealtime(trainLeg);
+                        realtimeSender.Add(trainLeg);
                         await databaseConnector.AddRealtimeAsync(trainLeg);
                     }
                     else
@@ -163,7 +163,7 @@ namespace EBuEf2IVUVehicle
 
             var allocations = await databaseConnector.GetVehicleAllocationsAsync();
 
-            realtimeSender.AddAllocations(allocations);
+            realtimeSender.Add(allocations);
         }
 
         #endregion Private Methods

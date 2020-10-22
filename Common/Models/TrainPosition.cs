@@ -6,9 +6,9 @@ namespace Common.Models
     {
         #region Public Properties
 
-        public TimeSpan? Abfahrt { get; set; }
+        public DateTime? Abfahrt { get; set; }
 
-        public TimeSpan? Ankunft { get; set; }
+        public DateTime? Ankunft { get; set; }
 
         public string Bemerkungen { get; set; }
 
