@@ -67,7 +67,7 @@ namespace TrainPathSenderTests
         }
 
         [Test]
-        public void Test()
+        public void InitialImport()
         {
             var connectorSettings = config
                 .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
