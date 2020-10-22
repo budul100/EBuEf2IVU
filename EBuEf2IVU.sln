@@ -31,7 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainPathSender", "Services
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AF50D50-8827-4EE7-BA50-79DDCED4B1F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainPathSenderTests", "Tests\TrainPathSenderTests\TrainPathSenderTests.csproj", "{55E268D8-F5A5-4AD3-A5D0-6B81E571C5EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainPathSenderTests", "Tests\TrainPathSenderTests\TrainPathSenderTests.csproj", "{55E268D8-F5A5-4AD3-A5D0-6B81E571C5EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTests", "Tests\CommonTests\CommonTests.csproj", "{CE3C121B-603E-4380-98D5-77199B49D2B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{55E268D8-F5A5-4AD3-A5D0-6B81E571C5EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55E268D8-F5A5-4AD3-A5D0-6B81E571C5EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55E268D8-F5A5-4AD3-A5D0-6B81E571C5EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE3C121B-603E-4380-98D5-77199B49D2B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE3C121B-603E-4380-98D5-77199B49D2B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE3C121B-603E-4380-98D5-77199B49D2B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE3C121B-603E-4380-98D5-77199B49D2B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +109,7 @@ Global
 		{2868B473-BDF3-4123-A814-1B3F61C0AD0A} = {C7375F97-1086-40C2-A1AD-43E3731F0987}
 		{454BB9BC-3567-496C-AA8E-C6478ECBFFC4} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
 		{55E268D8-F5A5-4AD3-A5D0-6B81E571C5EA} = {0AF50D50-8827-4EE7-BA50-79DDCED4B1F6}
+		{CE3C121B-603E-4380-98D5-77199B49D2B2} = {0AF50D50-8827-4EE7-BA50-79DDCED4B1F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E929A830-61A1-48FF-9596-23961F1A08C4}
