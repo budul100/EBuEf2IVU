@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Common.Converters;
+using Newtonsoft.Json;
 using System;
 
 namespace Common.Models
@@ -67,7 +68,8 @@ namespace Common.Models
         [JsonProperty("gleis_soll")]
         public int? GleisSoll { get; set; }
 
-        [JsonProperty("ist_durchfahrt")]
+        [JsonProperty("ist_durchfahrt"),
+            JsonConverter(typeof(IntToBooleanConverter))]
         public bool IstDurchfahrt { get; set; }
 
         [JsonProperty("mbr")]
@@ -80,10 +82,10 @@ namespace Common.Models
         public string TriebfahrzeugIst { get; set; }
 
         [JsonProperty("uebergang_nach_zug_id")]
-        public int UebergangNachZugId { get; set; }
+        public int? UebergangNachZugId { get; set; }
 
         [JsonProperty("uebergang_von_zug_id")]
-        public int UebergangVonZugId { get; set; }
+        public int? UebergangVonZugId { get; set; }
 
         [JsonProperty("verkehrstage")]
         public string Verkehrstage { get; set; }
