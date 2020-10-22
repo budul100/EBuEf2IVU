@@ -25,6 +25,8 @@ namespace TrainPathSender.Converters
         private readonly string stoppingReasonStop;
         private readonly TimetableVersion timetableVersion;
         private readonly TrainPathKeyTimetableVersion timetableVersionKey;
+        private readonly string trainPathStateCancelled;
+        private readonly string trainPathStateRun;
 
         #endregion Private Fields
 
@@ -32,7 +34,7 @@ namespace TrainPathSender.Converters
 
         public Message2ImportPaths(DateTime sessionDate, string infrastructureManager,
             string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
-            string importProfile, bool preferPrognosis)
+            string trainPathStateRun, string trainPathStateCancelled, string importProfile, bool preferPrognosis)
         {
             this.sessionDate = sessionDate;
             this.infrastructureManager = infrastructureManager;
@@ -40,6 +42,8 @@ namespace TrainPathSender.Converters
 
             this.stoppingReasonStop = stoppingReasonStop;
             this.stoppingReasonPass = stoppingReasonPass;
+            this.trainPathStateRun = trainPathStateRun;
+            this.trainPathStateCancelled = trainPathStateCancelled;
             this.importProfile = importProfile;
 
             abfahrtGetter = GetAbfahrtGetter(preferPrognosis);
@@ -53,16 +57,14 @@ namespace TrainPathSender.Converters
 
         #region Public Methods
 
-        public importTrainPaths Get(IEnumerable<TrainPathMessage> messages, string trainPathState)
+        public importTrainPaths Get(IEnumerable<TrainPathMessage> messages)
         {
             var result = default(importTrainPaths);
 
             if (messages.AnyItem())
             {
                 var stopPoints = GetNetworkPointKeys(messages).ToArray();
-                var trainPaths = GetTrainPaths(
-                    messages: messages,
-                    trainPathState: trainPathState).ToArray();
+                var trainPaths = GetTrainPaths(messages).ToArray();
 
                 var request = new TrainPathImportRequest
                 {
@@ -171,7 +173,7 @@ namespace TrainPathSender.Converters
             return result;
         }
 
-        private IEnumerable<TrainPath> GetTrainPaths(IEnumerable<TrainPathMessage> messages, string trainPathState)
+        private IEnumerable<TrainPath> GetTrainPaths(IEnumerable<TrainPathMessage> messages)
         {
             var trainGroups = messages
                 .GroupBy(m => m.Zugnummer).ToArray();
@@ -179,9 +181,7 @@ namespace TrainPathSender.Converters
             foreach (var trainGroup in trainGroups)
             {
                 var trainPathKey = GetTrainPathKey(trainGroup);
-                var trainPathVariants = GetTrainPathVariants(
-                    messages: trainGroup,
-                    trainPathState: trainPathState).ToArray();
+                var trainPathVariants = GetTrainPathVariants(trainGroup).ToArray();
 
                 var result = new TrainPath
                 {
@@ -209,11 +209,14 @@ namespace TrainPathSender.Converters
 
                 var stoppingReasons = GetStoppingReasons(message).ToArray();
 
+                var isRunning = message.IsRunning();
+
                 var result = new TrainPathStop
                 {
                     arrivalTrack = message.GleisSoll?.ToString(),
                     departureTrack = message.GleisSoll?.ToString(),
-                    running = true,
+                    running = isRunning,
+                    runningSpecified = true,
                     stoppingReasons = stoppingReasons,
                     stopPoint = message.GetStopPoint(),
                     times = times,
@@ -223,7 +226,7 @@ namespace TrainPathSender.Converters
             }
         }
 
-        private IEnumerable<TrainPathVariant> GetTrainPathVariants(IEnumerable<TrainPathMessage> messages, string trainPathState)
+        private IEnumerable<TrainPathVariant> GetTrainPathVariants(IEnumerable<TrainPathMessage> messages)
         {
             var variantGroups = messages
                 .GroupBy(m => m.ZugId).ToArray();
@@ -231,6 +234,13 @@ namespace TrainPathSender.Converters
             foreach (var variantGroup in variantGroups)
             {
                 var trainPathItinerary = GetTrainPathStops(variantGroup).ToArray();
+
+                var isRunning = trainPathItinerary
+                    .Where(i => i.running).Any();
+
+                var trainPathState = isRunning
+                    ? trainPathStateRun
+                    : trainPathStateCancelled;
 
                 var result = new TrainPathVariant
                 {

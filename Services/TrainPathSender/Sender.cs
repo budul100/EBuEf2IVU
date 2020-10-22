@@ -31,7 +31,6 @@ namespace TrainPathSender
         private IEnumerable<string> ignoreTrainTypes;
         private Message2ImportPaths messageConverter;
         private AsyncRetryPolicy retryPolicy;
-        private string trainPathState;
         private TrainRun2ImportPaths trainRunConverter;
 
         #endregion Private Fields
@@ -54,9 +53,7 @@ namespace TrainPathSender
 
             if (filtereds.AnyItem())
             {
-                var imports = messageConverter.Get(
-                    messages: filtereds,
-                    trainPathState: trainPathState);
+                var imports = messageConverter.Get(filtereds);
 
                 if (imports != default)
                     importsQueue.Enqueue(imports);
@@ -70,9 +67,7 @@ namespace TrainPathSender
 
             if (filtereds.AnyItem())
             {
-                var imports = trainRunConverter.Get(
-                    trainRuns: filtereds,
-                    trainPathState: trainPathState);
+                var imports = trainRunConverter.Get(filtereds);
 
                 if (imports != default)
                     importsQueue.Enqueue(imports);
@@ -81,10 +76,10 @@ namespace TrainPathSender
 
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
             int retryTime, DateTime sessionDate, string infrastructureManager, string orderingTransportationCompany,
-            string trainPathState, string stoppingReasonStop, string stoppingReasonPass, string importProfile,
-            bool preferPrognosis, IEnumerable<string> ignoreTrainTypes)
+            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
+            string trainPathStateCancelled, string importProfile, bool preferPrognosis,
+            IEnumerable<string> ignoreTrainTypes)
         {
-            this.trainPathState = trainPathState;
             this.ignoreTrainTypes = ignoreTrainTypes;
 
             messageConverter = new Message2ImportPaths(
@@ -93,6 +88,8 @@ namespace TrainPathSender
                 orderingTransportationCompany: orderingTransportationCompany,
                 stoppingReasonStop: stoppingReasonStop,
                 stoppingReasonPass: stoppingReasonPass,
+                trainPathStateRun: trainPathStateRun,
+                trainPathStateCancelled: trainPathStateCancelled,
                 importProfile: importProfile,
                 preferPrognosis: preferPrognosis);
 
@@ -102,6 +99,7 @@ namespace TrainPathSender
                 orderingTransportationCompany: orderingTransportationCompany,
                 stoppingReasonStop: stoppingReasonStop,
                 stoppingReasonPass: stoppingReasonPass,
+                trainPathStateRun: trainPathStateRun,
                 importProfile: importProfile);
 
             channelFactory = new Factory<TrainPathImportWebFacadeChannel>(

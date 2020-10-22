@@ -17,6 +17,13 @@ namespace TrainPathSender.Extensions
             return result;
         }
 
+        public static bool IsRunning(this TrainPathMessage message)
+        {
+            var result = message.AnkunftSoll.HasValue || message.AbfahrtSoll.HasValue;
+
+            return result;
+        }
+
         #endregion Public Methods
     }
 }

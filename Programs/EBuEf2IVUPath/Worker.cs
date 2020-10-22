@@ -117,9 +117,10 @@ namespace EBuEf2IVUPath
                 sessionDate: ivuSessionDate,
                 infrastructureManager: senderSettings.InfrastructureManager,
                 orderingTransportationCompany: senderSettings.OrderingTransportationCompany,
-                trainPathState: senderSettings.TrainPathState,
                 stoppingReasonStop: senderSettings.StoppingReasonStop,
                 stoppingReasonPass: senderSettings.StoppingReasonPass,
+                trainPathStateRun: senderSettings.TrainPathStateRun,
+                trainPathStateCancelled: senderSettings.TrainPathStateCancelled,
                 importProfile: senderSettings.ImportProfile,
                 preferPrognosis: senderSettings.PreferPrognosis,
                 ignoreTrainTypes: ignoreTrainTypes);

@@ -36,7 +36,9 @@
 
         public string StoppingReasonStop { get; set; }
 
-        public string TrainPathState { get; set; }
+        public string TrainPathStateCancelled { get; set; }
+
+        public string TrainPathStateRun { get; set; }
 
         public string Username { get; set; }
 
