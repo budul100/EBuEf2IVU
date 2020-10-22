@@ -52,9 +52,6 @@ namespace Common.Models
         [JsonProperty("bremssystem")]
         public string Bremssystem { get; set; }
 
-        [JsonProperty("fahrtrichtung")]
-        public string Fahrtrichtung { get; set; }
-
         [JsonProperty("fzm_id")]
         public string FzmId { get; set; }
 
@@ -70,14 +67,8 @@ namespace Common.Models
         [JsonProperty("gleis_soll")]
         public int? GleisSoll { get; set; }
 
-        [JsonProperty("ins_gegengleis")]
-        public bool InsGegengleis { get; set; }
-
         [JsonProperty("ist_durchfahrt")]
         public bool IstDurchfahrt { get; set; }
-
-        [JsonProperty("ist_kurzeinfahrt")]
-        public bool IstKurzeinfahrt { get; set; }
 
         [JsonProperty("mbr")]
         public string Mbr { get; set; }
