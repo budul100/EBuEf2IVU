@@ -13,6 +13,8 @@ namespace Common.Models
 
         public IEnumerable<TrainPosition> Positions { get; set; }
 
+        public string Zuggattung { get; set; }
+
         public int ZugId { get; set; }
 
         public int Zugnummer { get; set; }

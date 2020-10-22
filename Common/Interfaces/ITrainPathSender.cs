@@ -17,7 +17,7 @@ namespace Common.Interfaces
         void Initialize(string host, int port, string path, string username, string password, bool isHttps,
             int retryTime, DateTime sessionDate, string infrastructureManager, string orderingTransportationCompany,
             string trainPathState, string stoppingReasonStop, string stoppingReasonPass, string importProfile,
-            bool preferPrognosis);
+            bool preferPrognosis, IEnumerable<string> ignoreTrainTypes);
 
         Task RunAsnc(CancellationToken cancellationToken);
 

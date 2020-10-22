@@ -6,6 +6,8 @@
 
         public string Host { get; set; }
 
+        public string IgnoreTrainTypes { get; set; }
+
         public string ImportProfile { get; set; }
 
         public string InfrastructureManager { get; set; }

@@ -222,6 +222,7 @@ namespace DatabaseConnector
                         Abfahrt = relevant.GetAbfahrt(),
                         Bemerkungen = relevant.Zug.Bemerkungen,
                         Positions = positions,
+                        Zuggattung = relevant.Zug.Zuggattung.Kurzname,
                         ZugId = relevant.ZugID,
                         Zugnummer = relevant.Zug.Zugnummer,
                     };
@@ -375,7 +376,7 @@ namespace DatabaseConnector
                 var zugId = trainId.ToNullableInt();
 
                 var halte = await context.Halte
-                    .Include(h => h.Zug)
+                    .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
                     .Where(h => !zugId.HasValue || h.ZugID == zugId)
                     .ToArrayAsync(queryCancellationToken);
 
@@ -400,7 +401,7 @@ namespace DatabaseConnector
                 using var context = new HaltContext(connectionString);
 
                 var halte = await context.Halte
-                    .Include(h => h.Zug)
+                    .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
                     .Where(h => h.HasAbfahrt())
                     .Where(h => h.GetAbfahrt() >= minTime)
                     .Where(h => h.GetAbfahrt() <= maxTime)

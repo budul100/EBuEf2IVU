@@ -28,6 +28,7 @@ namespace TrainPathSender
         private readonly ILogger<Sender> logger;
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
+        private IEnumerable<string> ignoreTrainTypes;
         private Message2ImportPaths messageConverter;
         private AsyncRetryPolicy retryPolicy;
         private string trainPathState;
@@ -48,10 +49,13 @@ namespace TrainPathSender
 
         public void Add(IEnumerable<TrainPathMessage> messages)
         {
-            if (messages.AnyItem())
+            var filtereds = messages
+                .Where(m => !ignoreTrainTypes.AnyItem() || !ignoreTrainTypes.Contains(m.Zuggattung)).ToArray();
+
+            if (filtereds.AnyItem())
             {
                 var imports = messageConverter.Get(
-                    messages: messages,
+                    messages: filtereds,
                     trainPathState: trainPathState);
 
                 if (imports != default)
@@ -61,10 +65,13 @@ namespace TrainPathSender
 
         public void Add(IEnumerable<TrainRun> trainRuns)
         {
-            if (trainRuns.AnyItem())
+            var filtereds = trainRuns
+                .Where(r => !ignoreTrainTypes.AnyItem() || !ignoreTrainTypes.Contains(r.Zuggattung)).ToArray();
+
+            if (filtereds.AnyItem())
             {
                 var imports = trainRunConverter.Get(
-                    trainRuns: trainRuns,
+                    trainRuns: filtereds,
                     trainPathState: trainPathState);
 
                 if (imports != default)
@@ -75,9 +82,10 @@ namespace TrainPathSender
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
             int retryTime, DateTime sessionDate, string infrastructureManager, string orderingTransportationCompany,
             string trainPathState, string stoppingReasonStop, string stoppingReasonPass, string importProfile,
-            bool preferPrognosis)
+            bool preferPrognosis, IEnumerable<string> ignoreTrainTypes)
         {
             this.trainPathState = trainPathState;
+            this.ignoreTrainTypes = ignoreTrainTypes;
 
             messageConverter = new Message2ImportPaths(
                 sessionDate: sessionDate,

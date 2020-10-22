@@ -19,6 +19,7 @@ namespace EBuEf2IVUPath
         #region Private Fields
 
         private const string MessageTypePaths = "Zugtrassen";
+        private const string SettingsSeparator = ";";
 
         private readonly IMessageReceiver trainPathReceiver;
         private readonly ITrainPathSender trainPathSender;
@@ -102,6 +103,10 @@ namespace EBuEf2IVUPath
                 .GetSection(nameof(Settings.TrainPathSender))
                 .Get<Settings.TrainPathSender>();
 
+            var ignoreTrainTypes = senderSettings.IgnoreTrainTypes?.Split(
+                separator: SettingsSeparator,
+                options: StringSplitOptions.RemoveEmptyEntries);
+
             trainPathSender.Initialize(
                 host: senderSettings.Host,
                 port: senderSettings.Port,
@@ -117,7 +122,8 @@ namespace EBuEf2IVUPath
                 stoppingReasonStop: senderSettings.StoppingReasonStop,
                 stoppingReasonPass: senderSettings.StoppingReasonPass,
                 importProfile: senderSettings.ImportProfile,
-                preferPrognosis: senderSettings.PreferPrognosis);
+                preferPrognosis: senderSettings.PreferPrognosis,
+                ignoreTrainTypes: ignoreTrainTypes);
         }
 
         private void OnMessageReceived(object sender, Common.EventsArgs.MessageReceivedArgs e)
