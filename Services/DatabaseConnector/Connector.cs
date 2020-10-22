@@ -27,9 +27,9 @@ namespace DatabaseConnector
 
         private readonly ILogger logger;
 
-        private CancellationToken cancellationToken;
         private string connectionString;
         private AsyncRetryPolicy retryPolicy;
+        private CancellationToken sessionCancellationToken;
 
         #endregion Private Fields
 
@@ -47,10 +47,10 @@ namespace DatabaseConnector
         public Task AddRealtimeAsync(TrainLeg leg)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => SaveTrainPositionsAsync(
+                action: (queryCancellationToken) => SaveTrainPositionsAsync(
                     leg: leg,
-                    cancellationToken: token),
-                cancellationToken: cancellationToken);
+                    queryCancellationToken: queryCancellationToken),
+                cancellationToken: sessionCancellationToken);
 
             return result;
         }
@@ -58,8 +58,8 @@ namespace DatabaseConnector
         public Task<EBuEfSession> GetEBuEfSessionAsync()
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => QuerySessionDateAsync(token),
-                cancellationToken: cancellationToken);
+                action: (queryCancellationToken) => QuerySessionDateAsync(queryCancellationToken),
+                cancellationToken: sessionCancellationToken);
 
             return result;
         }
@@ -67,11 +67,11 @@ namespace DatabaseConnector
         public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainId, bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => QueryTrainRunsAsync(
+                action: (queryCancellationToken) => QueryTrainRunsAsync(
                     trainId: trainId,
                     preferPrognosis: preferPrognosis,
-                    cancellationToken: token),
-                cancellationToken: cancellationToken);
+                    queryCancellationToken: queryCancellationToken),
+                cancellationToken: sessionCancellationToken);
 
             return result;
         }
@@ -79,11 +79,11 @@ namespace DatabaseConnector
         public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => QueryTrainRunsAsync(
+                action: (queryCancellationToken) => QueryTrainRunsAsync(
                     trainId: default,
                     preferPrognosis: preferPrognosis,
-                    cancellationToken: token),
-                cancellationToken: cancellationToken);
+                    queryCancellationToken: queryCancellationToken),
+                cancellationToken: sessionCancellationToken);
 
             return result;
         }
@@ -91,11 +91,22 @@ namespace DatabaseConnector
         public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => QueryTrainRunsAsync(
+                action: (queryCancellationToken) => QueryTrainRunsAsync(
                     minTime: minTime,
                     maxTime: maxTime,
-                    cancellationToken: token),
-                cancellationToken: cancellationToken);
+                    queryCancellationToken: queryCancellationToken),
+                cancellationToken: sessionCancellationToken);
+
+            return result;
+        }
+
+        public Task<int?> GetTrainTypeId(string zuggattung)
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (queryCancellationToken) => QueryTrainTypeId(
+                    zuggattung: zuggattung,
+                    queryCancellationToken: queryCancellationToken),
+                cancellationToken: sessionCancellationToken);
 
             return result;
         }
@@ -103,16 +114,16 @@ namespace DatabaseConnector
         public Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync()
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => QueryVehicleAllocationsAsync(token),
-                cancellationToken: cancellationToken);
+                action: (queryCancellationToken) => QueryVehicleAllocationsAsync(queryCancellationToken),
+                cancellationToken: sessionCancellationToken);
 
             return result;
         }
 
-        public void Initialize(string connectionString, int retryTime, CancellationToken cancellationToken)
+        public void Initialize(string connectionString, int retryTime, CancellationToken sessionCancellationToken)
         {
             this.connectionString = connectionString;
-            this.cancellationToken = cancellationToken;
+            this.sessionCancellationToken = sessionCancellationToken;
 
             retryPolicy = Policy
                 .Handle<Exception>()
@@ -126,10 +137,10 @@ namespace DatabaseConnector
         public Task SetCrewingsAsync(IEnumerable<CrewingElement> crewingElements)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => SaveCrewingsAsync(
+                action: (queryCancellationToken) => SaveCrewingsAsync(
                     crewingElements: crewingElements,
-                    cancellationToken: token),
-                cancellationToken: cancellationToken);
+                    queryCancellationToken: queryCancellationToken),
+                cancellationToken: sessionCancellationToken);
 
             return result;
         }
@@ -276,16 +287,16 @@ namespace DatabaseConnector
                 reconnection.TotalSeconds);
         }
 
-        private async Task<EBuEfSession> QuerySessionDateAsync(CancellationToken cancellationToken)
+        private async Task<EBuEfSession> QuerySessionDateAsync(CancellationToken queryCancellationToken)
         {
             var result = default(EBuEfSession);
 
-            if (!cancellationToken.IsCancellationRequested)
+            if (!queryCancellationToken.IsCancellationRequested)
             {
                 logger.LogDebug(
                     "Suche in der EBuEf-DB nach der aktuellen Fahrplan-Session.");
 
-                using var context = new SitzungenContext(connectionString);
+                using var context = new SitzungContext(connectionString);
 
                 var sitzung = await context.Sitzungen
                     .Where(s => s.Status == Convert.ToByte(SessionStates.InPreparation)
@@ -293,7 +304,7 @@ namespace DatabaseConnector
                         || s.Status == Convert.ToByte(SessionStates.IsPaused))
                     .OrderByDescending(s => s.Status == Convert.ToByte(SessionStates.IsRunning))
                     .ThenByDescending(s => s.Status == Convert.ToByte(SessionStates.IsPaused))
-                    .FirstOrDefaultAsync(cancellationToken);
+                    .FirstOrDefaultAsync(queryCancellationToken);
 
                 if (sitzung != default)
                 {
@@ -329,7 +340,7 @@ namespace DatabaseConnector
 
             if (!zugnummer.IsEmpty())
             {
-                using var context = new ZuegeContext(connectionString);
+                using var context = new ZugContext(connectionString);
 
                 var trainNumber = zugnummer.ToInt();
 
@@ -341,11 +352,11 @@ namespace DatabaseConnector
         }
 
         private async Task<IEnumerable<TrainRun>> QueryTrainRunsAsync(string trainId, bool preferPrognosis,
-            CancellationToken cancellationToken)
+            CancellationToken queryCancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
 
-            if (!cancellationToken.IsCancellationRequested)
+            if (!queryCancellationToken.IsCancellationRequested)
             {
                 if (!trainId.IsEmpty())
                 {
@@ -359,14 +370,14 @@ namespace DatabaseConnector
                         "Suche nach allen Zügen.");
                 }
 
-                using var context = new HalteContext(connectionString);
+                using var context = new HaltContext(connectionString);
 
                 var zugId = trainId.ToNullableInt();
 
                 var halte = await context.Halte
                     .Include(h => h.Zug)
                     .Where(h => !zugId.HasValue || h.ZugID == zugId)
-                    .ToArrayAsync(cancellationToken);
+                    .ToArrayAsync(queryCancellationToken);
 
                 result = GetTrainRuns(
                     halte: halte,
@@ -377,23 +388,23 @@ namespace DatabaseConnector
         }
 
         private async Task<IEnumerable<TrainRun>> QueryTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime,
-            CancellationToken cancellationToken)
+            CancellationToken queryCancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
 
-            if (!cancellationToken.IsCancellationRequested)
+            if (!queryCancellationToken.IsCancellationRequested)
             {
                 logger.LogDebug(
                     "Suche nach aktuellen Fahrplaneinträgen.");
 
-                using var context = new HalteContext(connectionString);
+                using var context = new HaltContext(connectionString);
 
                 var halte = await context.Halte
                     .Include(h => h.Zug)
                     .Where(h => h.HasAbfahrt())
                     .Where(h => h.GetAbfahrt() >= minTime)
                     .Where(h => h.GetAbfahrt() <= maxTime)
-                    .ToArrayAsync(cancellationToken);
+                    .ToArrayAsync(queryCancellationToken);
 
                 result = GetTrainRuns(
                     halte: halte,
@@ -403,21 +414,37 @@ namespace DatabaseConnector
             return result;
         }
 
-        private async Task<IEnumerable<VehicleAllocation>> QueryVehicleAllocationsAsync(CancellationToken cancellationToken)
+        private async Task<int?> QueryTrainTypeId(string zuggattung, CancellationToken queryCancellationToken)
+        {
+            var result = default(Zuggattung);
+
+            if (!zuggattung.IsEmpty())
+            {
+                using var context = new ZugGattungContext(connectionString);
+
+                result = await context.Zuggattungen.FirstOrDefaultAsync(
+                    predicate: g => g.Kurzname == zuggattung,
+                    cancellationToken: queryCancellationToken);
+            }
+
+            return result?.ID;
+        }
+
+        private async Task<IEnumerable<VehicleAllocation>> QueryVehicleAllocationsAsync(CancellationToken queryCancellationToken)
         {
             var result = Enumerable.Empty<VehicleAllocation>();
 
-            if (!cancellationToken.IsCancellationRequested)
+            if (!queryCancellationToken.IsCancellationRequested)
             {
                 logger.LogDebug(
                     "Suche nach allen Fahrzeugen der Grundaufstellung.");
 
-                using var context = new AufstellungenContext(connectionString);
+                using var context = new AufstellungContext(connectionString);
 
                 var aufstellungen = await context.Aufstellungen
                     .Include(a => a.Feld)
                     .ThenInclude(f => f.AbschnittZuFeld)
-                    .ThenInclude(z => z.Abschnitt).ToArrayAsync(cancellationToken);
+                    .ThenInclude(z => z.Abschnitt).ToArrayAsync(queryCancellationToken);
 
                 result = GetVehicleAllocations(aufstellungen).ToArray();
             }
@@ -425,11 +452,11 @@ namespace DatabaseConnector
             return result;
         }
 
-        private async Task SaveCrewingsAsync(IEnumerable<CrewingElement> crewingElements, CancellationToken cancellationToken)
+        private async Task SaveCrewingsAsync(IEnumerable<CrewingElement> crewingElements, CancellationToken queryCancellationToken)
         {
             if (crewingElements?.Any() ?? false)
             {
-                using var context = new BesatzungenContext(connectionString);
+                using var context = new BesatzungContext(connectionString);
 
                 context.Database.OpenConnection();
 
@@ -448,7 +475,7 @@ namespace DatabaseConnector
 
                     context.Besatzungen.AddRange(besatzungen);
 
-                    await context.SaveChangesAsync(cancellationToken);
+                    await context.SaveChangesAsync(queryCancellationToken);
 
                     logger.LogDebug(
                         "Die Crewing-Einträge wurden gespeichert.");
@@ -458,7 +485,7 @@ namespace DatabaseConnector
             }
         }
 
-        private async Task SaveTrainPositionAsync(TrainLeg leg, bool istVon, CancellationToken cancellationToken)
+        private async Task SaveTrainPositionAsync(TrainLeg leg, bool istVon, CancellationToken queryCancellationToken)
         {
             var betriebsstelle = istVon
                 ? leg.EBuEfBetriebsstelleVon
@@ -471,7 +498,7 @@ namespace DatabaseConnector
                     leg.Zugnummer,
                     betriebsstelle);
 
-                using var context = new HalteContext(connectionString);
+                using var context = new HaltContext(connectionString);
 
                 var halt = context.Halte
                     .Where(h => h.Betriebsstelle == betriebsstelle)
@@ -495,7 +522,7 @@ namespace DatabaseConnector
                         halt.AnkunftIst = leg.EBuEfZeitpunktNach;
                     }
 
-                    await context.SaveChangesAsync(cancellationToken);
+                    await context.SaveChangesAsync(queryCancellationToken);
 
                     logger.LogDebug(
                         "Das Update des Halts wurde gespeichert.");
@@ -509,9 +536,9 @@ namespace DatabaseConnector
             }
         }
 
-        private async Task SaveTrainPositionsAsync(TrainLeg leg, CancellationToken cancellationToken)
+        private async Task SaveTrainPositionsAsync(TrainLeg leg, CancellationToken queryCancellationToken)
         {
-            if (leg != null && !cancellationToken.IsCancellationRequested)
+            if (leg != null && !queryCancellationToken.IsCancellationRequested)
             {
                 logger.LogDebug(
                     "Suche in Session-Fahrplan nach: {leg}",
@@ -520,12 +547,12 @@ namespace DatabaseConnector
                 await SaveTrainPositionAsync(
                     leg: leg,
                     istVon: true,
-                    cancellationToken: cancellationToken);
+                    queryCancellationToken: queryCancellationToken);
 
                 await SaveTrainPositionAsync(
                     leg: leg,
                     istVon: false,
-                    cancellationToken: cancellationToken);
+                    queryCancellationToken: queryCancellationToken);
             }
         }
 

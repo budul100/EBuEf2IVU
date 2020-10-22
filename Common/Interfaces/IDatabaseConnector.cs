@@ -20,6 +20,8 @@ namespace Common.Interfaces
 
         Task<IEnumerable<TrainRun>> GetTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime);
 
+        Task<int?> GetTrainTypeId(string zuggattung);
+
         Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync();
 
         void Initialize(string connectionString, int retryTime, CancellationToken cancellationToken);

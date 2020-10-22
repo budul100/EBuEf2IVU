@@ -15,6 +15,12 @@ namespace DatabaseConnector.Models
         [Column("id")]
         public int ID { get; set; }
 
+        [ForeignKey(nameof(ZuggattungId))]
+        public Zuggattung Zuggattung { get; set; }
+
+        [Column("zuggattung_id")]
+        public int ZuggattungId { get; set; }
+
         [Column("zugnummer")]
         public int Zugnummer { get; set; }
 
