@@ -6,7 +6,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RuntimeIdentifiers>win10-x64;linux-arm;linux-x64</RuntimeIdentifiers>
     <StartupObject>EBuEf2IVUVehicle.Program</StartupObject>
-    <AssemblyVersion>0.38.0.1</AssemblyVersion>
+    <AssemblyVersion>0.38.0.2</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <Version>$(AssemblyVersion)</Version>
   </PropertyGroup>
