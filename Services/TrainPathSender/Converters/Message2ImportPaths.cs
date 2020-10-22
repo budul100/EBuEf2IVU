@@ -165,7 +165,7 @@ namespace TrainPathSender.Converters
             {
                 infrastructureManager = infrastructureManager,
                 timetableVersion = timetableVersionKey,
-                trainPathId = relevant.Zugnummer,
+                trainPathId = relevant.ZugId.ToString(),
             };
 
             return result;
