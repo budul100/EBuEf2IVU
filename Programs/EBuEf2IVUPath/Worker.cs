@@ -19,7 +19,6 @@ namespace EBuEf2IVUPath
         #region Private Fields
 
         private const string MessageTypePaths = "Zugtrassen";
-        private const string SettingsSeparator = ";";
 
         private readonly IMessageReceiver trainPathReceiver;
         private readonly ITrainPathSender trainPathSender;
@@ -104,7 +103,7 @@ namespace EBuEf2IVUPath
                 .Get<Settings.TrainPathSender>();
 
             var ignoreTrainTypes = senderSettings.IgnoreTrainTypes?.Split(
-                separator: SettingsSeparator,
+                separator: Settings.TrainPathSender.SettingsSeparator,
                 options: StringSplitOptions.RemoveEmptyEntries);
 
             trainPathSender.Initialize(

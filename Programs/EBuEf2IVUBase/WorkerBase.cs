@@ -81,7 +81,7 @@ namespace EBuEf2IVUBase
             databaseConnector.Initialize(
                 connectionString: connectorSettings.ConnectionString,
                 retryTime: connectorSettings.RetryTime,
-                cancellationToken: sessionCancellationToken);
+                sessionCancellationToken: sessionCancellationToken);
         }
 
         protected void InitializeStateReceiver()

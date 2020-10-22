@@ -2,6 +2,12 @@
 {
     public class TrainPathSender
     {
+        #region Public Fields
+
+        public const string SettingsSeparator = ";";
+
+        #endregion Public Fields
+
         #region Public Properties
 
         public string Host { get; set; }

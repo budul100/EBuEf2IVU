@@ -24,7 +24,7 @@ namespace Common.Interfaces
 
         Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync();
 
-        void Initialize(string connectionString, int retryTime, CancellationToken cancellationToken);
+        void Initialize(string connectionString, int retryTime, CancellationToken sessionCancellationToken);
 
         Task SetCrewingsAsync(IEnumerable<CrewingElement> crewingElements);
 
