@@ -86,7 +86,9 @@ namespace TrainPathSenderTests
             sender.Add(trainRuns);
 
             Task.WhenAll(sender.RunAsnc(new CancellationToken()));
-            Task.WhenAll(sender.RunAsnc(new CancellationToken()));
+
+            // Activate only if a soap server is running to receive a result
+            // Task.WhenAll(sender.RunAsnc(new CancellationToken()));
         }
 
         #endregion Public Methods
