@@ -1,13 +1,11 @@
 ﻿using CommandLine;
 using Common.Extensions;
 using Common.Interfaces;
+using EBuEf2IVUBase.Extensions;
 using EBuEf2IVUBase.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using StringExtensions;
-using System.IO;
-using System.Reflection;
 
 namespace EBuEf2IVUPath
 {
@@ -29,10 +27,12 @@ namespace EBuEf2IVUPath
                 .ParseArguments<CommandLineArgs>(args)
                 .WithParsed(options =>
                 {
+                    var settingsPath = options.GetSettingsPath(SettingsFileName);
+
                     result = Host
                         .CreateDefaultBuilder(args)
                         .GetHostBuilder()
-                        .ConfigureAppConfiguration((hostingContext, config) => config.ConfigureAppConfiguration(GetSettingsPath(options)))
+                        .ConfigureAppConfiguration((hostingContext, config) => config.ConfigureAppConfiguration(settingsPath))
                         .ConfigureServices((hostContext, services) => ConfigureServices(services))
                         .UseSerilog((hostingContext, loggerConfiguration) => hostingContext.GetSerilogConfiguration(loggerConfiguration));
                 });
@@ -58,20 +58,6 @@ namespace EBuEf2IVUPath
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
 
             services.AddSingleton<ITrainPathSender, TrainPathSender.Sender>();
-        }
-
-        private static string GetSettingsPath(CommandLineArgs args)
-        {
-            var result = args.SettingsPath;
-
-            if (result.IsEmpty())
-            {
-                result = Path.Combine(
-                    path1: Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    path2: SettingsFileName);
-            }
-
-            return result;
         }
 
         #endregion Private Methods

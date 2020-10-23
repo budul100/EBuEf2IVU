@@ -2,15 +2,18 @@
   "profiles": {
     "EBuEf2IVUCrew": {
       "commandName": "Executable",
-      "executablePath": "D:\\Users\\mgr\\Entwicklung\\EBuEf2IVU\\Programs\\EBuEf2IVUCrew\\bin\\Debug\\netcoreapp3.1\\EBuEf2IVUCrew.exe"
+      "executablePath": "D:\\Users\\mgr\\Entwicklung\\EBuEf2IVU\\Programs\\EBuEf2IVUCrew\\bin\\Debug\\netcoreapp3.1\\EBuEf2IVUCrew.exe",
+      "commandLineArgs": "-s ebuef2ivucrew-settings.example.xml"
     },
     "EBuEf2IVUPath": {
       "commandName": "Executable",
-      "executablePath": "D:\\Users\\mgr\\Entwicklung\\EBuEf2IVU\\Programs\\EBuEf2IVUPath\\bin\\Debug\\netcoreapp3.1\\EBuEf2IVUPath.exe"
+      "executablePath": "D:\\Users\\mgr\\Entwicklung\\EBuEf2IVU\\Programs\\EBuEf2IVUPath\\bin\\Debug\\netcoreapp3.1\\EBuEf2IVUPath.exe",
+      "commandLineArgs": "-s ebuef2ivupath-settings.example.xml"
     },
     "EBuEf2IVUVehicle": {
       "commandName": "Executable",
-      "executablePath": "D:\\Users\\mgr\\Entwicklung\\EBuEf2IVU\\Programs\\EBuEf2IVUVehicle\\bin\\Debug\\netcoreapp3.1\\EBuEf2IVUVehicle.exe"
+      "executablePath": "D:\\Users\\mgr\\Entwicklung\\EBuEf2IVU\\Programs\\EBuEf2IVUVehicle\\bin\\Debug\\netcoreapp3.1\\EBuEf2IVUVehicle.exe",
+      "commandLineArgs": "-s ebuef2ivuvehicle-settings.example.xml"
     }
   }
 }
