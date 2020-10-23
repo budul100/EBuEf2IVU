@@ -14,13 +14,15 @@ namespace Common.Interfaces
 
         Task<EBuEfSession> GetEBuEfSessionAsync();
 
+        Task<IEnumerable<string>> GetLocationShortnamesAsync(IEnumerable<string> locationTypes);
+
         Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainId, bool preferPrognosis = false);
 
         Task<IEnumerable<TrainRun>> GetTrainRunsAsync(bool preferPrognosis = false);
 
         Task<IEnumerable<TrainRun>> GetTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime);
 
-        Task<int?> GetTrainTypeId(string zuggattung);
+        Task<int?> GetTrainTypeIdAsync(string zuggattung);
 
         Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync();
 

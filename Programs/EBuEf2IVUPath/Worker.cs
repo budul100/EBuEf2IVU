@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -56,10 +57,12 @@ namespace EBuEf2IVUPath
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                InitializePathReceiver();
-                InitializePathSender();
+                InitializeDatabaseConnector(sessionCancellationToken);
 
-                await InitializeSessionAsync(sessionCancellationToken);
+                InitializePathReceiver();
+                await InitializePathSenderAsync();
+
+                await InitializeSessionAsync();
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
@@ -82,6 +85,17 @@ namespace EBuEf2IVUPath
 
         #region Private Methods
 
+        private async Task<IEnumerable<string>> GetLocationShortnamesAsync(Settings.TrainPathSender senderSettings)
+        {
+            var locationTypes = senderSettings.LocationTypes?.Split(
+                separator: Settings.TrainPathSender.SettingsSeparator,
+                options: StringSplitOptions.RemoveEmptyEntries);
+
+            var result = await databaseConnector.GetLocationShortnamesAsync(locationTypes);
+
+            return result;
+        }
+
         private void InitializePathReceiver()
         {
             var receiverSettings = config
@@ -95,7 +109,7 @@ namespace EBuEf2IVUPath
                 messageType: MessageTypePaths);
         }
 
-        private void InitializePathSender()
+        private async Task InitializePathSenderAsync()
         {
             var senderSettings = config
                 .GetSection(nameof(Settings.TrainPathSender))
@@ -104,6 +118,8 @@ namespace EBuEf2IVUPath
             var ignoreTrainTypes = senderSettings.IgnoreTrainTypes?.Split(
                 separator: Settings.TrainPathSender.SettingsSeparator,
                 options: StringSplitOptions.RemoveEmptyEntries);
+
+            var locationShortnames = await GetLocationShortnamesAsync(senderSettings);
 
             trainPathSender.Initialize(
                 host: senderSettings.Host,
@@ -122,7 +138,8 @@ namespace EBuEf2IVUPath
                 trainPathStateCancelled: senderSettings.TrainPathStateCancelled,
                 importProfile: senderSettings.ImportProfile,
                 preferPrognosis: senderSettings.PreferPrognosis,
-                ignoreTrainTypes: ignoreTrainTypes);
+                ignoreTrainTypes: ignoreTrainTypes,
+                locationShortnames: locationShortnames);
         }
 
         private void OnMessageReceived(object sender, Common.EventsArgs.MessageReceivedArgs e)

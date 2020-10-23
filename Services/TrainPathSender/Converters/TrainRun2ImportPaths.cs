@@ -18,6 +18,7 @@ namespace TrainPathSender.Converters
 
         private readonly string importProfile;
         private readonly string infrastructureManager;
+        private readonly IEnumerable<string> locationShortnames;
         private readonly string orderingTransportationCompany;
         private readonly DateTime sessionDate;
         private readonly string stoppingReasonPass;
@@ -32,7 +33,7 @@ namespace TrainPathSender.Converters
 
         public TrainRun2ImportPaths(DateTime sessionDate, string infrastructureManager,
             string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
-            string trainPathStateRun, string importProfile)
+            string trainPathStateRun, string importProfile, IEnumerable<string> locationShortnames)
         {
             this.sessionDate = sessionDate;
             this.infrastructureManager = infrastructureManager;
@@ -42,7 +43,7 @@ namespace TrainPathSender.Converters
             this.stoppingReasonPass = stoppingReasonPass;
             this.trainPathStateRun = trainPathStateRun;
             this.importProfile = importProfile;
-
+            this.locationShortnames = locationShortnames;
             timetableVersion = GetTimetableVersion();
             timetableVersionKey = GetTimetableVersionKey();
         }
@@ -85,8 +86,8 @@ namespace TrainPathSender.Converters
         {
             var networkPoints = trainRuns
                 .SelectMany(r => r.Positions)
-                .Select(p => p.Betriebsstelle)
-                .Distinct().ToArray();
+                .Select(p => p.Betriebsstelle).Distinct()
+                .Where(b => !locationShortnames.AnyItem() || locationShortnames.Contains(b)).ToArray();
 
             foreach (var networkPoint in networkPoints)
             {
@@ -175,25 +176,28 @@ namespace TrainPathSender.Converters
 
         private IEnumerable<TrainPathStop> GetTrainPathStops(TrainRun trainRun)
         {
-            foreach (var trainPosition in trainRun.Positions)
+            var relevants = trainRun.Positions
+                .Where(p => !locationShortnames.AnyItem() || locationShortnames.Contains(p.Betriebsstelle)).ToArray();
+
+            foreach (var relevant in relevants)
             {
                 var times = new Times
                 {
-                    operationalArrivalTime = trainPosition.Ankunft ?? default,
-                    operationalArrivalTimeTextSpecified = trainPosition.Ankunft.HasValue,
-                    operationalDepartureTime = trainPosition.Abfahrt ?? default,
-                    operationalDepartureTimeTextSpecified = trainPosition.Abfahrt.HasValue,
+                    operationalArrivalTime = relevant.Ankunft ?? default,
+                    operationalArrivalTimeTextSpecified = relevant.Ankunft.HasValue,
+                    operationalDepartureTime = relevant.Abfahrt ?? default,
+                    operationalDepartureTimeTextSpecified = relevant.Abfahrt.HasValue,
                 };
 
-                var stoppingReasons = GetStoppingReasons(trainPosition).ToArray();
+                var stoppingReasons = GetStoppingReasons(relevant).ToArray();
 
                 var result = new TrainPathStop
                 {
-                    arrivalTrack = trainPosition.Gleis,
-                    departureTrack = trainPosition.Gleis,
+                    arrivalTrack = relevant.Gleis,
+                    departureTrack = relevant.Gleis,
                     running = true,
                     stoppingReasons = stoppingReasons,
-                    stopPoint = trainPosition.GetStopPoint(),
+                    stopPoint = relevant.GetStopPoint(),
                     times = times,
                 };
 

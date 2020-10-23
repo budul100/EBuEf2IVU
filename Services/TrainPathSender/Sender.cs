@@ -77,7 +77,7 @@ namespace TrainPathSender
             int retryTime, DateTime sessionDate, string infrastructureManager, string orderingTransportationCompany,
             string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
             string trainPathStateCancelled, string importProfile, bool preferPrognosis,
-            IEnumerable<string> ignoreTrainTypes)
+            IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames)
         {
             this.ignoreTrainTypes = ignoreTrainTypes;
 
@@ -90,7 +90,8 @@ namespace TrainPathSender
                 trainPathStateRun: trainPathStateRun,
                 trainPathStateCancelled: trainPathStateCancelled,
                 importProfile: importProfile,
-                preferPrognosis: preferPrognosis);
+                preferPrognosis: preferPrognosis,
+                locationShortnames: locationShortnames);
 
             trainRunConverter = new TrainRun2ImportPaths(
                 sessionDate: sessionDate,
@@ -99,7 +100,8 @@ namespace TrainPathSender
                 stoppingReasonStop: stoppingReasonStop,
                 stoppingReasonPass: stoppingReasonPass,
                 trainPathStateRun: trainPathStateRun,
-                importProfile: importProfile);
+                importProfile: importProfile,
+                locationShortnames: locationShortnames);
 
             channelFactory = new Factory<TrainPathImportWebFacadeChannel>(
                 host: host,

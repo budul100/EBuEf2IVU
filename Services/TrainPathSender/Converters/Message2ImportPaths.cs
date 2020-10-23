@@ -20,6 +20,7 @@ namespace TrainPathSender.Converters
         private readonly Func<TrainPathMessage, DateTime> ankunftGetter;
         private readonly string importProfile;
         private readonly string infrastructureManager;
+        private readonly IEnumerable<string> locationShortnames;
         private readonly string orderingTransportationCompany;
         private readonly DateTime sessionDate;
         private readonly string stoppingReasonPass;
@@ -35,7 +36,8 @@ namespace TrainPathSender.Converters
 
         public Message2ImportPaths(DateTime sessionDate, string infrastructureManager,
             string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
-            string trainPathStateRun, string trainPathStateCancelled, string importProfile, bool preferPrognosis)
+            string trainPathStateRun, string trainPathStateCancelled, string importProfile, bool preferPrognosis,
+            IEnumerable<string> locationShortnames)
         {
             this.sessionDate = sessionDate;
             this.infrastructureManager = infrastructureManager;
@@ -46,6 +48,7 @@ namespace TrainPathSender.Converters
             this.trainPathStateRun = trainPathStateRun;
             this.trainPathStateCancelled = trainPathStateCancelled;
             this.importProfile = importProfile;
+            this.locationShortnames = locationShortnames;
 
             abfahrtGetter = GetAbfahrtGetter(preferPrognosis);
             ankunftGetter = GetAnkunftGetter(preferPrognosis);
@@ -109,8 +112,8 @@ namespace TrainPathSender.Converters
         private IEnumerable<NetworkPointKey> GetNetworkPointKeys(IEnumerable<TrainPathMessage> messages)
         {
             var networkPoints = messages
-                .Select(m => m.Betriebsstelle)
-                .Distinct().ToArray();
+                .Select(m => m.Betriebsstelle).Distinct()
+                .Where(b => !locationShortnames.AnyItem() || locationShortnames.Contains(b)).ToArray();
 
             foreach (var networkPoint in networkPoints)
             {
@@ -199,28 +202,31 @@ namespace TrainPathSender.Converters
 
         private IEnumerable<TrainPathStop> GetTrainPathStops(IEnumerable<TrainPathMessage> messages)
         {
-            foreach (var message in messages)
+            var relevants = messages
+                .Where(m => !locationShortnames.AnyItem() || locationShortnames.Contains(m.Betriebsstelle)).ToArray();
+
+            foreach (var relevant in relevants)
             {
                 var times = new Times
                 {
-                    operationalArrivalTime = ankunftGetter.Invoke(message),
-                    operationalArrivalTimeTextSpecified = message.AnkunftSoll.HasValue,
-                    operationalDepartureTime = abfahrtGetter.Invoke(message),
-                    operationalDepartureTimeTextSpecified = message.AbfahrtSoll.HasValue,
+                    operationalArrivalTime = ankunftGetter.Invoke(relevant),
+                    operationalArrivalTimeTextSpecified = relevant.AnkunftSoll.HasValue,
+                    operationalDepartureTime = abfahrtGetter.Invoke(relevant),
+                    operationalDepartureTimeTextSpecified = relevant.AbfahrtSoll.HasValue,
                 };
 
-                var stoppingReasons = GetStoppingReasons(message).ToArray();
+                var stoppingReasons = GetStoppingReasons(relevant).ToArray();
 
-                var isRunning = message.IsRunning();
+                var isRunning = relevant.IsRunning();
 
                 var result = new TrainPathStop
                 {
-                    arrivalTrack = message.GleisSoll?.ToString(),
-                    departureTrack = message.GleisSoll?.ToString(),
+                    arrivalTrack = relevant.GleisSoll?.ToString(),
+                    departureTrack = relevant.GleisSoll?.ToString(),
                     running = isRunning,
                     runningSpecified = true,
                     stoppingReasons = stoppingReasons,
-                    stopPoint = message.GetStopPoint(),
+                    stopPoint = relevant.GetStopPoint(),
                     times = times,
                 };
 

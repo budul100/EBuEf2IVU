@@ -64,6 +64,17 @@ namespace DatabaseConnector
             return result;
         }
 
+        public Task<IEnumerable<string>> GetLocationShortnamesAsync(IEnumerable<string> locationTypes)
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (queryCancellationToken) => QueryLocationShortnames(
+                    locationTypes: locationTypes,
+                    queryCancellationToken: queryCancellationToken),
+                cancellationToken: sessionCancellationToken);
+
+            return result;
+        }
+
         public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainId, bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
@@ -100,7 +111,7 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<int?> GetTrainTypeId(string zuggattung)
+        public Task<int?> GetTrainTypeIdAsync(string zuggattung)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (queryCancellationToken) => QueryTrainTypeId(
@@ -286,6 +297,21 @@ namespace DatabaseConnector
                 "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
                 exception.Message,
                 reconnection.TotalSeconds);
+        }
+
+        private async Task<IEnumerable<string>> QueryLocationShortnames(IEnumerable<string> locationTypes,
+            CancellationToken queryCancellationToken)
+        {
+            using var context = new BetriebsstelleContext(connectionString);
+
+            var betriebsstellen = await context.Betriebsstellen
+                .ToArrayAsync(queryCancellationToken);
+
+            var result = betriebsstellen?
+                .Where(b => !locationTypes.AnyItem() || locationTypes.Contains(b.Art))
+                .Select(b => b.Kurzname).ToArray();
+
+            return result;
         }
 
         private async Task<EBuEfSession> QuerySessionDateAsync(CancellationToken queryCancellationToken)

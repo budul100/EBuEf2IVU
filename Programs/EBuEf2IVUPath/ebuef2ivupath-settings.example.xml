@@ -38,9 +38,10 @@
     <Username>trainpath</Username>
     <Password>trainpath</Password>
     <RetryTime>30</RetryTime>
-    <IgnoreTrainTypes>RF;</IgnoreTrainTypes> <!-- Split multiple values with ; -->
+    <IgnoreTrainTypes>RF</IgnoreTrainTypes> <!-- Split multiple IgnoreTrainTypes with , -->
     <ImportProfile>Standard Train Path Import</ImportProfile>
     <InfrastructureManager>EBuEf</InfrastructureManager>
+    <LocationTypes>zfs,zms</LocationTypes> <!-- Split multiple LocationTypes with , -->
     <OrderingTransportationCompany>EBuEf</OrderingTransportationCompany>
     <PreferPrognosis>false</PreferPrognosis>
     <StoppingReasonPass>Pass</StoppingReasonPass>

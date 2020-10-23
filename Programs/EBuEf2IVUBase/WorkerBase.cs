@@ -72,7 +72,7 @@ namespace EBuEf2IVUBase
             return DateTime.Now.Add(ebuefTimeshift);
         }
 
-        protected async Task InitializeSessionAsync(CancellationToken sessionCancellationToken)
+        protected void InitializeDatabaseConnector(CancellationToken sessionCancellationToken)
         {
             var connectorSettings = config
                 .GetSection(nameof(EBuEfDBConnector))
@@ -82,6 +82,14 @@ namespace EBuEf2IVUBase
                 connectionString: connectorSettings.ConnectionString,
                 retryTime: connectorSettings.RetryTime,
                 sessionCancellationToken: sessionCancellationToken);
+        }
+
+        protected async Task InitializeSessionAsync()
+        {
+            if (databaseConnector == default)
+            {
+                throw new ApplicationException("The database connector must be initialized firstly.");
+            }
 
             var currentSession = await databaseConnector.GetEBuEfSessionAsync();
 

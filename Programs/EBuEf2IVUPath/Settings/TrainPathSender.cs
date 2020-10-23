@@ -4,7 +4,7 @@
     {
         #region Public Fields
 
-        public const string SettingsSeparator = ";";
+        public const string SettingsSeparator = ",";
 
         #endregion Public Fields
 
@@ -19,6 +19,8 @@
         public string InfrastructureManager { get; set; }
 
         public bool IsHttps { get; set; }
+
+        public string LocationTypes { get; set; }
 
         public string OrderingTransportationCompany { get; set; }
 

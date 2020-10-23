@@ -62,10 +62,12 @@ namespace EBuEf2IVUVehicle
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
+                InitializeDatabaseConnector(sessionCancellationToken);
+
                 InitializePositionReceiver();
                 InitializeRealtimeSender();
 
-                await InitializeSessionAsync(sessionCancellationToken);
+                await InitializeSessionAsync();
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {

@@ -65,7 +65,8 @@ namespace TrainPathSenderTests
                 trainPathStateCancelled: senderSettings.TrainPathStateCancelled,
                 importProfile: senderSettings.ImportProfile,
                 preferPrognosis: senderSettings.PreferPrognosis,
-                ignoreTrainTypes: ignoreTrainTypes);
+                ignoreTrainTypes: ignoreTrainTypes,
+                locationShortnames: default);
         }
 
         [Test]

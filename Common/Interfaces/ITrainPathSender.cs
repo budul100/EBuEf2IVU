@@ -18,7 +18,7 @@ namespace Common.Interfaces
             int retryTime, DateTime sessionDate, string infrastructureManager, string orderingTransportationCompany,
             string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
             string trainPathStateCancelled, string importProfile, bool preferPrognosis,
-            IEnumerable<string> ignoreTrainTypes);
+            IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames);
 
         Task RunAsnc(CancellationToken cancellationToken);
 
