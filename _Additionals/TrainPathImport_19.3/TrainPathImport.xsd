@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.ivu.de/mb/intf/trainpath/standard/remote" version="1.3" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ivu="http://www.ivu.de/mb/intf/trainpath/standard/remote" elementFormDefault="qualified" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0">
+    <!-- element types from wsdl -->
+    <xsd:element name="trainPathImportRequest" type="ivu:TrainPathImportRequest"/>
+    <xsd:complexType name="TrainPathImportRequest">
+        <xsd:all>
+            <xsd:element name="importProfile" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="trainPaths" type="ivu:TrainPaths" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="stopPoints" type="ivu:NetworkPointKeys" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="timetableVersions" type="ivu:TimetableVersions" minOccurs="1" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:element name="trainPathImportResponse" type="ivu:TrainPathImportResponse"/>
+    <xsd:complexType name="TrainPathImportResponse">
+        <xsd:sequence>
+            <xsd:element name="protocolTransactionId" type="xsd:int" maxOccurs="1" minOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="technicalFaultResponse" type="ivu:TechnicalFaultResponse"/>
+    <xsd:complexType name="TechnicalFaultResponse"/>
+
+    <!-- train path core elements -->
+    <xsd:complexType name="TrainPaths">
+        <xsd:sequence>
+            <xsd:element name="trainPath" type="ivu:TrainPath" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="TrainPath">
+        <xsd:all>
+            <xsd:element name="trainPathKey" type="ivu:TrainPathKey" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="infrastructureManagerTrainPathId" type="ivu:string255Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="importValidityFrame" type="ivu:Validity" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="trainPathVariants" type="ivu:TrainPathVariants" minOccurs="1" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="TrainPathKey">
+        <xsd:all>
+            <xsd:element name="infrastructureManager" type="ivu:string20Char" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="trainPathId" type="ivu:string64Char" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="timetableVersion" minOccurs="1" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:attribute name="ref" type="xsd:IDREF" use="required">
+                        <xsd:annotation>
+                            <xsd:appinfo>
+                                <jaxb:property>
+                                    <jaxb:baseType name="de.ivu.mb.intf.trainpath.standard.remote.TimetableVersion"/>
+                                </jaxb:property>
+                            </xsd:appinfo>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="TrainPathVariants">
+        <xsd:sequence>
+            <xsd:element name="trainPathVariant" type="ivu:TrainPathVariant" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="TrainPathVariant">
+        <xsd:all>
+            <xsd:element name="validity" type="ivu:Validity" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="trainDescription" type="ivu:string255Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="routeNumber" type="ivu:string255Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="state" type="ivu:State" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="createdUserId" type="ivu:string64Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="orderingTransportationCompany" type="ivu:string20Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="trainPathItinerary" type="ivu:TrainPathItinerary" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="stopsMissing" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="TrainPathItinerary">
+        <xsd:sequence>
+            <xsd:element name="trainPathStop" type="ivu:TrainPathStop" minOccurs="2" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="TrainPathStop">
+        <xsd:all>
+            <xsd:element name="itinerarySegmentAttributes" type="ivu:ItinerarySegmentAttributes" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="stoppingReasons" type="ivu:StoppingReasons" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="times" type="ivu:Times" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="arrivalTrack" type="ivu:string255Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="departureTrack" type="ivu:string255Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="linkToNextStopDescription" type="ivu:string60Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="stopPoint" minOccurs="1" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:attribute name="ref" type="xsd:IDREF" use="required">
+                        <xsd:annotation>
+                            <xsd:appinfo>
+                                <jaxb:property>
+                                    <jaxb:baseType name="de.ivu.mb.intf.trainpath.standard.remote.NetworkPointKey"/>
+                                </jaxb:property>
+                            </xsd:appinfo>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="running" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="ItinerarySegmentAttributes">
+        <xsd:all>
+            <xsd:element name="trainNumber" type="ivu:string20Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="replacementTrainNumber" type="ivu:string20Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="commercialTrainNames" type="ivu:CommercialTrainNames" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="trainProduct" type="ivu:string8Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="formationRestrictions" type="ivu:FormationRestrictions" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="costCenter" type="ivu:string20Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="attributes" type="ivu:Attributes" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <!-- Attributes -->
+    <xsd:complexType name="Attributes">
+        <xsd:sequence>
+            <xsd:element name="attribute" type="ivu:Attribute" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="Attribute">
+        <xsd:all>
+            <xsd:element name="attributeKey" type="ivu:AttributeKey" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="attributeValue">
+                <xsd:complexType>
+                    <xsd:choice>
+                        <xsd:element name="stringValue" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="numericValue" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="booleanValue" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="decimalValue" type="xsd:double" minOccurs="0" maxOccurs="1"/>
+                    </xsd:choice>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="AttributeKey">
+        <xsd:all>
+            <xsd:element name="name" type="ivu:string60Char" minOccurs="1" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="CommercialTrainNames">
+        <xsd:sequence>
+            <xsd:element name="commercialTrainName" type="ivu:string255Char" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="FormationRestrictions">
+        <xsd:sequence>
+            <xsd:element name="formationRestriction" type="ivu:FormationRestriction" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="FormationRestriction">
+        <xsd:all>
+            <xsd:element name="vehicleTypes" type="ivu:VehicleTypes" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="maximumLength" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="maximumWeight" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="minimumMaxSpeed" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="numberOfWaggons" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="isDefault" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="emergencyBrakeOverride" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="etcsLevel" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="lzb" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="brakingSystem" type="ivu:BrakingSystem" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="tiltingTrainConf" type="ivu:TiltingTrainConf" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="minBrakingPercent" type="xsd:integer" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="lineCategory" type="ivu:string8Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="attributes" type="ivu:Attributes" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+    
+    <xsd:complexType name="VehicleTypes">
+        <xsd:sequence>
+            <xsd:element name="vehicleType" type="ivu:VehicleType" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="VehicleType">
+        <xsd:all>
+            <xsd:element name="vehicleType" type="ivu:string255Char" minOccurs="1" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="StoppingReasons">
+        <xsd:sequence>
+            <xsd:element name="stoppingReason" type="ivu:string255Char" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="Times">
+        <xsd:all>
+            <xsd:element name="commercialArrivalTime" type="xsd:time" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="commercialArrivalDayOffset" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="commercialDepartureTime" type="xsd:time" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="commercialDepartureDayOffset" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="operationalArrivalTime" type="xsd:time" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="operationalArrivalDayOffset" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="operationalDepartureTime" type="xsd:time" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="operationalDepartureDayOffset" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="operationalWaitDuration" type="xsd:duration" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="operationalStopDuration" type="xsd:duration" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <!-- validity types -->
+    <xsd:complexType name="DateInterval">
+        <xsd:all>
+            <xsd:element name="begin" type="xsd:date" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="end" type="xsd:date" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="bitmask" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="Validity">
+        <xsd:sequence>
+            <xsd:element name="validitySegment" type="ivu:DateInterval" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- referenceable types -->
+    <xsd:complexType name="NetworkPointKeys">
+        <xsd:sequence>
+            <xsd:element name="stopPoint" type="ivu:NetworkPointKey" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="NetworkPointKey">
+        <xsd:all>
+            <xsd:element name="abbreviation" type="ivu:string8Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="externalNumber" type="ivu:int20" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="stopType" type="ivu:StopType" minOccurs="1" maxOccurs="1"/>
+        </xsd:all>
+        <xsd:attribute name="id" type="xsd:ID" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="TimetableVersions">
+        <xsd:sequence>
+            <xsd:element name="timetableVersion" type="ivu:TimetableVersion" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="TimetableVersion">
+        <xsd:all>
+            <xsd:element name="abbreviation" type="ivu:string8Char" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="validity" type="ivu:DateInterval" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+        <xsd:attribute name="id" type="xsd:ID" use="required" />
+    </xsd:complexType>
+
+    <!-- enumeration types -->
+    <xsd:simpleType name="State">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="CREATED"/>
+            <xsd:enumeration value="REQUESTED"/>
+            <xsd:enumeration value="PROPOSED"/>
+            <xsd:enumeration value="CONFIRMED"/>
+            <xsd:enumeration value="CANCELLED"/>
+            <xsd:enumeration value="REJECTED"/>
+            <xsd:enumeration value="ALTERED"/>
+            <xsd:enumeration value="CHANGED"/>
+            <xsd:enumeration value="MODIFIED"/>
+            <xsd:enumeration value="PROPOSEDMOD"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="StopType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="STOP_POST"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="BrakingSystem">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="G"/>
+            <xsd:enumeration value="P"/>
+            <xsd:enumeration value="P2"/>
+            <xsd:enumeration value="R"/>
+            <xsd:enumeration value="RMg"/>
+            <xsd:enumeration value="RWb"/>
+            <xsd:enumeration value="PMg"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="TiltingTrainConf">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="none"/>
+            <xsd:enumeration value="active"/>
+            <xsd:enumeration value="passive"/>
+            <xsd:enumeration value="lateral"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!-- basic data types -->
+
+    <xsd:simpleType name="int20">
+        <xsd:restriction base="xsd:integer">
+            <xsd:pattern value="\d{0,20}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="string6Char">
+        <xsd:restriction base="xsd:string">
+            <xsd:maxLength value="6"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="string8Char">
+        <xsd:restriction base="xsd:string">
+            <xsd:maxLength value="8"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="string20Char">
+        <xsd:restriction base="xsd:string">
+            <xsd:maxLength value="20"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="string60Char">
+        <xsd:restriction base="xsd:string">
+            <xsd:maxLength value="60"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="string64Char">
+        <xsd:restriction base="xsd:string">
+            <xsd:maxLength value="64"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="string255Char">
+        <xsd:restriction base="xsd:string">
+            <xsd:maxLength value="255"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

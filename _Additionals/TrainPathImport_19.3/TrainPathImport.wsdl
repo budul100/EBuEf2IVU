@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<wsdl:definitions name="TrainPathImportWebFacade" targetNamespace="http://www.ivu.de/mb/intf/trainpath/standard/remote" xmlns:ivu="http://www.ivu.de/mb/intf/trainpath/standard/remote" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+   <wsdl:types>
+      <xsd:schema targetNamespace="http://www.ivu.de/mb/intf/trainpath/standard/remote">
+         <xsd:include schemaLocation="TrainPathImport.xsd" />
+      </xsd:schema>
+   </wsdl:types>
+
+   <wsdl:message name="TrainPathImportRequest">
+      <wsdl:part name="trainPathImportRequest" element="ivu:trainPathImportRequest" />
+   </wsdl:message>
+   <wsdl:message name="TrainPathImportResponse">
+      <wsdl:part name="trainPathImportResponse" element="ivu:trainPathImportResponse" />
+   </wsdl:message>
+   <wsdl:message name="TechnicalFaultResponse">
+      <wsdl:part name="technicalFaultResponse" element="ivu:technicalFaultResponse" />
+   </wsdl:message>
+
+   <wsdl:portType name="TrainPathImportWebFacade">
+      <wsdl:operation name="importTrainPaths">
+         <wsdl:input message="ivu:TrainPathImportRequest" />
+         <wsdl:output message="ivu:TrainPathImportResponse" />
+         <wsdl:fault message="ivu:TechnicalFaultResponse" name="TechnicalFault"/>
+      </wsdl:operation>
+   </wsdl:portType>
+
+   <wsdl:binding name="TrainPathImportWebFacadeBinding" type="ivu:TrainPathImportWebFacade">
+      <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+      <wsdl:operation name="importTrainPaths">
+         <soap:operation soapAction="http://www.ivu.de/mb/intf/trainpath/standard/remote" />
+         <wsdl:input>
+            <soap:body use="literal" />
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal" />
+         </wsdl:output>
+         <wsdl:fault name="TechnicalFault">
+            <soap:fault name="TechnicalFault" use="literal" /> 
+         </wsdl:fault>
+      </wsdl:operation>
+   </wsdl:binding>
+
+   <wsdl:service name="TrainPathImportService">
+      <wsdl:port binding="ivu:TrainPathImportWebFacadeBinding" name="TrainPathImportWebFacadePort">
+         <soap:address location="http://localhost:80" />
+      </wsdl:port>
+   </wsdl:service>
+</wsdl:definitions>
