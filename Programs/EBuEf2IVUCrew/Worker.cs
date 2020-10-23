@@ -53,9 +53,7 @@ namespace EBuEf2IVUCrew
 
                 InitializeCrewChecker();
 
-                InitializeDatabaseConnector(sessionCancellationToken);
-
-                await StartIVUSessionAsync();
+                await InitializeSessionAsync(sessionCancellationToken);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {

@@ -72,7 +72,7 @@ namespace EBuEf2IVUBase
             return DateTime.Now.Add(ebuefTimeshift);
         }
 
-        protected void InitializeDatabaseConnector(CancellationToken sessionCancellationToken)
+        protected async Task InitializeSessionAsync(CancellationToken sessionCancellationToken)
         {
             var connectorSettings = config
                 .GetSection(nameof(EBuEfDBConnector))
@@ -82,6 +82,19 @@ namespace EBuEf2IVUBase
                 connectionString: connectorSettings.ConnectionString,
                 retryTime: connectorSettings.RetryTime,
                 sessionCancellationToken: sessionCancellationToken);
+
+            var currentSession = await databaseConnector.GetEBuEfSessionAsync();
+
+            ivuSessionDate = currentSession.IVUDatum;
+            ebuefSessionStart = ivuSessionDate
+                .Add(currentSession.SessionStart.TimeOfDay);
+
+            ebuefTimeshift = currentSession.Verschiebung;
+
+            logger.LogDebug(
+                "Die IVU-Sitzung läuft am {sessionDate} um {sessionTime}.",
+                ivuSessionDate.ToString("yyyy-MM-dd"),
+                ebuefSessionStart.ToString("hh:mm"));
         }
 
         protected void InitializeStateReceiver()
@@ -96,22 +109,6 @@ namespace EBuEf2IVUBase
                 retryTime: settings.RetryTime,
                 startPattern: settings.StartPattern,
                 statusPattern: settings.StatusPattern);
-        }
-
-        protected async Task StartIVUSessionAsync()
-        {
-            var currentSession = await databaseConnector.GetEBuEfSessionAsync();
-
-            ivuSessionDate = currentSession.IVUDatum;
-            ebuefSessionStart = ivuSessionDate
-                .Add(currentSession.SessionStart.TimeOfDay);
-
-            ebuefTimeshift = currentSession.Verschiebung;
-
-            logger.LogDebug(
-                "Die IVU-Sitzung läuft am {sessionDate} um {sessionTime}.",
-                ivuSessionDate.ToString("yyyy-MM-dd"),
-                ebuefSessionStart.ToString("hh:mm"));
         }
 
         #endregion Protected Methods

@@ -1,5 +1,6 @@
 #pragma warning disable CA1031 // Do not catch general exception types
 
+using Common.Enums;
 using Common.Interfaces;
 using Common.Models;
 using EBuEf2IVUBase;
@@ -31,7 +32,7 @@ namespace EBuEf2IVUPath
             IMessageReceiver trainPathReceiver, ITrainPathSender trainPathSender, ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger)
         {
-            this.sessionStateHandler.SessionStartedEvent += OnSessionStart;
+            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
 
             this.trainPathReceiver = trainPathReceiver;
             this.trainPathReceiver.MessageReceivedEvent += OnMessageReceived;
@@ -58,9 +59,7 @@ namespace EBuEf2IVUPath
                 InitializePathReceiver();
                 InitializePathSender();
 
-                InitializeDatabaseConnector(sessionCancellationToken);
-
-                await StartIVUSessionAsync();
+                await InitializeSessionAsync(sessionCancellationToken);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
@@ -160,25 +159,28 @@ namespace EBuEf2IVUPath
             }
         }
 
-        private async void OnSessionStart(object sender, EventArgs e)
+        private async void OnSessionChangedAsync(object sender, Common.EventsArgs.StateChangedArgs e)
         {
-            logger.LogDebug(
-                "Nachricht zum initialen Import der Zugtrassen empfangen.");
-
-            var senderSettings = config
-                .GetSection(nameof(Settings.TrainPathSender))
-                .Get<Settings.TrainPathSender>();
-
-            var trainRuns = await databaseConnector.GetTrainRunsAsync(senderSettings.PreferPrognosis);
-
-            if (trainRuns.AnyItem())
-            {
-                trainPathSender.Add(trainRuns);
-            }
-            else
+            if (e.State == SessionStates.InPreparation)
             {
                 logger.LogDebug(
-                    "In der Datenbank wurden keine Zugtrassen gefunden.");
+                    "Nachricht zum initialen Import der Zugtrassen empfangen.");
+
+                var senderSettings = config
+                    .GetSection(nameof(Settings.TrainPathSender))
+                    .Get<Settings.TrainPathSender>();
+
+                var trainRuns = await databaseConnector.GetTrainRunsAsync(senderSettings.PreferPrognosis);
+
+                if (trainRuns.AnyItem())
+                {
+                    trainPathSender.Add(trainRuns);
+                }
+                else
+                {
+                    logger.LogDebug(
+                        "In der Datenbank wurden keine Zugtrassen gefunden.");
+                }
             }
         }
 

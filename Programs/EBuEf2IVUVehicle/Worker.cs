@@ -65,9 +65,7 @@ namespace EBuEf2IVUVehicle
                 InitializePositionReceiver();
                 InitializeRealtimeSender();
 
-                InitializeDatabaseConnector(sessionCancellationToken);
-
-                await StartIVUSessionAsync();
+                await InitializeSessionAsync(sessionCancellationToken);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
