@@ -22,6 +22,8 @@ namespace TrainPathSenderTests
 
         #region Public Methods
 
+        // Database must be activated for tests!
+
         [SetUp]
         public void Init()
         {
