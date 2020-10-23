@@ -150,7 +150,7 @@ namespace TrainPathSender
             {
                 if (!importsQueue.IsEmpty)
                 {
-                    var currentImport = importsQueue.GetFirst().FirstOrDefault();
+                    importsQueue.TryDequeue(out importTrainPaths currentImport);
 
                     if (currentImport != default)
                     {
@@ -163,8 +163,6 @@ namespace TrainPathSender
                                 "Trassen wurden mit folgender ID an IVU.rail gesendet: {id}",
                                 response.trainPathImportResponse.protocolTransactionId);
                         }
-
-                        importsQueue.TryDequeue(out importTrainPaths _);
                     }
                 }
             }
