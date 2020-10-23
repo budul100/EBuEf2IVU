@@ -28,7 +28,7 @@ namespace TrainPathSender
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
         private IEnumerable<string> ignoreTrainTypes;
-        private Message2ImportPaths messageConverter;
+        private Message2TrainRun messageConverter;
         private AsyncRetryPolicy retryPolicy;
         private TrainRun2ImportPaths trainRunConverter;
 
@@ -47,15 +47,12 @@ namespace TrainPathSender
 
         public void Add(IEnumerable<TrainPathMessage> messages)
         {
-            var filtereds = messages
-                .Where(m => !ignoreTrainTypes.AnyItem() || !ignoreTrainTypes.Contains(m.Zuggattung)).ToArray();
-
-            if (filtereds.AnyItem())
+            if (messages.AnyItem())
             {
-                var imports = messageConverter.Get(filtereds);
+                var trainRuns = messageConverter
+                    .Get(messages).ToArray();
 
-                if (imports != default)
-                    importsQueue.Enqueue(imports);
+                Add(trainRuns);
             }
         }
 
@@ -81,17 +78,7 @@ namespace TrainPathSender
         {
             this.ignoreTrainTypes = ignoreTrainTypes;
 
-            messageConverter = new Message2ImportPaths(
-                sessionDate: sessionDate,
-                infrastructureManager: infrastructureManager,
-                orderingTransportationCompany: orderingTransportationCompany,
-                stoppingReasonStop: stoppingReasonStop,
-                stoppingReasonPass: stoppingReasonPass,
-                trainPathStateRun: trainPathStateRun,
-                trainPathStateCancelled: trainPathStateCancelled,
-                importProfile: importProfile,
-                preferPrognosis: preferPrognosis,
-                locationShortnames: locationShortnames);
+            messageConverter = new Message2TrainRun(preferPrognosis);
 
             trainRunConverter = new TrainRun2ImportPaths(
                 sessionDate: sessionDate,

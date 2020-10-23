@@ -115,7 +115,7 @@ namespace Common.Models
         public int ZugId { get; set; }
 
         [JsonProperty("zugnummer")]
-        public string Zugnummer { get; set; }
+        public int Zugnummer { get; set; }
 
         #endregion Public Properties
 
