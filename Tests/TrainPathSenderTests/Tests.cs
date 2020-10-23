@@ -86,6 +86,7 @@ namespace TrainPathSenderTests
             sender.Add(trainRuns);
 
             Task.WhenAll(sender.RunAsnc(new CancellationToken()));
+            Task.WhenAll(sender.RunAsnc(new CancellationToken()));
         }
 
         #endregion Public Methods
