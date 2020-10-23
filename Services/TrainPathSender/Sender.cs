@@ -99,7 +99,7 @@ namespace TrainPathSender
                 isHttps: isHttps,
                 notIgnoreCertificateErrors: true);
 
-            logger.LogInformation(
+            logger.LogDebug(
                 "Zugtrassen werden gesendet an {host}:{port}/{path}.",
                 host,
                 port,
