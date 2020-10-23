@@ -207,22 +207,36 @@ namespace TrainPathSender.Converters
 
             foreach (var relevant in relevants)
             {
+                var arrivalSpecified = relevant.AnkunftSoll.HasValue
+                    && relevant != relevants.First();
+
+                var departureSpecified = relevant.AbfahrtSoll.HasValue
+                    && relevant != relevants.Last();
+
                 var times = new Times
                 {
                     operationalArrivalTime = ankunftGetter.Invoke(relevant),
-                    operationalArrivalTimeTextSpecified = relevant.AnkunftSoll.HasValue,
+                    operationalArrivalTimeTextSpecified = arrivalSpecified,
                     operationalDepartureTime = abfahrtGetter.Invoke(relevant),
-                    operationalDepartureTimeTextSpecified = relevant.AbfahrtSoll.HasValue,
+                    operationalDepartureTimeTextSpecified = departureSpecified,
                 };
 
                 var stoppingReasons = GetStoppingReasons(relevant).ToArray();
 
                 var isRunning = relevant.IsRunning();
 
+                var arrivalTrack = arrivalSpecified
+                    ? relevant.GleisSoll?.ToString()
+                    : default;
+
+                var departureTrack = departureSpecified
+                    ? relevant.GleisSoll?.ToString()
+                    : default;
+
                 var result = new TrainPathStop
                 {
-                    arrivalTrack = relevant.GleisSoll?.ToString(),
-                    departureTrack = relevant.GleisSoll?.ToString(),
+                    arrivalTrack = arrivalTrack,
+                    departureTrack = departureTrack,
                     running = isRunning,
                     runningSpecified = true,
                     stoppingReasons = stoppingReasons,

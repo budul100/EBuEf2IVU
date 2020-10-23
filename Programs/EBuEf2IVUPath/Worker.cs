@@ -93,6 +93,13 @@ namespace EBuEf2IVUPath
 
             var result = await databaseConnector.GetLocationShortnamesAsync(locationTypes);
 
+            if (result.AnyItem())
+            {
+                logger.LogDebug(
+                    "Es werden nur die folgenden Netzpunkte als Trassenpunkte importiert: {locations}",
+                    result.Merge());
+            }
+
             return result;
         }
 

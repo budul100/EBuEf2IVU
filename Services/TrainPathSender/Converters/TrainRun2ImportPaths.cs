@@ -181,20 +181,34 @@ namespace TrainPathSender.Converters
 
             foreach (var relevant in relevants)
             {
+                var arrivalSpecified = relevant.Ankunft.HasValue
+                    && relevant != relevants.First();
+
+                var departureSpecified = relevant.Abfahrt.HasValue
+                    && relevant != relevants.Last();
+
                 var times = new Times
                 {
                     operationalArrivalTime = relevant.Ankunft ?? default,
-                    operationalArrivalTimeTextSpecified = relevant.Ankunft.HasValue,
+                    operationalArrivalTimeTextSpecified = arrivalSpecified,
                     operationalDepartureTime = relevant.Abfahrt ?? default,
-                    operationalDepartureTimeTextSpecified = relevant.Abfahrt.HasValue,
+                    operationalDepartureTimeTextSpecified = departureSpecified,
                 };
 
                 var stoppingReasons = GetStoppingReasons(relevant).ToArray();
 
+                var arrivalTrack = arrivalSpecified
+                    ? relevant.Gleis?.ToString()
+                    : default;
+
+                var departureTrack = departureSpecified
+                    ? relevant.Gleis?.ToString()
+                    : default;
+
                 var result = new TrainPathStop
                 {
-                    arrivalTrack = relevant.Gleis,
-                    departureTrack = relevant.Gleis,
+                    arrivalTrack = arrivalTrack,
+                    departureTrack = departureTrack,
                     running = true,
                     stoppingReasons = stoppingReasons,
                     stopPoint = relevant.GetStopPoint(),
