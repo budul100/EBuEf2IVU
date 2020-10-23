@@ -204,9 +204,9 @@ namespace TrainPathSender.Converters
                 var times = new Times
                 {
                     operationalArrivalTime = ankunftGetter.Invoke(message),
-                    operationalArrivalTimeSpecified = message.AnkunftSoll.HasValue,
+                    operationalArrivalTimeTextSpecified = message.AnkunftSoll.HasValue,
                     operationalDepartureTime = abfahrtGetter.Invoke(message),
-                    operationalDepartureTimeSpecified = message.AbfahrtSoll.HasValue,
+                    operationalDepartureTimeTextSpecified = message.AbfahrtSoll.HasValue,
                 };
 
                 var stoppingReasons = GetStoppingReasons(message).ToArray();

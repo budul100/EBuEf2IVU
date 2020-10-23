@@ -180,9 +180,9 @@ namespace TrainPathSender.Converters
                 var times = new Times
                 {
                     operationalArrivalTime = trainPosition.Ankunft ?? default,
-                    operationalArrivalTimeSpecified = trainPosition.Ankunft.HasValue,
+                    operationalArrivalTimeTextSpecified = trainPosition.Ankunft.HasValue,
                     operationalDepartureTime = trainPosition.Abfahrt ?? default,
-                    operationalDepartureTimeSpecified = trainPosition.Abfahrt.HasValue,
+                    operationalDepartureTimeTextSpecified = trainPosition.Abfahrt.HasValue,
                 };
 
                 var stoppingReasons = GetStoppingReasons(trainPosition).ToArray();

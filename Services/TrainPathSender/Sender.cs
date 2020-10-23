@@ -110,6 +110,12 @@ namespace TrainPathSender
                 isHttps: isHttps,
                 notIgnoreCertificateErrors: true);
 
+            logger.LogInformation(
+                "Die Zugtrassen werden gesendet an {host}:{port}/{path}.",
+                host,
+                port,
+                path);
+
             retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
@@ -153,13 +159,17 @@ namespace TrainPathSender
 
                     if (currentImport != default)
                     {
+                        logger.LogDebug(
+                            "Es werden {Trassenzahl} Trassen an IVU.rail gesendet.",
+                            currentImport.trainPathImportRequest.trainPaths.Count());
+
                         using var channel = channelFactory.Get();
                         var response = await channel.importTrainPathsAsync(currentImport);
 
                         if (response.trainPathImportResponse != default)
                         {
                             logger.LogDebug(
-                                "Trassen wurden mit folgender ID an IVU.rail gesendet: {id}",
+                                "Trassen wurden mit folgender ID an IVU.rail gesendet: {id}.",
                                 response.trainPathImportResponse.protocolTransactionId);
                         }
                     }
