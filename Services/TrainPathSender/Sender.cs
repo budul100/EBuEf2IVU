@@ -111,7 +111,7 @@ namespace TrainPathSender
                 notIgnoreCertificateErrors: true);
 
             logger.LogInformation(
-                "Die Zugtrassen werden gesendet an {host}:{port}/{path}.",
+                "Zugtrassen werden gesendet an {host}:{port}/{path}.",
                 host,
                 port,
                 path);

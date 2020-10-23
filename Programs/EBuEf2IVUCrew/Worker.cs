@@ -47,7 +47,7 @@ namespace EBuEf2IVUCrew
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 logger.LogInformation(
-                    "Die Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Connector von EBuEf2IVUCrew werden gestartet.");
+                    "Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Connector von EBuEf2IVUCrew werden gestartet.");
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 

@@ -58,7 +58,7 @@ namespace EBuEf2IVUVehicle
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 logger.LogInformation(
-                    "Die Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Sender von EBuEf2IVUVehicle werden gestartet.");
+                    "Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Sender von EBuEf2IVUVehicle werden gestartet.");
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 

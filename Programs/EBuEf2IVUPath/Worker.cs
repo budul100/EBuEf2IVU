@@ -51,7 +51,7 @@ namespace EBuEf2IVUPath
             while (!workerCancellationToken.IsCancellationRequested)
             {
                 logger.LogInformation(
-                    "Die Nachrichtenempfänger und IVU-Sender von EBuEf2IVUPath werden gestartet.");
+                    "Nachrichtenempfänger und IVU-Sender von EBuEf2IVUPath werden gestartet.");
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
