@@ -13,6 +13,7 @@ namespace TrainPathSender.Converters
         #region Private Fields
 
         private const string SingleDayBitmask = "1";
+        private const string StopType = "STOP_POST";
         private const string TimetableVersionId = "Timetable";
 
         private readonly Func<TrainPathMessage, DateTime> abfahrtGetter;
@@ -117,6 +118,7 @@ namespace TrainPathSender.Converters
                 {
                     abbreviation = networkPoint,
                     id = networkPoint,
+                    stopType = StopType,
                 };
 
                 yield return result;
