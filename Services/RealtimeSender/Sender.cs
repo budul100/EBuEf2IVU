@@ -1,6 +1,5 @@
 ﻿#pragma warning disable CA1031 // Do not catch general exception types
 
-using Common.Extensions;
 using Common.Interfaces;
 using Common.Models;
 using Microsoft.Extensions.Logging;
@@ -114,41 +113,44 @@ namespace RealtimeSender
             {
                 if (!infosQueue.IsEmpty)
                 {
-                    var currentMessage = infosQueue.GetFirst().ToArray();
-
                     using var client = new RealTimeInformationImportFacadeClient();
                     client.Endpoint.Address = endpointAddress;
 
-                    var response = await client.importRealTimeInfoAsync(currentMessage);
-                    var result = response.importRealTimeInfoResponse1?.ToArray();
+                    infosQueue.TryDequeue(out RealTimeInfoTO currentMessage); ;
 
-                    if (result?.Any() ?? false)
+                    if (currentMessage != default)
                     {
-                        var relevantValiditation = result.First();
-                        var relevantMessage = currentMessage.First();
+                        var importInfo = new RealTimeInfoTO[1] { currentMessage };
 
-                        if (relevantValiditation.code == 0)
+                        var response = await client.importRealTimeInfoAsync(importInfo);
+                        var result = response.importRealTimeInfoResponse1?.ToArray();
+
+                        if (result?.Any() ?? false)
                         {
-                            logger.LogDebug(
-                                "Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet " +
-                                "(Zug: {trainNumber}, Betriebsstelle: {location}, Decoder: {decoder}).",
-                                relevantMessage.tripNumber,
-                                relevantMessage.stopArea,
-                                relevantMessage.vehicles.FirstOrDefault()?.number);
-                        }
-                        else
-                        {
-                            logger.LogError(
-                                "Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen " +
-                                "(Zug: {trainNumber}, Betriebsstelle: {location}, Decoder: {decoder}): {message}.",
-                                relevantValiditation.message,
-                                relevantMessage.tripNumber,
-                                relevantMessage.stopArea,
-                                relevantMessage.vehicles.FirstOrDefault()?.number);
+                            var relevantValiditation = result.First();
+                            var relevantMessage = currentMessage;
+
+                            if (relevantValiditation.code == 0)
+                            {
+                                logger.LogDebug(
+                                    "Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet " +
+                                    "(Zug: {trainNumber}, Betriebsstelle: {location}, Decoder: {decoder}).",
+                                    relevantMessage.tripNumber,
+                                    relevantMessage.stopArea,
+                                    relevantMessage.vehicles.FirstOrDefault()?.number);
+                            }
+                            else
+                            {
+                                logger.LogError(
+                                    "Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen " +
+                                    "(Zug: {trainNumber}, Betriebsstelle: {location}, Decoder: {decoder}): {message}.",
+                                    relevantValiditation.message,
+                                    relevantMessage.tripNumber,
+                                    relevantMessage.stopArea,
+                                    relevantMessage.vehicles.FirstOrDefault()?.number);
+                            }
                         }
                     }
-
-                    infosQueue.TryDequeue(out RealTimeInfoTO info);
                 }
             }
         }

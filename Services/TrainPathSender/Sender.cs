@@ -1,6 +1,5 @@
 ﻿#pragma warning disable CA1031 // Do not catch general exception types
 
-using Common.Extensions;
 using Common.Interfaces;
 using Common.Models;
 using CredentialChannelFactory;
