@@ -90,13 +90,15 @@ namespace TrainPathSender.Converters
         {
             var positions = GetPositions(messages).ToArray();
 
+            var relevantMessage = messages.First();
+
             var result = new TrainRun
             {
                 Abfahrt = positions.First().Abfahrt?.TimeOfDay,
                 Positions = positions,
-                Zuggattung = messages.First().Zuggattung,
-                ZugId = messages.First().ZugId,
-                Zugnummer = messages.First().Zugnummer,
+                Zuggattung = relevantMessage.Zuggattung,
+                ZugId = relevantMessage.ZugId,
+                Zugnummer = relevantMessage.Zugnummer,
             };
 
             return result;

@@ -179,6 +179,8 @@ namespace TrainPathSender.Converters
             var relevants = trainRun.Positions
                 .Where(p => !locationShortnames.AnyItem() || locationShortnames.Contains(p.Betriebsstelle)).ToArray();
 
+            var itinerarySegmentAttributes = trainRun.GetItinerarySegmentAttributes();
+
             foreach (var relevant in relevants)
             {
                 var arrivalSpecified = relevant.Ankunft.HasValue
@@ -213,6 +215,7 @@ namespace TrainPathSender.Converters
                     stoppingReasons = stoppingReasons,
                     stopPoint = relevant.GetStopPoint(),
                     times = times,
+                    itinerarySegmentAttributes = itinerarySegmentAttributes,
                 };
 
                 yield return result;
