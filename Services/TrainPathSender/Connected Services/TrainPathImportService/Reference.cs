@@ -263,8 +263,6 @@ namespace TrainPathImportService
         
         private string operationalStopDurationField;
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "time")]
         [System.Xml.Serialization.XmlElementAttribute("commercialArrivalTime")]
         public string commercialArrivalTimeText
         {
@@ -332,8 +330,6 @@ namespace TrainPathImportService
             }
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "time")]
         [System.Xml.Serialization.XmlElementAttribute("commercialDepartureTime")]
         public string commercialDepartureTimeText
         {
@@ -401,8 +397,6 @@ namespace TrainPathImportService
             }
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "time")]
         [System.Xml.Serialization.XmlElementAttribute("operationalArrivalTime")]
         public string operationalArrivalTimeText
         {
@@ -469,8 +463,6 @@ namespace TrainPathImportService
             }
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType = "time")]
         [System.Xml.Serialization.XmlElementAttribute("operationalDepartureTime")]
         public string operationalDepartureTimeText
         {
