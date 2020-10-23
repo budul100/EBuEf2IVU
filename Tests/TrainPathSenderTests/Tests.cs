@@ -24,7 +24,7 @@ namespace TrainPathSenderTests
         [SetUp]
         public void Init()
         {
-            var path = Path.GetFullPath(@"..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.xml");
+            var path = Path.GetFullPath(@"..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
 
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddXmlFile(
