@@ -26,8 +26,8 @@
     <StatusPattern>SESSION NEW STATUS $</StatusPattern>
   </StatusReceiver>
   <TrainPathReceiver>
-    <Host>224.0.0.7</Host>
-    <Port>4453</Port>
+    <Host>224.0.0.9</Host>
+    <Port>4455</Port>
     <RetryTime>30</RetryTime>
   </TrainPathReceiver>
   <TrainPathSender>
