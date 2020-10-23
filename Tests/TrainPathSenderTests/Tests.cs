@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using TrainPathSender;
 
 namespace TrainPathSenderTests
@@ -83,6 +84,8 @@ namespace TrainPathSenderTests
 
             var trainRuns = databaseConnector.GetTrainRunsAsync(false).Result;
             sender.Add(trainRuns);
+
+            Task.WhenAll(sender.RunAsnc(new CancellationToken()));
         }
 
         #endregion Public Methods
