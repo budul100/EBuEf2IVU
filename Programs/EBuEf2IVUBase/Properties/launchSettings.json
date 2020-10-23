@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "EBuEf2IVUCrew": {
+      "commandName": "Executable",
+      "executablePath": "D:\\Users\\mgr\\Entwicklung\\EBuEf2IVU\\Programs\\EBuEf2IVUCrew\\bin\\Debug\\netcoreapp3.1\\EBuEf2IVUCrew.exe"
+    },
+    "EBuEf2IVUPath": {
+      "commandName": "Executable",
+      "executablePath": "D:\\Users\\mgr\\Entwicklung\\EBuEf2IVU\\Programs\\EBuEf2IVUPath\\bin\\Debug\\netcoreapp3.1\\EBuEf2IVUPath.exe"
+    },
+    "EBuEf2IVUVehicle": {
+      "commandName": "Executable",
+      "executablePath": "D:\\Users\\mgr\\Entwicklung\\EBuEf2IVU\\Programs\\EBuEf2IVUVehicle\\bin\\Debug\\netcoreapp3.1\\EBuEf2IVUVehicle.exe"
+    }
+  }
+}
