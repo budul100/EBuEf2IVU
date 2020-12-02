@@ -74,7 +74,6 @@ namespace EBuEf2IVUVehicle
 
         private TrainLeg GetTrainLeg(RealTimeMessage message, InfrastructureMapping mapping)
         {
-            TrainLeg result;
             var ebuefVonZeit = TimeSpan.FromSeconds(mapping.EBuEfVonVerschiebungSekunden.ToInt());
             var ebuefNachZeit = TimeSpan.FromSeconds(mapping.EBuEfNachVerschiebungSekunden.ToInt());
 
@@ -83,7 +82,7 @@ namespace EBuEf2IVUVehicle
 
             var fahrzeuge = message?.Decoder.AsEnumerable();
 
-            result = new TrainLeg
+            var result = new TrainLeg
             {
                 EBuEfBetriebsstelleNach = mapping.EBuEfNachBetriebsstelle,
                 EBuEfBetriebsstelleVon = mapping.EBuEfVonBetriebsstelle,
@@ -98,6 +97,7 @@ namespace EBuEf2IVUVehicle
                 IVUZeitpunkt = ivuZeitpunkt,
                 Zugnummer = message.Zugnummer,
             };
+
             return result;
         }
 
