@@ -69,7 +69,7 @@ namespace EBuEf2IVUBase
 
         protected DateTime GetSimTime()
         {
-            return DateTime.Now.Add(ebuefTimeshift);
+            return DateTime.Now.Add(-ebuefTimeshift);
         }
 
         protected void InitializeDatabaseConnector(CancellationToken sessionCancellationToken)
