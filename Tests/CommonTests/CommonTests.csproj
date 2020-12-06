@@ -14,12 +14,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="TrainPathMessages.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\..\Programs\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
+    <ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,15 +1,19 @@
+using Common.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TrainPathSender;
 
 namespace TrainPathSenderTests
 {
+    // Database must be activated for tests!
     public class Tests
     {
         #region Private Fields
@@ -22,10 +26,8 @@ namespace TrainPathSenderTests
 
         #region Public Methods
 
-        // Database must be activated for tests!
-
         [SetUp]
-        public void Init()
+        public void _Init()
         {
             var path = Path.GetFullPath(@"..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
 
@@ -69,6 +71,15 @@ namespace TrainPathSenderTests
                 preferPrognosis: senderSettings.PreferPrognosis,
                 ignoreTrainTypes: ignoreTrainTypes,
                 locationShortnames: default);
+        }
+
+        [Test]
+        public void ConvertTrainPathMessages()
+        {
+            var content = File.ReadAllText("TrainPathMessages.json");
+            var messages = JsonConvert.DeserializeObject<TrainPathMessage[]>(content);
+
+            Assert.True(messages.Any());
         }
 
         [Test]

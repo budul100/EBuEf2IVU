@@ -17,4 +17,10 @@
     <ProjectReference Include="..\..\Services\TrainPathSender\TrainPathSender.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TrainPathMessages.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
