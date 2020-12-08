@@ -136,6 +136,7 @@ namespace EBuEf2IVUPath
                 password: senderSettings.Password,
                 isHttps: senderSettings.IsHttps,
                 retryTime: senderSettings.RetryTime,
+                sessionKey: ebuefSession.SessionKey,
                 sessionDate: ivuSessionDate,
                 infrastructureManager: senderSettings.InfrastructureManager,
                 orderingTransportationCompany: senderSettings.OrderingTransportationCompany,

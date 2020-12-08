@@ -71,9 +71,9 @@ namespace TrainPathSender
         }
 
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
-            int retryTime, DateTime sessionDate, string infrastructureManager, string orderingTransportationCompany,
-            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
-            string trainPathStateCancelled, string importProfile, bool preferPrognosis,
+            int retryTime, string sessionKey, DateTime sessionDate, string infrastructureManager,
+            string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
+            string trainPathStateRun, string trainPathStateCancelled, string importProfile, bool preferPrognosis,
             IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames)
         {
             this.ignoreTrainTypes = ignoreTrainTypes;
@@ -82,6 +82,7 @@ namespace TrainPathSender
 
             trainRunConverter = new TrainRun2ImportPaths(
                 sessionDate: sessionDate,
+                sessionKey: sessionKey,
                 infrastructureManager: infrastructureManager,
                 orderingTransportationCompany: orderingTransportationCompany,
                 stoppingReasonStop: stoppingReasonStop,

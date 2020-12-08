@@ -15,9 +15,9 @@ namespace Common.Interfaces
         void Add(IEnumerable<TrainRun> trainRuns);
 
         void Initialize(string host, int port, string path, string username, string password, bool isHttps,
-            int retryTime, DateTime sessionDate, string infrastructureManager, string orderingTransportationCompany,
-            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
-            string trainPathStateCancelled, string importProfile, bool preferPrognosis,
+            int retryTime, string sessionKey, DateTime sessionDate, string infrastructureManager,
+            string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
+            string trainPathStateRun, string trainPathStateCancelled, string importProfile, bool preferPrognosis,
             IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames);
 
         Task RunAsnc(CancellationToken cancellationToken);

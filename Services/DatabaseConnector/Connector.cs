@@ -343,7 +343,8 @@ namespace DatabaseConnector
                     result = new EBuEfSession
                     {
                         IVUDatum = sitzung.IvuDate ?? DateTime.Today,
-                        SessionStart = sitzung.SimulationStartzeit.ToDateTime(),
+                        SessionKey = sitzung.SessionKey,
+                        SessionStart = sitzung.SimulationStartzeit.ToDateTime().ToLocalTime(),
                         Verschiebung = timeshift,
                     };
 
@@ -428,9 +429,9 @@ namespace DatabaseConnector
 
                 var halte = await context.Halte
                     .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
-                    .Where(h => h.HasAbfahrt())
-                    .Where(h => h.GetAbfahrt() >= minTime)
-                    .Where(h => h.GetAbfahrt() <= maxTime)
+                    .Where(h => h.AbfahrtIst.HasValue || h.AbfahrtSoll.HasValue || h.AbfahrtPlan.HasValue)
+                    .Where(h => (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) >= minTime)
+                    .Where(h => (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) <= maxTime)
                     .ToArrayAsync(queryCancellationToken);
 
                 result = GetTrainRuns(

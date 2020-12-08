@@ -21,6 +21,7 @@ namespace TrainPathSender.Converters
         private readonly IEnumerable<string> locationShortnames;
         private readonly string orderingTransportationCompany;
         private readonly DateTime sessionDate;
+        private readonly string sessionKey;
         private readonly string stoppingReasonPass;
         private readonly string stoppingReasonStop;
         private readonly TimetableVersion timetableVersion;
@@ -31,11 +32,12 @@ namespace TrainPathSender.Converters
 
         #region Public Constructors
 
-        public TrainRun2ImportPaths(DateTime sessionDate, string infrastructureManager,
+        public TrainRun2ImportPaths(DateTime sessionDate, string sessionKey, string infrastructureManager,
             string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
             string trainPathStateRun, string importProfile, IEnumerable<string> locationShortnames)
         {
             this.sessionDate = sessionDate;
+            this.sessionKey = sessionKey;
             this.infrastructureManager = infrastructureManager;
             this.orderingTransportationCompany = orderingTransportationCompany;
             this.stoppingReasonStop = stoppingReasonStop;
@@ -141,12 +143,13 @@ namespace TrainPathSender.Converters
         private TrainPathKey GetTrainPathKey(IEnumerable<TrainRun> trainRuns)
         {
             var relevant = trainRuns.First();
+            var trainPathId = $"{relevant.ZugId}_{sessionKey}";
 
             var result = new TrainPathKey
             {
                 infrastructureManager = infrastructureManager,
                 timetableVersion = timetableVersionKey,
-                trainPathId = relevant.ZugId.ToString(),
+                trainPathId = trainPathId,
             };
 
             return result;

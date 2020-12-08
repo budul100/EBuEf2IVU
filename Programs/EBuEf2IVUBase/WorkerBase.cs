@@ -1,6 +1,7 @@
 using Common.Enums;
 using Common.EventsArgs;
 using Common.Interfaces;
+using Common.Models;
 using EBuEf2IVUBase.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -23,6 +24,7 @@ namespace EBuEf2IVUBase
         protected readonly IStateHandler sessionStateHandler;
 
         protected SessionStates currentState;
+        protected EBuEfSession ebuefSession;
         protected DateTime ebuefSessionStart = DateTime.Now;
         protected DateTime ivuSessionDate = DateTime.Now;
 
@@ -30,7 +32,6 @@ namespace EBuEf2IVUBase
 
         #region Private Fields
 
-        private TimeSpan ebuefTimeshift;
         private CancellationTokenSource sessionCancellationTokenSource;
 
         #endregion Private Fields
@@ -69,7 +70,7 @@ namespace EBuEf2IVUBase
 
         protected DateTime GetSimTime()
         {
-            return DateTime.Now.Add(-ebuefTimeshift);
+            return DateTime.Now.Add(-ebuefSession.Verschiebung);
         }
 
         protected void InitializeDatabaseConnector(CancellationToken sessionCancellationToken)
@@ -91,13 +92,11 @@ namespace EBuEf2IVUBase
                 throw new ApplicationException("The database connector must be initialized firstly.");
             }
 
-            var currentSession = await databaseConnector.GetEBuEfSessionAsync();
+            ebuefSession = await databaseConnector.GetEBuEfSessionAsync();
 
-            ivuSessionDate = currentSession.IVUDatum;
+            ivuSessionDate = ebuefSession.IVUDatum;
             ebuefSessionStart = ivuSessionDate
-                .Add(currentSession.SessionStart.TimeOfDay);
-
-            ebuefTimeshift = currentSession.Verschiebung;
+                .Add(ebuefSession.SessionStart.TimeOfDay);
 
             logger.LogDebug(
                 "Die IVU-Sitzung läuft am {sessionDate} um {sessionTime}.",
