@@ -59,11 +59,10 @@ namespace EBuEf2IVUPath
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
                 InitializeDatabaseConnector(sessionCancellationToken);
+                await InitializeSessionAsync();
 
                 InitializePathReceiver();
                 await InitializePathSenderAsync();
-
-                await InitializeSessionAsync();
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {

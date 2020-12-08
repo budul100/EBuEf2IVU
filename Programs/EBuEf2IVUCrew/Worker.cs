@@ -53,10 +53,9 @@ namespace EBuEf2IVUCrew
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
                 InitializeDatabaseConnector(sessionCancellationToken);
+                await InitializeSessionAsync();
 
                 InitializeCrewChecker();
-
-                await InitializeSessionAsync();
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
