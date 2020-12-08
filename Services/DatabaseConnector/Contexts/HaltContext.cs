@@ -16,7 +16,7 @@ namespace DatabaseConnector.Contexts
 
         #region Public Properties
 
-        public DbSet<Halt> Halte { get; set; }
+        public DbSet<DispoHalt> Halte { get; set; }
 
         #endregion Public Properties
     }

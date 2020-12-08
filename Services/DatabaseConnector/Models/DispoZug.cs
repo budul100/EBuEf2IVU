@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DatabaseConnector.Models
 {
     [Table("fahrplan_sessionzuege")]
-    internal class Zug
+    internal class DispoZug
     {
         #region Public Properties
 

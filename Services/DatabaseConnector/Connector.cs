@@ -189,7 +189,7 @@ namespace DatabaseConnector
             }
         }
 
-        private IEnumerable<TrainPosition> GetTrainPositions(IEnumerable<Halt> halte, bool preferPrognosis)
+        private IEnumerable<TrainPosition> GetTrainPositions(IEnumerable<DispoHalt> halte, bool preferPrognosis)
         {
             if (halte.AnyItem())
             {
@@ -210,7 +210,7 @@ namespace DatabaseConnector
             }
         }
 
-        private IEnumerable<TrainRun> GetTrainRuns(IEnumerable<Halt> halte, bool preferPrognosis)
+        private IEnumerable<TrainRun> GetTrainRuns(IEnumerable<DispoHalt> halte, bool preferPrognosis)
         {
             if (halte.AnyItem())
             {

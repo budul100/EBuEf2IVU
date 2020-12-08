@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DatabaseConnector.Models
 {
-    [Table("fahrplan_sessionfahrplan")]
+    [Table("fahrplan_ffz")]
     internal class Halt
     {
         #region Public Properties
@@ -59,7 +59,7 @@ namespace DatabaseConnector.Models
         public TimeSpan SortierZeit { get; set; }
 
         [ForeignKey(nameof(ZugID))]
-        public Zug Zug { get; set; }
+        public DispoZug Zug { get; set; }
 
         [Column("zug_id")]
         public int ZugID { get; set; }

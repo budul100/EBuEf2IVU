@@ -7,14 +7,14 @@ namespace DatabaseConnector.Extensions
     {
         #region Public Methods
 
-        public static TimeSpan? GetAbfahrt(this Halt halt)
+        public static TimeSpan? GetAbfahrt(this DispoHalt halt)
         {
             var result = halt.AbfahrtIst ?? halt.AbfahrtSoll ?? halt.AbfahrtPlan;
 
             return result;
         }
 
-        public static DateTime? GetAbfahrtPath(this Halt halt, bool preferPrognosis)
+        public static DateTime? GetAbfahrtPath(this DispoHalt halt, bool preferPrognosis)
         {
             var result = preferPrognosis
                 ? halt.AbfahrtPrognose ?? halt.AbfahrtSoll
@@ -23,7 +23,7 @@ namespace DatabaseConnector.Extensions
             return result.ToDateTime();
         }
 
-        public static DateTime? GetAnkunftPath(this Halt halt, bool preferPrognosis)
+        public static DateTime? GetAnkunftPath(this DispoHalt halt, bool preferPrognosis)
         {
             var result = preferPrognosis
                 ? halt.AnkunftPrognose ?? halt.AnkunftSoll
