@@ -53,8 +53,8 @@ namespace TrainPathSender.Converters
         private static Func<TrainPathMessage, DateTime?> GetAbfahrtGetter(bool preferPrognosis)
         {
             var result = preferPrognosis
-                ? (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtPrognose ?? m.AbfahrtSoll)
-                : (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtSoll);
+                ? (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtPrognose ?? m.AbfahrtSoll ?? m.AbfahrtPlan)
+                : (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtSoll ?? m.AbfahrtPlan);
 
             return result;
         }
@@ -62,8 +62,8 @@ namespace TrainPathSender.Converters
         private static Func<TrainPathMessage, DateTime?> GetAnkunftGetter(bool preferPrognosis)
         {
             var result = preferPrognosis
-                ? (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftPrognose ?? m.AnkunftSoll)
-                : (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftSoll);
+                ? (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftPrognose ?? m.AnkunftSoll ?? m.AnkunftPlan)
+                : (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftSoll ?? m.AnkunftPlan);
 
             return result;
         }
@@ -76,14 +76,14 @@ namespace TrainPathSender.Converters
                 var ankunft = ankunftGetter.Invoke(message);
 
                 var result = abfahrt == default && ankunft == default
-                    ? GetTrainPositionWithoutTraffic(message)
-                    : GetTrainPositionWithTraffic(message);
+                    ? GetPositionWithoutTraffic(message)
+                    : GetPositionWithTraffic(message);
 
                 yield return result;
             }
         }
 
-        private TrainPosition GetTrainPositionWithoutTraffic(TrainPathMessage message)
+        private TrainPosition GetPositionWithoutTraffic(TrainPathMessage message)
         {
             var result = new TrainPosition
             {
@@ -99,7 +99,7 @@ namespace TrainPathSender.Converters
             return result;
         }
 
-        private TrainPosition GetTrainPositionWithTraffic(TrainPathMessage message)
+        private TrainPosition GetPositionWithTraffic(TrainPathMessage message)
         {
             var result = new TrainPosition
             {
