@@ -1,6 +1,4 @@
-﻿#pragma warning disable CA1031 // Do not catch general exception types
-
-using Common.Interfaces;
+﻿using Common.Interfaces;
 using Common.Models;
 using CredentialChannelFactory;
 using EnumerableExtensions;
@@ -88,6 +86,7 @@ namespace TrainPathSender
                 stoppingReasonStop: stoppingReasonStop,
                 stoppingReasonPass: stoppingReasonPass,
                 trainPathStateRun: trainPathStateRun,
+                trainPathStateCancelled: trainPathStateCancelled,
                 importProfile: importProfile,
                 locationShortnames: locationShortnames);
 
@@ -170,5 +169,3 @@ namespace TrainPathSender
         #endregion Private Methods
     }
 }
-
-#pragma warning disable CA1031 // Do not catch general exception types

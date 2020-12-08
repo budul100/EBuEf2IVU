@@ -72,18 +72,47 @@ namespace TrainPathSender.Converters
         {
             foreach (var message in messages)
             {
-                var result = new TrainPosition
-                {
-                    Abfahrt = abfahrtGetter.Invoke(message),
-                    Ankunft = ankunftGetter.Invoke(message),
-                    Bemerkungen = message.Bemerkungen,
-                    Betriebsstelle = message.Betriebsstelle,
-                    Gleis = message.GleisSoll?.ToString(),
-                    IstDurchfahrt = message.IstDurchfahrt,
-                };
+                var abfahrt = abfahrtGetter.Invoke(message);
+                var ankunft = ankunftGetter.Invoke(message);
+
+                var result = abfahrt == default && ankunft == default
+                    ? GetTrainPositionWithoutTraffic(message)
+                    : GetTrainPositionWithTraffic(message);
 
                 yield return result;
             }
+        }
+
+        private TrainPosition GetTrainPositionWithoutTraffic(TrainPathMessage message)
+        {
+            var result = new TrainPosition
+            {
+                Abfahrt = message.AbfahrtPlan,
+                Ankunft = message.AnkunftPlan,
+                Bemerkungen = message.Bemerkungen,
+                Betriebsstelle = message.Betriebsstelle,
+                Gleis = message.GleisSoll?.ToString(),
+                IstDurchfahrt = message.IstDurchfahrt,
+                IstVorhanden = false,
+            };
+
+            return result;
+        }
+
+        private TrainPosition GetTrainPositionWithTraffic(TrainPathMessage message)
+        {
+            var result = new TrainPosition
+            {
+                Abfahrt = abfahrtGetter.Invoke(message),
+                Ankunft = ankunftGetter.Invoke(message),
+                Bemerkungen = message.Bemerkungen,
+                Betriebsstelle = message.Betriebsstelle,
+                Gleis = message.GleisSoll?.ToString(),
+                IstDurchfahrt = message.IstDurchfahrt,
+                IstVorhanden = true,
+            };
+
+            return result;
         }
 
         private TrainRun GetTrainRun(IEnumerable<TrainPathMessage> messages)

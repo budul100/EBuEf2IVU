@@ -26,6 +26,7 @@ namespace TrainPathSender.Converters
         private readonly string stoppingReasonStop;
         private readonly TimetableVersion timetableVersion;
         private readonly TrainPathKeyTimetableVersion timetableVersionKey;
+        private readonly string trainPathStateCancelled;
         private readonly string trainPathStateRun;
 
         #endregion Private Fields
@@ -34,7 +35,8 @@ namespace TrainPathSender.Converters
 
         public TrainRun2ImportPaths(DateTime sessionDate, string sessionKey, string infrastructureManager,
             string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
-            string trainPathStateRun, string importProfile, IEnumerable<string> locationShortnames)
+            string trainPathStateRun, string trainPathStateCancelled, string importProfile,
+            IEnumerable<string> locationShortnames)
         {
             this.sessionDate = sessionDate;
             this.sessionKey = sessionKey;
@@ -43,6 +45,7 @@ namespace TrainPathSender.Converters
             this.stoppingReasonStop = stoppingReasonStop;
             this.stoppingReasonPass = stoppingReasonPass;
             this.trainPathStateRun = trainPathStateRun;
+            this.trainPathStateCancelled = trainPathStateCancelled;
             this.importProfile = importProfile;
             this.locationShortnames = locationShortnames;
 
@@ -214,7 +217,7 @@ namespace TrainPathSender.Converters
                 {
                     arrivalTrack = arrivalTrack,
                     departureTrack = departureTrack,
-                    running = true,
+                    running = relevant.IstVorhanden,
                     stoppingReasons = stoppingReasons,
                     stopPoint = relevant.GetStopPoint(),
                     times = times,
@@ -231,10 +234,14 @@ namespace TrainPathSender.Converters
             {
                 var trainPathItinerary = GetTrainPathStops(trainRun).ToArray();
 
+                var state = trainPathItinerary.Any(i => i.running)
+                    ? trainPathStateRun
+                    : trainPathStateCancelled;
+
                 var result = new TrainPathVariant
                 {
                     orderingTransportationCompany = orderingTransportationCompany,
-                    state = trainPathStateRun,
+                    state = state,
                     trainDescription = trainRun.Bemerkungen,
                     trainPathItinerary = trainPathItinerary,
                     validity = timetableVersion.validity.AsArray(),

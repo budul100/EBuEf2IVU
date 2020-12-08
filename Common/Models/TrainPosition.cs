@@ -18,6 +18,8 @@ namespace Common.Models
 
         public bool IstDurchfahrt { get; set; }
 
+        public bool IstVorhanden { get; set; }
+
         #endregion Public Properties
     }
 }
