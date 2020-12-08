@@ -39,11 +39,6 @@ namespace DatabaseConnector.Extensions
             return result;
         }
 
-        public static bool HasAbfahrt(this Halt halt)
-        {
-            return halt.AbfahrtIst.HasValue || halt.AbfahrtSoll.HasValue || halt.AbfahrtPlan.HasValue;
-        }
-
         #endregion Public Methods
 
         #region Private Methods
