@@ -1,4 +1,3 @@
-using Epoch.net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -51,19 +50,12 @@ namespace CommonTests
                 retryTime: connectorSettings.RetryTime,
                 sessionCancellationToken: new CancellationToken());
 
-            var result = databaseConnector.GetEBuEfSessionAsync();
+            var query = databaseConnector.GetEBuEfSessionAsync();
 
-            result.Wait();
+            query.Wait();
 
-            Assert.That(result.Result.IVUDatum == DateTime.Today, Is.True);
-        }
-
-        [Test]
-        public void TestUnixTime()
-        {
-            var timestamp = 1608292800;
-
-            Assert.IsTrue(timestamp.ToDateTime().ToLocalTime().TimeOfDay == new TimeSpan(13, 0, 0));
+            Assert.That(query.Result.IVUDatum == query.Result.IVUDatum.Date, Is.True);
+            Assert.That(query.Result.SessionStart.TimeOfDay == new TimeSpan(14, 0, 0), Is.True);
         }
 
         #endregion Public Methods
