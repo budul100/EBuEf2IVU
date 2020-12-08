@@ -6,7 +6,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RuntimeIdentifiers>win10-x64;linux-arm;linux-x64</RuntimeIdentifiers>
     <StartupObject>EBuEf2IVUCrew.Program</StartupObject>
-    <AssemblyVersion>0.38.1.0</AssemblyVersion>
+    <AssemblyVersion>0.38.2.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <Version>$(AssemblyVersion)</Version>
   </PropertyGroup>
