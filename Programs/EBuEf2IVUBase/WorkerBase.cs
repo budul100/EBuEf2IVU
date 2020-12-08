@@ -39,9 +39,9 @@ namespace EBuEf2IVUBase
         #region Protected Constructors
 
         protected WorkerBase(IConfiguration config, IStateHandler sessionStateHandler,
-            IDatabaseConnector databaseConnector, ILogger logger)
+            IDatabaseConnector databaseConnector, ILogger logger, Assembly assembly)
         {
-            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
+            var assemblyInfo = assembly.GetName();
             logger.LogInformation(
                 "{name} (Version {version}) wird gestartet.",
                 assemblyInfo.Name,

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,7 +31,7 @@ namespace EBuEf2IVUCrew
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
             ICrewChecker crewChecker, ILogger<Worker> logger)
-            : base(config, sessionStateHandler, databaseConnector, logger)
+            : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
         {
             this.crewChecker = crewChecker;
         }

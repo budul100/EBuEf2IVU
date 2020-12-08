@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,7 +32,7 @@ namespace EBuEf2IVUPath
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
             IMessageReceiver trainPathReceiver, ITrainPathSender trainPathSender, ILogger<Worker> logger)
-            : base(config, sessionStateHandler, databaseConnector, logger)
+            : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
         {
             this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
 

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,7 +32,7 @@ namespace EBuEf2IVUVehicle
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
             IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, ILogger<Worker> logger)
-            : base(config, sessionStateHandler, databaseConnector, logger)
+            : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
         {
             this.sessionStateHandler.SessionStartedEvent += OnSessionStart;
 
