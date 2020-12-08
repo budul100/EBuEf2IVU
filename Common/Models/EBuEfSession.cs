@@ -20,7 +20,7 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return @$"EBuEf-Session | Key: {SessionKey} | Start: {SessionStart:hh\:mm\:ss} | IVU-Datum: {IVUDatum:yyyy-MM-dd} | " +
+            return @$"EBuEf-Session | Key: {SessionKey} | Start: {SessionStart:HH\:mm\:ss} | IVU-Datum: {IVUDatum:yyyy-MM-dd} | " +
                 @$"Verschiebung: {(Verschiebung >= TimeSpan.Zero ? string.Empty : "-")}{Verschiebung:d\.hh\:mm\:ss}";
         }
 

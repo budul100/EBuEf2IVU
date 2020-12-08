@@ -18,7 +18,7 @@ namespace DatabaseConnector.Models
         public string SessionKey { get; set; }
 
         [Column("sim_startzeit")]
-        public long SimulationStartzeit { get; set; }
+        public int SimulationStartzeit { get; set; }
 
         [Column("status")]
         public byte Status { get; set; }
