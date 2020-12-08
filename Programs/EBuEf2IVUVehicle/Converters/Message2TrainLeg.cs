@@ -48,7 +48,7 @@ namespace EBuEf2IVUVehicle
                 .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
                 .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis)).FirstOrDefault();
 
-            if (mapping != null)
+            if (mapping != default)
             {
                 if ((message.SignalTyp == SignalType.ESig && mapping.IVUTrainPositionType != LegType.Ankunft)
                     || (message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != LegType.Abfahrt)
