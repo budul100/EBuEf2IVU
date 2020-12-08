@@ -136,7 +136,7 @@ namespace EBuEf2IVUPath
                 password: senderSettings.Password,
                 isHttps: senderSettings.IsHttps,
                 retryTime: senderSettings.RetryTime,
-                sessionKey: ebuefSession.SessionKey,
+                sessionKey: ebuefSession?.SessionKey,
                 sessionDate: ivuSessionDate,
                 infrastructureManager: senderSettings.InfrastructureManager,
                 orderingTransportationCompany: senderSettings.OrderingTransportationCompany,
@@ -212,5 +212,3 @@ namespace EBuEf2IVUPath
         #endregion Private Methods
     }
 }
-
-#pragma warning disable CA1031 // Do not catch general exception types

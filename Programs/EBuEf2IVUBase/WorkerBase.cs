@@ -70,7 +70,11 @@ namespace EBuEf2IVUBase
 
         protected DateTime GetSimTime()
         {
-            return DateTime.Now.Add(-ebuefSession.Verschiebung);
+            var sessionShift = -ebuefSession.Verschiebung;
+
+            return sessionShift == default
+                ? DateTime.Now
+                : DateTime.Now.Add(sessionShift);
         }
 
         protected void InitializeDatabaseConnector(CancellationToken sessionCancellationToken)
