@@ -38,12 +38,12 @@ namespace TrainPathSender.Converters
             this.sessionDate = sessionDate;
             this.infrastructureManager = infrastructureManager;
             this.orderingTransportationCompany = orderingTransportationCompany;
-
             this.stoppingReasonStop = stoppingReasonStop;
             this.stoppingReasonPass = stoppingReasonPass;
             this.trainPathStateRun = trainPathStateRun;
             this.importProfile = importProfile;
             this.locationShortnames = locationShortnames;
+
             timetableVersion = GetTimetableVersion();
             timetableVersionKey = GetTimetableVersionKey();
         }
