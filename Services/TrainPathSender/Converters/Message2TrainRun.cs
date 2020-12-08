@@ -72,10 +72,7 @@ namespace TrainPathSender.Converters
         {
             foreach (var message in messages)
             {
-                var abfahrt = abfahrtGetter.Invoke(message);
-                var ankunft = ankunftGetter.Invoke(message);
-
-                var result = abfahrt == default && ankunft == default
+                var result = message.AnkunftSoll == default && message.AbfahrtSoll == default
                     ? GetPositionWithoutTraffic(message)
                     : GetPositionWithTraffic(message);
 
