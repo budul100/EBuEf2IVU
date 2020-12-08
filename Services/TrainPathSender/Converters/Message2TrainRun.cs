@@ -10,8 +10,8 @@ namespace TrainPathSender.Converters
     {
         #region Private Fields
 
-        private readonly Func<TrainPathMessage, DateTime> abfahrtGetter;
-        private readonly Func<TrainPathMessage, DateTime> ankunftGetter;
+        private readonly Func<TrainPathMessage, DateTime?> abfahrtGetter;
+        private readonly Func<TrainPathMessage, DateTime?> ankunftGetter;
 
         #endregion Private Fields
 
@@ -50,20 +50,20 @@ namespace TrainPathSender.Converters
 
         #region Private Methods
 
-        private static Func<TrainPathMessage, DateTime> GetAbfahrtGetter(bool preferPrognosis)
+        private static Func<TrainPathMessage, DateTime?> GetAbfahrtGetter(bool preferPrognosis)
         {
             var result = preferPrognosis
-                ? (Func<TrainPathMessage, DateTime>)(m => m.AbfahrtPrognose ?? m.AbfahrtSoll ?? DateTime.MinValue)
-                : (Func<TrainPathMessage, DateTime>)(m => m.AbfahrtSoll ?? DateTime.MinValue);
+                ? (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtPrognose ?? m.AbfahrtSoll)
+                : (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtSoll);
 
             return result;
         }
 
-        private static Func<TrainPathMessage, DateTime> GetAnkunftGetter(bool preferPrognosis)
+        private static Func<TrainPathMessage, DateTime?> GetAnkunftGetter(bool preferPrognosis)
         {
             var result = preferPrognosis
-                ? (Func<TrainPathMessage, DateTime>)(m => m.AnkunftPrognose ?? m.AnkunftSoll ?? DateTime.MinValue)
-                : (Func<TrainPathMessage, DateTime>)(m => m.AnkunftSoll ?? DateTime.MinValue);
+                ? (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftPrognose ?? m.AnkunftSoll)
+                : (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftSoll);
 
             return result;
         }
