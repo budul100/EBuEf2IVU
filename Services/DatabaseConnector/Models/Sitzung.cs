@@ -14,6 +14,9 @@ namespace DatabaseConnector.Models
         [Column("sim_ivutag")]
         public DateTime? IvuDate { get; set; }
 
+        [Column("sessionkey")]
+        public string SessionKey { get; set; }
+
         [Column("sim_startzeit")]
         public long SimulationStartzeit { get; set; }
 
