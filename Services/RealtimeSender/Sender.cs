@@ -1,6 +1,4 @@
-﻿#pragma warning disable CA1031 // Do not catch general exception types
-
-using Common.Interfaces;
+﻿using Common.Interfaces;
 using Common.Models;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -158,5 +156,3 @@ namespace RealtimeSender
         #endregion Private Methods
     }
 }
-
-#pragma warning disable CA1031 // Do not catch general exception types
