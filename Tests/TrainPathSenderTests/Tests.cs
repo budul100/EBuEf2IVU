@@ -18,6 +18,8 @@ namespace TrainPathSenderTests
     {
         #region Private Fields
 
+        private const string SessionKey = "TestSessionKey";
+
         private IConfigurationRoot config;
         private NullLoggerFactory loggerFactory;
         private Sender sender;
@@ -60,6 +62,7 @@ namespace TrainPathSenderTests
                 password: senderSettings.Password,
                 isHttps: senderSettings.IsHttps,
                 retryTime: senderSettings.RetryTime,
+                sessionKey: SessionKey,
                 sessionDate: DateTime.Today,
                 infrastructureManager: senderSettings.InfrastructureManager,
                 orderingTransportationCompany: senderSettings.OrderingTransportationCompany,
