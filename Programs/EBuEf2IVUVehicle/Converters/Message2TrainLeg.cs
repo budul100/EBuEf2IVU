@@ -55,7 +55,7 @@ namespace EBuEf2IVUVehicle
                     || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != LegType.Durchfahrt))
                 {
                     logger.LogWarning(
-                        "Der IVUTrainPositionType des Mappings {mappingType} entspricht nicht dem SignalTyp der eingegangenen Nachricht ({message}).",
+                        "Der IVUTrainPositionType des Mappings {mappingType} entspricht nicht dem SignalTyp der eingegangenen Nachricht: {message}",
                         mapping.IVUTrainPositionType,
                         message);
                 }
@@ -63,6 +63,12 @@ namespace EBuEf2IVUVehicle
                 result = GetTrainLeg(
                     message: message,
                     mapping: mapping);
+            }
+            else
+            {
+                logger.LogWarning(
+                    "Es wurde kein Mapping für die eingegangene Nachricht gefunden: {message}",
+                    message);
             }
 
             return result;
