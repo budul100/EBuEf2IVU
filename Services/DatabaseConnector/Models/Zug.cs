@@ -3,8 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DatabaseConnector.Models
 {
-    [Table("fahrplan_sessionzuege")]
-    internal class DispoZug
+    internal abstract class Zug
     {
         #region Public Properties
 

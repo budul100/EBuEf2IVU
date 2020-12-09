@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseConnector.Contexts
 {
-    internal class HaltContext
+    internal class HaltDispoContext
         : BaseContext
     {
         #region Public Constructors
 
-        public HaltContext(string connectionString)
+        public HaltDispoContext(string connectionString)
             : base(connectionString)
         { }
 
@@ -16,7 +16,7 @@ namespace DatabaseConnector.Contexts
 
         #region Public Properties
 
-        public DbSet<DispoHalt> Halte { get; set; }
+        public DbSet<HaltDispo> Halte { get; set; }
 
         #endregion Public Properties
     }

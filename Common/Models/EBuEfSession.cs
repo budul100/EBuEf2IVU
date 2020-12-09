@@ -6,6 +6,8 @@ namespace Common.Models
     {
         #region Public Properties
 
+        public int FahrplanId { get; set; }
+
         public DateTime IVUDatum { get; set; }
 
         public string SessionKey { get; set; }
@@ -14,14 +16,17 @@ namespace Common.Models
 
         public TimeSpan Verschiebung { get; set; }
 
+        public DayOfWeek Wochentag { get; set; }
+
         #endregion Public Properties
 
         #region Public Methods
 
         public override string ToString()
         {
-            return @$"EBuEf-Session | Key: {SessionKey} | Start: {SessionStart:HH\:mm\:ss} | IVU-Datum: {IVUDatum:yyyy-MM-dd} | " +
-                @$"Verschiebung: {(Verschiebung >= TimeSpan.Zero ? string.Empty : "-")}{Verschiebung:d\.hh\:mm\:ss}";
+            return @$"EBuEf-Session | Start: {SessionStart:HH\:mm\:ss} | IVU-Datum: {IVUDatum:yyyy-MM-dd} | Wochentag: {Wochentag} | " +
+                @$"Verschiebung: {(Verschiebung >= TimeSpan.Zero ? string.Empty : "-")}{Verschiebung:d\.hh\:mm\:ss} | " +
+                @$"Key: {SessionKey} | Fahrplan-Id: {FahrplanId} ";
         }
 
         #endregion Public Methods

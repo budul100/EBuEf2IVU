@@ -8,6 +8,9 @@ namespace DatabaseConnector.Models
     {
         #region Public Properties
 
+        [Column("fahrplan_id")]
+        public int FahrplanId { get; set; }
+
         [Column("id")]
         public int Id { get; set; }
 
@@ -18,7 +21,10 @@ namespace DatabaseConnector.Models
         public string SessionKey { get; set; }
 
         [Column("sim_startzeit")]
-        public int SimulationStartzeit { get; set; }
+        public int SimStartzeit { get; set; }
+
+        [Column("sim_wochentag")]
+        public string SimWochentag { get; set; }
 
         [Column("status")]
         public byte Status { get; set; }

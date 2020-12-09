@@ -191,20 +191,30 @@ namespace EBuEf2IVUPath
                 logger.LogDebug(
                     "Nachricht zum initialen Import der Zugtrassen empfangen.");
 
-                var senderSettings = config
-                    .GetSection(nameof(Settings.TrainPathSender))
-                    .Get<Settings.TrainPathSender>();
-
-                var trainRuns = await databaseConnector.GetTrainRunsAsync(senderSettings.PreferPrognosis);
-
-                if (trainRuns.AnyItem())
+                if (ebuefSession == default)
                 {
-                    trainPathSender.Add(trainRuns);
+                    logger.LogWarning(
+                        "Das initiale Sitzungsupdate wurde bisher nicht empfangen. Daher können keine Zugtrassen importiert werden.");
                 }
                 else
                 {
-                    logger.LogDebug(
-                        "In der Datenbank wurden keine Zugtrassen gefunden.");
+                    var senderSettings = config
+                        .GetSection(nameof(Settings.TrainPathSender))
+                        .Get<Settings.TrainPathSender>();
+
+                    var trainRuns = await databaseConnector.GetTrainRunsPlanAsync(
+                        timetableId: ebuefSession.FahrplanId,
+                        preferPrognosis: senderSettings.PreferPrognosis);
+
+                    if (trainRuns.AnyItem())
+                    {
+                        trainPathSender.Add(trainRuns);
+                    }
+                    else
+                    {
+                        logger.LogDebug(
+                            "In der Datenbank wurden keine Zugtrassen gefunden.");
+                    }
                 }
             }
         }

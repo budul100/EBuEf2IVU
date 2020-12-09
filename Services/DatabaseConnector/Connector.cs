@@ -75,10 +75,10 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainId, bool preferPrognosis = false)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsDispoAsync(int trainId, bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (queryCancellationToken) => QueryTrainRunsAsync(
+                action: (queryCancellationToken) => QueryTrainRunsDispoAsync(
                     trainId: trainId,
                     preferPrognosis: preferPrognosis,
                     queryCancellationToken: queryCancellationToken),
@@ -87,24 +87,24 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(bool preferPrognosis = false)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsDispoAsync(TimeSpan minTime, TimeSpan maxTime)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (queryCancellationToken) => QueryTrainRunsAsync(
-                    trainId: default,
-                    preferPrognosis: preferPrognosis,
+                action: (queryCancellationToken) => QueryTrainRunsDispoAsync(
+                    minTime: minTime,
+                    maxTime: maxTime,
                     queryCancellationToken: queryCancellationToken),
                 cancellationToken: sessionCancellationToken);
 
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsPlanAsync(int timetableId, bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (queryCancellationToken) => QueryTrainRunsAsync(
-                    minTime: minTime,
-                    maxTime: maxTime,
+                action: (queryCancellationToken) => QueryTrainRunsPlanAsync(
+                    timetableId: timetableId,
+                    preferPrognosis: preferPrognosis,
                     queryCancellationToken: queryCancellationToken),
                 cancellationToken: sessionCancellationToken);
 
@@ -189,7 +189,8 @@ namespace DatabaseConnector
             }
         }
 
-        private IEnumerable<TrainPosition> GetTrainPositions(IEnumerable<DispoHalt> halte, bool preferPrognosis)
+        private IEnumerable<TrainPosition> GetTrainPositions<T>(IEnumerable<Halt<T>> halte, bool preferPrognosis)
+            where T : Zug
         {
             if (halte.AnyItem())
             {
@@ -210,7 +211,8 @@ namespace DatabaseConnector
             }
         }
 
-        private IEnumerable<TrainRun> GetTrainRuns(IEnumerable<DispoHalt> halte, bool preferPrognosis)
+        private IEnumerable<TrainRun> GetTrainRuns<T>(IEnumerable<Halt<T>> halte, bool preferPrognosis)
+            where T : Zug
         {
             if (halte.AnyItem())
             {
@@ -342,10 +344,12 @@ namespace DatabaseConnector
 
                     result = new EBuEfSession
                     {
+                        FahrplanId = sitzung.FahrplanId,
                         IVUDatum = sitzung.IvuDate ?? DateTime.Today,
                         SessionKey = sitzung.SessionKey,
-                        SessionStart = sitzung.SimulationStartzeit.ToDateTime().ToLocalTime(),
+                        SessionStart = sitzung.SimStartzeit.ToDateTime().ToLocalTime(),
                         Verschiebung = timeshift,
+                        Wochentag = sitzung.SimWochentag.GetWochentag(),
                     };
 
                     logger.LogDebug(
@@ -368,7 +372,7 @@ namespace DatabaseConnector
 
             if (!zugnummer.IsEmpty())
             {
-                using var context = new ZugContext(connectionString);
+                using var context = new ZugDispoContext(connectionString);
 
                 var trainNumber = zugnummer.ToInt();
 
@@ -379,43 +383,7 @@ namespace DatabaseConnector
             return result;
         }
 
-        private async Task<IEnumerable<TrainRun>> QueryTrainRunsAsync(string trainId, bool preferPrognosis,
-            CancellationToken queryCancellationToken)
-        {
-            var result = Enumerable.Empty<TrainRun>();
-
-            if (!queryCancellationToken.IsCancellationRequested)
-            {
-                if (!trainId.IsEmpty())
-                {
-                    logger.LogDebug(
-                        "Suche nach Zug-ID {trainId}.",
-                        trainId);
-                }
-                else
-                {
-                    logger.LogDebug(
-                        "Suche nach allen Zügen.");
-                }
-
-                using var context = new HaltContext(connectionString);
-
-                var zugId = trainId.ToNullableInt();
-
-                var halte = await context.Halte
-                    .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
-                    .Where(h => !zugId.HasValue || h.ZugID == zugId)
-                    .ToArrayAsync(queryCancellationToken);
-
-                result = GetTrainRuns(
-                    halte: halte,
-                    preferPrognosis: preferPrognosis).ToArray();
-            }
-
-            return result;
-        }
-
-        private async Task<IEnumerable<TrainRun>> QueryTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime,
+        private async Task<IEnumerable<TrainRun>> QueryTrainRunsDispoAsync(TimeSpan minTime, TimeSpan maxTime,
             CancellationToken queryCancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
@@ -425,7 +393,7 @@ namespace DatabaseConnector
                 logger.LogDebug(
                     "Suche nach aktuellen Fahrplaneinträgen.");
 
-                using var context = new HaltContext(connectionString);
+                using var context = new HaltDispoContext(connectionString);
 
                 var halte = await context.Halte
                     .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
@@ -437,6 +405,57 @@ namespace DatabaseConnector
                 result = GetTrainRuns(
                     halte: halte,
                     preferPrognosis: false).ToArray();
+            }
+
+            return result;
+        }
+
+        private async Task<IEnumerable<TrainRun>> QueryTrainRunsDispoAsync(int trainId, bool preferPrognosis,
+            CancellationToken queryCancellationToken)
+        {
+            var result = Enumerable.Empty<TrainRun>();
+
+            if (!queryCancellationToken.IsCancellationRequested)
+            {
+                logger.LogDebug(
+                    "Suche nach Zug-ID {trainId}.",
+                    trainId);
+
+                using var context = new HaltDispoContext(connectionString);
+
+                var halte = await context.Halte
+                    .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
+                    .Where(h => h.ZugID == trainId)
+                    .ToArrayAsync(queryCancellationToken);
+
+                result = GetTrainRuns(
+                    halte: halte,
+                    preferPrognosis: preferPrognosis).ToArray();
+            }
+
+            return result;
+        }
+
+        private async Task<IEnumerable<TrainRun>> QueryTrainRunsPlanAsync(int timetableId, bool preferPrognosis,
+            CancellationToken queryCancellationToken)
+        {
+            var result = Enumerable.Empty<TrainRun>();
+
+            if (!queryCancellationToken.IsCancellationRequested)
+            {
+                logger.LogDebug(
+                    "Suche nach allen Zügen.");
+
+                using var context = new HaltPlanContext(connectionString);
+
+                var halte = await context.Halte
+                    .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
+                    .Where(h => h.Zug.FahrplanId == timetableId)
+                    .ToArrayAsync(queryCancellationToken);
+
+                result = GetTrainRuns(
+                    halte: halte,
+                    preferPrognosis: preferPrognosis).ToArray();
             }
 
             return result;
@@ -526,7 +545,7 @@ namespace DatabaseConnector
                     leg.Zugnummer,
                     betriebsstelle);
 
-                using var context = new HaltContext(connectionString);
+                using var context = new HaltDispoContext(connectionString);
 
                 var halt = context.Halte
                     .Where(h => h.Betriebsstelle == betriebsstelle)

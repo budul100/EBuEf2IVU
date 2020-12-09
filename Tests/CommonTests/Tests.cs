@@ -51,7 +51,6 @@ namespace CommonTests
                 sessionCancellationToken: new CancellationToken());
 
             var query = databaseConnector.GetEBuEfSessionAsync();
-
             query.Wait();
 
             Assert.That(query.Result.IVUDatum == query.Result.IVUDatum.Date, Is.True);

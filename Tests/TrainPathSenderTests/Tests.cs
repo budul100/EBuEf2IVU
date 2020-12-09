@@ -99,7 +99,13 @@ namespace TrainPathSenderTests
                 retryTime: connectorSettings.RetryTime,
                 sessionCancellationToken: new CancellationToken());
 
-            var trainRuns = databaseConnector.GetTrainRunsAsync(false).Result;
+            var query = databaseConnector.GetEBuEfSessionAsync();
+            query.Wait();
+
+            var trainRuns = databaseConnector.GetTrainRunsPlanAsync(
+                timetableId: query.Result.FahrplanId,
+                preferPrognosis: false).Result;
+
             sender.Add(trainRuns);
 
             Task.WhenAll(sender.RunAsnc(new CancellationToken()));

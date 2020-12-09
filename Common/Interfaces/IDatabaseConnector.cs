@@ -16,11 +16,11 @@ namespace Common.Interfaces
 
         Task<IEnumerable<string>> GetLocationShortnamesAsync(IEnumerable<string> locationTypes);
 
-        Task<IEnumerable<TrainRun>> GetTrainRunsAsync(string trainId, bool preferPrognosis = false);
+        Task<IEnumerable<TrainRun>> GetTrainRunsDispoAsync(int trainId, bool preferPrognosis = false);
 
-        Task<IEnumerable<TrainRun>> GetTrainRunsAsync(bool preferPrognosis = false);
+        Task<IEnumerable<TrainRun>> GetTrainRunsDispoAsync(TimeSpan minTime, TimeSpan maxTime);
 
-        Task<IEnumerable<TrainRun>> GetTrainRunsAsync(TimeSpan minTime, TimeSpan maxTime);
+        Task<IEnumerable<TrainRun>> GetTrainRunsPlanAsync(int timetableId, bool preferPrognosis = false);
 
         Task<int?> GetTrainTypeIdAsync(string zuggattung);
 

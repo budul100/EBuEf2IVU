@@ -90,7 +90,7 @@ namespace EBuEf2IVUCrew
             var maxTime = GetSimTime()
                 .Add(queryDurationFuture).TimeOfDay;
 
-            var trainRuns = await databaseConnector.GetTrainRunsAsync(
+            var trainRuns = await databaseConnector.GetTrainRunsDispoAsync(
                 minTime: minTime,
                 maxTime: maxTime);
 
