@@ -20,7 +20,7 @@ namespace Common.Interfaces
 
         Task<IEnumerable<TrainRun>> GetTrainRunsDispoAsync(TimeSpan minTime, TimeSpan maxTime);
 
-        Task<IEnumerable<TrainRun>> GetTrainRunsPlanAsync(int timetableId, bool preferPrognosis = false);
+        Task<IEnumerable<TrainRun>> GetTrainRunsPlanAsync(int timetableId, int weekdayId, bool preferPrognosis = false);
 
         Task<int?> GetTrainTypeIdAsync(string zuggattung);
 

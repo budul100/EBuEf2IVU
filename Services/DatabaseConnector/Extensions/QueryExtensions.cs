@@ -5,11 +5,11 @@ namespace DatabaseConnector.Extensions
 {
     internal static class QueryExtensions
     {
-        #region Private Fields
+        #region Public Fields
 
-        private const string PositiveBit = "1";
+        public const char PositiveBit = '1';
 
-        #endregion Private Fields
+        #endregion Public Fields
 
         #region Public Methods
 
@@ -63,37 +63,14 @@ namespace DatabaseConnector.Extensions
             return result;
         }
 
-        public static DayOfWeek GetWochentag(this string bitmask)
+        public static int GetWochentagId(this string bitmask)
         {
             var bits = bitmask.Split();
 
             var index = 0;
             foreach (var bit in bits)
             {
-                if (bit == PositiveBit)
-                {
-                    switch (index)
-                    {
-                        case 0:
-                            return DayOfWeek.Monday;
-
-                        case 1:
-                            return DayOfWeek.Tuesday;
-
-                        case 2:
-                            return DayOfWeek.Wednesday;
-
-                        case 3:
-                            return DayOfWeek.Thursday;
-
-                        case 4:
-                            return DayOfWeek.Friday;
-
-                        case 5:
-                            return DayOfWeek.Saturday;
-                    }
-                }
-                else if (index > 5)
+                if (bit == PositiveBit.ToString())
                 {
                     break;
                 }
@@ -101,7 +78,7 @@ namespace DatabaseConnector.Extensions
                 index++;
             }
 
-            return DayOfWeek.Sunday;
+            return index;
         }
 
         #endregion Public Methods

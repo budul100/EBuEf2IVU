@@ -10,6 +10,9 @@ namespace DatabaseConnector.Models
         [Column("bemerkungen")]
         public string Bemerkungen { get; set; }
 
+        [Column("verkehrstage_bin")]
+        public string Bitmask { get; set; }
+
         [Key]
         [Column("id")]
         public int ID { get; set; }

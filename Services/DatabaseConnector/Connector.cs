@@ -99,11 +99,13 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsPlanAsync(int timetableId, bool preferPrognosis = false)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsPlanAsync(int timetableId, int weekdayId,
+            bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (queryCancellationToken) => QueryTrainRunsPlanAsync(
                     timetableId: timetableId,
+                    weekdayId: weekdayId,
                     preferPrognosis: preferPrognosis,
                     queryCancellationToken: queryCancellationToken),
                 cancellationToken: sessionCancellationToken);
@@ -349,7 +351,7 @@ namespace DatabaseConnector
                         SessionKey = sitzung.SessionKey,
                         SessionStart = sitzung.SimStartzeit.ToDateTime().ToLocalTime(),
                         Verschiebung = timeshift,
-                        Wochentag = sitzung.SimWochentag.GetWochentag(),
+                        WochentagId = sitzung.SimWochentag.GetWochentagId(),
                     };
 
                     logger.LogDebug(
@@ -436,8 +438,8 @@ namespace DatabaseConnector
             return result;
         }
 
-        private async Task<IEnumerable<TrainRun>> QueryTrainRunsPlanAsync(int timetableId, bool preferPrognosis,
-            CancellationToken queryCancellationToken)
+        private async Task<IEnumerable<TrainRun>> QueryTrainRunsPlanAsync(int timetableId, int weekdayId,
+            bool preferPrognosis, CancellationToken queryCancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
 
@@ -448,13 +450,17 @@ namespace DatabaseConnector
 
                 using var context = new HaltPlanContext(connectionString);
 
-                var halte = await context.Halte
+                var allHalte = await context.Halte
                     .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
                     .Where(h => h.Zug.FahrplanId == timetableId)
+                    .Where(h => h.Zug.Bitmask.Length >= weekdayId)
                     .ToArrayAsync(queryCancellationToken);
 
+                var currentHalte = allHalte
+                    .Where(h => h.Zug.Bitmask[weekdayId] == QueryExtensions.PositiveBit).ToArray();
+
                 result = GetTrainRuns(
-                    halte: halte,
+                    halte: currentHalte,
                     preferPrognosis: preferPrognosis).ToArray();
             }
 
