@@ -31,13 +31,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="budul.EnumerableExtensions" Version="1.13.0" />
-    <PackageReference Include="budul.StringExtensions" Version="1.9.0" />
+    <PackageReference Include="budul.EnumerableExtensions" Version="1.15.0" />
+    <PackageReference Include="budul.StringExtensions" Version="1.11.0" />
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
     <PackageReference Include="Packaging.Targets" Version="0.1.189" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
