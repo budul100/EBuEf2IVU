@@ -89,8 +89,8 @@ namespace TrainPathSender.Converters
                 Bemerkungen = message.Bemerkungen,
                 Betriebsstelle = message.Betriebsstelle,
                 Gleis = message.GleisSoll?.ToString(),
+                IstAktiv = false,
                 IstDurchfahrt = message.IstDurchfahrt,
-                IstVorhanden = false,
             };
 
             return result;
@@ -105,8 +105,8 @@ namespace TrainPathSender.Converters
                 Bemerkungen = message.Bemerkungen,
                 Betriebsstelle = message.Betriebsstelle,
                 Gleis = message.GleisSoll?.ToString(),
+                IstAktiv = true,
                 IstDurchfahrt = message.IstDurchfahrt,
-                IstVorhanden = true,
             };
 
             return result;

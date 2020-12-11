@@ -16,9 +16,9 @@ namespace Common.Models
 
         public string Gleis { get; set; }
 
-        public bool IstDurchfahrt { get; set; }
+        public bool IstAktiv { get; set; }
 
-        public bool IstVorhanden { get; set; }
+        public bool IstDurchfahrt { get; set; }
 
         #endregion Public Properties
     }
