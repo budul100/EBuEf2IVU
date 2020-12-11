@@ -25,6 +25,8 @@ namespace DatabaseConnector
     {
         #region Private Fields
 
+        private const int IdSunday = 6;
+
         private readonly ILogger logger;
 
         private string connectionString;
@@ -99,13 +101,13 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsPlanAsync(int timetableId, int weekdayId,
+        public Task<IEnumerable<TrainRun>> GetTrainRunsPlanAsync(int timetableId, DayOfWeek weekday,
             bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (queryCancellationToken) => QueryTrainRunsPlanAsync(
                     timetableId: timetableId,
-                    weekdayId: weekdayId,
+                    weekday: weekday,
                     preferPrognosis: preferPrognosis,
                     queryCancellationToken: queryCancellationToken),
                 cancellationToken: sessionCancellationToken);
@@ -352,7 +354,7 @@ namespace DatabaseConnector
                         SessionKey = sitzung.SessionKey,
                         SessionStart = sitzung.SimStartzeit.ToDateTime().ToLocalTime(),
                         Verschiebung = timeshift,
-                        WochentagId = sitzung.SimWochentag.GetWochentagId(),
+                        Wochentag = sitzung.SimWochentag.GetWochentag(),
                     };
 
                     logger.LogDebug(
@@ -439,7 +441,7 @@ namespace DatabaseConnector
             return result;
         }
 
-        private async Task<IEnumerable<TrainRun>> QueryTrainRunsPlanAsync(int timetableId, int weekdayId,
+        private async Task<IEnumerable<TrainRun>> QueryTrainRunsPlanAsync(int timetableId, DayOfWeek weekday,
             bool preferPrognosis, CancellationToken queryCancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
@@ -450,6 +452,10 @@ namespace DatabaseConnector
                     "Suche nach allen Zügen.");
 
                 using var context = new HaltPlanContext(connectionString);
+
+                var weekdayId = weekday != DayOfWeek.Sunday
+                    ? ((int)weekday) - 1
+                    : IdSunday;
 
                 var allHalte = await context.Halte
                     .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)

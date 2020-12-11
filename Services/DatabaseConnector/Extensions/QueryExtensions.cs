@@ -63,7 +63,7 @@ namespace DatabaseConnector.Extensions
             return result;
         }
 
-        public static int GetWochentagId(this string bitmask)
+        public static DayOfWeek GetWochentag(this string bitmask)
         {
             var bits = bitmask.ToCharArray();
 
@@ -78,7 +78,9 @@ namespace DatabaseConnector.Extensions
                 index++;
             }
 
-            return index;
+            return index < 6
+                ? (DayOfWeek)(index + 1)
+                : DayOfWeek.Sunday;
         }
 
         #endregion Public Methods

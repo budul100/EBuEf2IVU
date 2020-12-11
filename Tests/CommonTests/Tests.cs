@@ -55,6 +55,7 @@ namespace CommonTests
 
             Assert.That(query.Result.IVUDatum == query.Result.IVUDatum.Date, Is.True);
             Assert.That(query.Result.SessionStart.TimeOfDay == new TimeSpan(14, 0, 0), Is.True);
+            Assert.That(query.Result.Wochentag == DayOfWeek.Friday, Is.True);
         }
 
         #endregion Public Methods

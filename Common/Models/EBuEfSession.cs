@@ -16,7 +16,7 @@ namespace Common.Models
 
         public TimeSpan Verschiebung { get; set; }
 
-        public int WochentagId { get; set; }
+        public DayOfWeek Wochentag { get; set; }
 
         #endregion Public Properties
 
@@ -24,7 +24,7 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return @$"EBuEf-Session | Start: {SessionStart:HH\:mm\:ss} | IVU-Datum: {IVUDatum:yyyy-MM-dd} | Wochentag-Id: {WochentagId} | " +
+            return @$"EBuEf-Session | Start: {SessionStart:HH\:mm\:ss} | IVU-Datum: {IVUDatum:yyyy-MM-dd} | Wochentag: {Wochentag} | " +
                 @$"Verschiebung: {(Verschiebung >= TimeSpan.Zero ? string.Empty : "-")}{Verschiebung:d\.hh\:mm\:ss} | " +
                 @$"Key: {SessionKey} | Fahrplan-Id: {FahrplanId} ";
         }

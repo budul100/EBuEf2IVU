@@ -104,7 +104,7 @@ namespace TrainPathSenderTests
 
             var trainRuns = databaseConnector.GetTrainRunsPlanAsync(
                 timetableId: query.Result.FahrplanId,
-                weekdayId: query.Result.WochentagId,
+                weekday: query.Result.Wochentag,
                 preferPrognosis: false).Result;
 
             sender.Add(trainRuns);

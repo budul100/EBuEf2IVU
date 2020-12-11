@@ -204,7 +204,7 @@ namespace EBuEf2IVUPath
 
                     var trainRuns = await databaseConnector.GetTrainRunsPlanAsync(
                         timetableId: ebuefSession.FahrplanId,
-                        weekdayId: ebuefSession.WochentagId,
+                        weekday: ebuefSession.Wochentag,
                         preferPrognosis: senderSettings.PreferPrognosis);
 
                     if (trainRuns.AnyItem())
