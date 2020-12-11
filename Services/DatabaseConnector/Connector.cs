@@ -206,7 +206,7 @@ namespace DatabaseConnector
                         Betriebsstelle = halt.Betriebsstelle,
                         Gleis = halt.GleisPlan.ToString(),
                         IstDurchfahrt = halt.IstDurchfahrt,
-                        IstAktiv = true,
+                        VerkehrNicht = false,
                     };
 
                     yield return result;

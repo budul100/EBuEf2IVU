@@ -217,7 +217,7 @@ namespace TrainPathSender.Converters
                 {
                     arrivalTrack = arrivalTrack,
                     departureTrack = departureTrack,
-                    running = relevant.IstAktiv,
+                    running = !relevant.VerkehrNicht,
                     runningSpecified = true,
                     stoppingReasons = stoppingReasons,
                     stopPoint = relevant.GetStopPoint(),
