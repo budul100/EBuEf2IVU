@@ -65,12 +65,12 @@ namespace DatabaseConnector.Extensions
 
         public static int GetWochentagId(this string bitmask)
         {
-            var bits = bitmask.Split();
+            var bits = bitmask.ToCharArray();
 
             var index = 0;
             foreach (var bit in bits)
             {
-                if (bit == PositiveBit.ToString())
+                if (bit == PositiveBit)
                 {
                     break;
                 }
