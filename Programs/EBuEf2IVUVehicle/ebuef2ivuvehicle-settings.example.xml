@@ -579,6 +579,19 @@
       <MessageEndGleis />
       <MessageStartGleis />
     </InfrastructureMapping>
+    <InfrastructureMapping name="XWS">
+      <EBuEfNachBetriebsstelle />
+      <EBuEfNachVerschiebungSekunden />
+      <EBuEfVonBetriebsstelle>XWS</EBuEfVonBetriebsstelle>
+      <EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+      <IVUGleis />
+      <IVUNetzpunkt>XWS</IVUNetzpunkt>
+      <IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+      <IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+      <MessageBetriebsstelle>XWS</MessageBetriebsstelle>
+      <MessageEndGleis />
+      <MessageStartGleis />
+    </InfrastructureMapping>
     <InfrastructureMapping name="XZO_A">
       <EBuEfNachBetriebsstelle>XZO</EBuEfNachBetriebsstelle>
       <EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
