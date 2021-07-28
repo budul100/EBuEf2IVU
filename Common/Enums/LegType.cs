@@ -3,7 +3,9 @@
     public enum LegType
     {
         Abfahrt,
+
         Ankunft,
+
         Durchfahrt
     }
 }

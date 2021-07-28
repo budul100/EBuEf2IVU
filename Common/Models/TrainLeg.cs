@@ -24,9 +24,9 @@ namespace Common.Models
 
         public string IVUGleis { get; set; }
 
-        public string IVUNetzpunkt { get; set; }
-
         public LegType IVULegTyp { get; set; }
+
+        public string IVUNetzpunkt { get; set; }
 
         public DateTime IVUZeitpunkt { get; set; }
 
@@ -38,9 +38,9 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return $@"Zug: {Zugnummer.ToString()} | EBuEf von: {EBuEfBetriebsstelleVon}/{EBuEfGleisVon} um {EBuEfZeitpunktVon:hh\:mm} | " +
+            return $@"Zug: {Zugnummer} | EBuEf von: {EBuEfBetriebsstelleVon}/{EBuEfGleisVon} um {EBuEfZeitpunktVon:hh\:mm} | " +
                 $@"EBuEf nach: {EBuEfBetriebsstelleNach}/{EBuEfGleisNach} um {EBuEfZeitpunktNach:hh\:mm} | " +
-                $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeitpunkt:HH\:mm} ({IVULegTyp.ToString()})";
+                $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeitpunkt:HH\:mm} ({IVULegTyp})";
         }
 
         #endregion Public Methods

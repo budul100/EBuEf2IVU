@@ -3,7 +3,9 @@
     public enum SignalType
     {
         ASig,
+
         BkSig,
+
         ESig,
     }
 }
