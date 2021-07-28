@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -6,7 +6,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RuntimeIdentifiers>win10-x64;linux-arm;linux-x64</RuntimeIdentifiers>
     <StartupObject>EBuEf2IVUCrew.Program</StartupObject>
-    <AssemblyVersion>0.39.4.0</AssemblyVersion>
+    <AssemblyVersion>0.40.1.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <Version>$(AssemblyVersion)</Version>
   </PropertyGroup>
