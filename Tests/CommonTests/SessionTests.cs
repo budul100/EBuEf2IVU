@@ -9,6 +9,8 @@ using System.Threading;
 namespace CommonTests
 {
     // Database must be activated for tests!
+    // Check hosts file on C:\Windows\System32\drivers\etc for the following entry:
+    // 127.0.0.1 db.ebuef
     public class SessionTests
     {
         #region Private Fields

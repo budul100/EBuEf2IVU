@@ -1,0 +1,57 @@
+<definitions name="RealTimeInformationImportFacadeService" targetNamespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://web.facade.ejb.fzd.mb.ivu.de/jaws" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <schema elementFormDefault="qualified" targetNamespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:soap11-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://web.facade.ejb.fzd.mb.ivu.de/jaws" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <include schemaLocation="RealTimeInformationImportFacade.xsd"/>
+    </schema>
+  </types>
+  <message name="RealTimeInformationImportFacade_importRealTimeInfo">
+    <part element="tns:importRealTimeInfo" name="parameters"/>
+  </message>
+  <message name="RealTimeInformationImportFacade_importRealTimeInfoResponse">
+    <part element="tns:importRealTimeInfoResponse" name="result"/>
+  </message>
+  <message name="RealTimeInformationImportFacade_periodicTask">
+    <part element="tns:periodicTask" name="periodicTask"/>
+  </message>
+  <message name="RealTimeInformationImportFacade_periodicTaskResponse">
+    <part element="tns:periodicTaskResponse" name="periodicTaskResponse"/>
+  </message>
+  <portType name="RealTimeInformationImportFacade">
+    <operation name="importRealTimeInfo">
+      <input message="tns:RealTimeInformationImportFacade_importRealTimeInfo"/>
+      <output message="tns:RealTimeInformationImportFacade_importRealTimeInfoResponse"/>
+    </operation>
+    <operation name="periodicTask">
+      <input message="tns:RealTimeInformationImportFacade_periodicTask"/>
+      <output message="tns:RealTimeInformationImportFacade_periodicTaskResponse"/>
+    </operation>
+  </portType>
+  <binding name="RealTimeInformationImportFacadeBinding"
+           type="tns:RealTimeInformationImportFacade">
+    <soap:binding style="document"
+                  transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="importRealTimeInfo">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="periodicTask">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="RealTimeInformationImportFacadeService">
+    <port binding="tns:RealTimeInformationImportFacadeBinding" name="RealTimeInformationImportFacadePort">
+      <soap:address location="http://localhost/de/RealTimeInformationImportFacadeBean"/>
+    </port>
+  </service>
+</definitions>

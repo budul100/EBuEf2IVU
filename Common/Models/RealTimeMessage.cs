@@ -17,11 +17,14 @@ namespace Common.Models
         [JsonProperty("end_gleis")]
         public string EndGleis { get; set; }
 
+        [JsonProperty("modus")]
+        public MessageType? Modus { get; set; }
+
         [JsonProperty("signaltyp")]
-        public SignalType SignalTyp { get; set; }
+        public SignalType? SignalTyp { get; set; }
 
         [JsonProperty("simulationszeit")]
-        public DateTime SimulationsZeit { get; set; }
+        public DateTime? SimulationsZeit { get; set; }
 
         [JsonProperty("start_gleis")]
         public string StartGleis { get; set; }

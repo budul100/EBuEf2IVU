@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
 using RealtimeSender.Converters;
+using RealtimeSender20;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

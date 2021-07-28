@@ -22,6 +22,8 @@ namespace Common.Models
 
         public IEnumerable<string> Fahrzeuge { get; set; }
 
+        public bool IstPrognose { get; set; }
+
         public string IVUGleis { get; set; }
 
         public LegType IVULegTyp { get; set; }

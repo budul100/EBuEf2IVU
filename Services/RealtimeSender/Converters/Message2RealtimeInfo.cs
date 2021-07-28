@@ -1,6 +1,9 @@
-﻿using Common.Models;
+﻿#pragma warning disable CA1031 // Do not catch general exception types
+
+using Common.Models;
 using Microsoft.Extensions.Logging;
 using RealtimeSender.Extensions;
+using RealtimeSender20;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +15,6 @@ namespace RealtimeSender.Converters
         #region Private Fields
 
         private const string EnvironmentComputer = "COMPUTERNAME";
-
-        private const int EventCodeAllocation = 9;
-        private const int ShuntingTrip = 0;
-        private const int TrackPosition = 0;
 
         private readonly string deviceID;
         private readonly string division;
@@ -42,7 +41,8 @@ namespace RealtimeSender.Converters
         public RealTimeInfoTO Get(VehicleAllocation allocation)
         {
             var result = GetRealtimeInfo(
-                eventCode: EventCodeAllocation,
+                eventCode: RealtimeInfoConstants.EventCodeAllocation,
+                classifier: RealtimeInfoConstants.ClassifierActual,
                 tripNumber: allocation.Zugnummer,
                 timeStamp: sessionStart,
                 stopArea: allocation.Betriebsstelle,
@@ -56,6 +56,7 @@ namespace RealtimeSender.Converters
         {
             var result = GetRealtimeInfo(
                 eventCode: leg.GetEventcode(),
+                classifier: leg.GetClassifier(),
                 tripNumber: leg.Zugnummer,
                 timeStamp: leg.IVUZeitpunkt,
                 stopArea: leg.IVUNetzpunkt,
@@ -69,7 +70,7 @@ namespace RealtimeSender.Converters
 
         #region Private Methods
 
-        private RealTimeInfoTO GetRealtimeInfo(int eventCode, string tripNumber, DateTime timeStamp,
+        private RealTimeInfoTO GetRealtimeInfo(int eventCode, int classifier, string tripNumber, DateTime timeStamp,
             string stopArea, string track, IEnumerable<string> vehicles)
         {
             var result = default(RealTimeInfoTO);
@@ -82,6 +83,8 @@ namespace RealtimeSender.Converters
 
                     result = new RealTimeInfoTO
                     {
+                        classifier = classifier,
+                        classifierSpecified = true,
                         deviceId = deviceID,
                         division = division,
                         //employeeId = this.config.User,
@@ -97,9 +100,9 @@ namespace RealtimeSender.Converters
                     if (!string.IsNullOrEmpty(track))
                     {
                         result.track = track;
-                        result.trackposition = TrackPosition;
+                        result.trackposition = RealtimeInfoConstants.TrackPosition;
                         result.trackpositionSpecified = true;
-                        result.shuntingTrip = ShuntingTrip;
+                        result.shuntingTrip = RealtimeInfoConstants.ShuntingTrip;
                         result.shuntingTripSpecified = true;
                     }
 
@@ -122,3 +125,5 @@ namespace RealtimeSender.Converters
         #endregion Private Methods
     }
 }
+
+#pragma warning restore CA1031 // Do not catch general exception types

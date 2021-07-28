@@ -1,5 +1,6 @@
 ﻿using Common.Enums;
 using Common.Models;
+using RealtimeSender20;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,33 +11,51 @@ namespace RealtimeSender.Extensions
     {
         #region Private Fields
 
-        private const int EventCodeArrival = 1;
-        private const int EventCodeDeparture = 2;
-        private const int EventCodePassing = 3;
-        private const int TrainCombinationComplete = 1;
-        private const int TrainCombinationUnknown = 2;
-
         private static readonly DateTime timestampSubtract = GetTimestampSubtract();
 
         #endregion Private Fields
 
         #region Public Methods
 
+        public static int GetClassifier(this TrainLeg leg)
+        {
+            var result = leg.IstPrognose
+                ? RealtimeInfoConstants.ClassifierPrognosis
+                : RealtimeInfoConstants.ClassifierActual;
+
+            return result;
+        }
+
         public static int GetEventcode(this TrainLeg leg)
         {
-            return leg.IVULegTyp switch
+            int result;
+
+            if (leg.IstPrognose)
             {
-                LegType.Abfahrt => EventCodeDeparture,
-                LegType.Ankunft => EventCodeArrival,
-                _ => EventCodePassing,
-            };
+                result = leg.IVULegTyp switch
+                {
+                    LegType.Ankunft => RealtimeInfoConstants.EventCodeArrivalPrognosis,
+                    _ => RealtimeInfoConstants.EventCodeDeparturePrognosis,
+                };
+            }
+            else
+            {
+                result = leg.IVULegTyp switch
+                {
+                    LegType.Durchfahrt => RealtimeInfoConstants.EventCodePassing,
+                    LegType.Ankunft => RealtimeInfoConstants.EventCodeArrival,
+                    _ => RealtimeInfoConstants.EventCodeDeparture,
+                };
+            }
+
+            return result;
         }
 
         public static int GetTrainCombinationComplete(this IEnumerable<VehicleTO> vehicles)
         {
             return vehicles.Any()
-                ? TrainCombinationUnknown
-                : TrainCombinationComplete;
+                ? RealtimeInfoConstants.TrainCombinationUnknown
+                : RealtimeInfoConstants.TrainCombinationComplete;
         }
 
         public static IEnumerable<VehicleTO> GetVehicleTOs(this IEnumerable<string> vehicles)

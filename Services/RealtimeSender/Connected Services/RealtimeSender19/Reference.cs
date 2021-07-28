@@ -9,7 +9,7 @@
 
 using System.Linq;
 
-namespace RealtimeSender
+namespace RealtimeSender19
 {
 
 
@@ -21,12 +21,12 @@ namespace RealtimeSender
         [System.ServiceModel.OperationContractAttribute(Action = "", ReplyAction = "*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults = true)]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(AbstractRealTimeInfoTO))]
-        System.Threading.Tasks.Task<RealtimeSender.importDelayInfoResponse> importDelayInfoAsync(RealtimeSender.importDelayInfoRequest request);
+        System.Threading.Tasks.Task<RealtimeSender19.importDelayInfoResponse> importDelayInfoAsync(RealtimeSender19.importDelayInfoRequest request);
 
         [System.ServiceModel.OperationContractAttribute(Action = "", ReplyAction = "*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults = true)]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(AbstractRealTimeInfoTO))]
-        System.Threading.Tasks.Task<RealtimeSender.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender.importRealTimeInfoRequest request);
+        System.Threading.Tasks.Task<RealtimeSender19.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender19.importRealTimeInfoRequest request);
     }
 
     /// <remarks/>
@@ -684,13 +684,13 @@ namespace RealtimeSender
 
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order = 0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("delayInfoTO", IsNullable = false)]
-        public RealtimeSender.DelayInfoTO[] importDelayInfo;
+        public RealtimeSender19.DelayInfoTO[] importDelayInfo;
 
         public importDelayInfoRequest()
         {
         }
 
-        public importDelayInfoRequest(RealtimeSender.DelayInfoTO[] importDelayInfo)
+        public importDelayInfoRequest(RealtimeSender19.DelayInfoTO[] importDelayInfo)
         {
             this.importDelayInfo = importDelayInfo;
         }
@@ -705,13 +705,13 @@ namespace RealtimeSender
 
         [System.ServiceModel.MessageBodyMemberAttribute(Name = "importDelayInfoResponse", Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order = 0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("result", IsNullable = false)]
-        public RealtimeSender.ValidationErrorTO[] importDelayInfoResponse1;
+        public RealtimeSender19.ValidationErrorTO[] importDelayInfoResponse1;
 
         public importDelayInfoResponse()
         {
         }
 
-        public importDelayInfoResponse(RealtimeSender.ValidationErrorTO[] importDelayInfoResponse1)
+        public importDelayInfoResponse(RealtimeSender19.ValidationErrorTO[] importDelayInfoResponse1)
         {
             this.importDelayInfoResponse1 = importDelayInfoResponse1;
         }
@@ -726,13 +726,13 @@ namespace RealtimeSender
 
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order = 0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("realTimeInfoTO", IsNullable = false)]
-        public RealtimeSender.RealTimeInfoTO[] importRealTimeInfo;
+        public RealtimeSender19.RealTimeInfoTO[] importRealTimeInfo;
 
         public importRealTimeInfoRequest()
         {
         }
 
-        public importRealTimeInfoRequest(RealtimeSender.RealTimeInfoTO[] importRealTimeInfo)
+        public importRealTimeInfoRequest(RealtimeSender19.RealTimeInfoTO[] importRealTimeInfo)
         {
             this.importRealTimeInfo = importRealTimeInfo;
         }
@@ -747,26 +747,26 @@ namespace RealtimeSender
 
         [System.ServiceModel.MessageBodyMemberAttribute(Name = "importRealTimeInfoResponse", Namespace = "http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order = 0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("result", IsNullable = false)]
-        public RealtimeSender.ValidationErrorTO[] importRealTimeInfoResponse1;
+        public RealtimeSender19.ValidationErrorTO[] importRealTimeInfoResponse1;
 
         public importRealTimeInfoResponse()
         {
         }
 
-        public importRealTimeInfoResponse(RealtimeSender.ValidationErrorTO[] importRealTimeInfoResponse1)
+        public importRealTimeInfoResponse(RealtimeSender19.ValidationErrorTO[] importRealTimeInfoResponse1)
         {
             this.importRealTimeInfoResponse1 = importRealTimeInfoResponse1;
         }
     }
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
-    internal interface RealTimeInformationImportFacadeChannel : RealtimeSender.RealTimeInformationImportFacade, System.ServiceModel.IClientChannel
+    internal interface RealTimeInformationImportFacadeChannel : RealtimeSender19.RealTimeInformationImportFacade, System.ServiceModel.IClientChannel
     {
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.1-preview-30422-0661")]
-    internal partial class RealTimeInformationImportFacadeClient : System.ServiceModel.ClientBase<RealtimeSender.RealTimeInformationImportFacade>, RealtimeSender.RealTimeInformationImportFacade
+    internal partial class RealTimeInformationImportFacadeClient : System.ServiceModel.ClientBase<RealtimeSender19.RealTimeInformationImportFacade>, RealtimeSender19.RealTimeInformationImportFacade
     {
 
         /// <summary>
@@ -810,29 +810,29 @@ namespace RealtimeSender
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<RealtimeSender.importDelayInfoResponse> RealtimeSender.RealTimeInformationImportFacade.importDelayInfoAsync(RealtimeSender.importDelayInfoRequest request)
+        System.Threading.Tasks.Task<RealtimeSender19.importDelayInfoResponse> RealtimeSender19.RealTimeInformationImportFacade.importDelayInfoAsync(RealtimeSender19.importDelayInfoRequest request)
         {
             return base.Channel.importDelayInfoAsync(request);
         }
 
-        public System.Threading.Tasks.Task<RealtimeSender.importDelayInfoResponse> importDelayInfoAsync(RealtimeSender.DelayInfoTO[] importDelayInfo)
+        public System.Threading.Tasks.Task<RealtimeSender19.importDelayInfoResponse> importDelayInfoAsync(RealtimeSender19.DelayInfoTO[] importDelayInfo)
         {
-            RealtimeSender.importDelayInfoRequest inValue = new RealtimeSender.importDelayInfoRequest();
+            RealtimeSender19.importDelayInfoRequest inValue = new RealtimeSender19.importDelayInfoRequest();
             inValue.importDelayInfo = importDelayInfo;
-            return ((RealtimeSender.RealTimeInformationImportFacade)(this)).importDelayInfoAsync(inValue);
+            return ((RealtimeSender19.RealTimeInformationImportFacade)(this)).importDelayInfoAsync(inValue);
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<RealtimeSender.importRealTimeInfoResponse> RealtimeSender.RealTimeInformationImportFacade.importRealTimeInfoAsync(RealtimeSender.importRealTimeInfoRequest request)
+        System.Threading.Tasks.Task<RealtimeSender19.importRealTimeInfoResponse> RealtimeSender19.RealTimeInformationImportFacade.importRealTimeInfoAsync(RealtimeSender19.importRealTimeInfoRequest request)
         {
             return base.Channel.importRealTimeInfoAsync(request);
         }
 
-        public System.Threading.Tasks.Task<RealtimeSender.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender.RealTimeInfoTO[] importRealTimeInfo)
+        public System.Threading.Tasks.Task<RealtimeSender19.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender19.RealTimeInfoTO[] importRealTimeInfo)
         {
-            RealtimeSender.importRealTimeInfoRequest inValue = new RealtimeSender.importRealTimeInfoRequest();
+            RealtimeSender19.importRealTimeInfoRequest inValue = new RealtimeSender19.importRealTimeInfoRequest();
             inValue.importRealTimeInfo = importRealTimeInfo;
-            return ((RealtimeSender.RealTimeInformationImportFacade)(this)).importRealTimeInfoAsync(inValue);
+            return ((RealtimeSender19.RealTimeInformationImportFacade)(this)).importRealTimeInfoAsync(inValue);
         }
 
         public virtual System.Threading.Tasks.Task OpenAsync()

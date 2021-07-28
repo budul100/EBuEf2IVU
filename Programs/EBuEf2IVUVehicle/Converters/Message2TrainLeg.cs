@@ -105,6 +105,7 @@ namespace EBuEf2IVUVehicle
                 EBuEfZeitpunktNach = ebuefZeitpunktNach,
                 EBuEfZeitpunktVon = ebuefZeitpunktVon,
                 Fahrzeuge = fahrzeuge,
+                IstPrognose = message.Modus == MessageType.Prognose,
                 IVUGleis = mapping.IVUGleis,
                 IVULegTyp = mapping.IVUTrainPositionType,
                 IVUNetzpunkt = mapping.IVUNetzpunkt,
