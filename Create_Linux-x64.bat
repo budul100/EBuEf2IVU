@@ -10,7 +10,7 @@ SET SOURCEDIR=.\bin\Release\%FRAMEWORK%\%RUNTIME%
 SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 
 echo.
-echo ##### Create Library #####
+echo ##### Create libraries #####
 echo.
 
 CHOICE /C mb /N /M "Shall the [b]uild (x.x._X_.0) or the [m]inor version (x._X_.0.0) be increased?"
@@ -19,12 +19,9 @@ echo.
 
 echo.
 echo ***
-echo *** Clean solution ***
+echo *** Clean target dir ***
 echo ***
 echo.
-
-FOR /F "tokens=*" %%G IN ('DIR /B /AD /S bin') DO RMDIR /S /Q "%%G"
-FOR /F "tokens=*" %%G IN ('DIR /B /AD /S obj') DO RMDIR /S /Q "%%G"
 
 DEL /q %TARGETDIR%\*.deb
 
@@ -41,12 +38,10 @@ echo ***
 echo.
 
 if /i "%VERSIONSELECTION%" == "1" (
-	echo.
-	echo Update minor version
-	echo.
-
 	powershell "%ScriptsDir%\Update_VersionMinor.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 )
+
+powershell "%ScriptsDir%\CleanFolders.ps1 -baseDir .\Programs\%SERVICENAME%"
 
 dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
@@ -77,12 +72,10 @@ echo ***
 echo.
 
 if /i "%VERSIONSELECTION%" == "1" (
-	echo.
-	echo Update minor version
-	echo.
-
 	powershell "%ScriptsDir%\Update_VersionMinor.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 )
+
+powershell "%ScriptsDir%\CleanFolders.ps1 -baseDir .\Programs\%SERVICENAME%"
 
 dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
@@ -113,12 +106,10 @@ echo ***
 echo.
 
 if /i "%VERSIONSELECTION%" == "1" (
-	echo.
-	echo Update minor version
-	echo.
-
 	powershell "%ScriptsDir%\Update_VersionMinor.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 )
+
+powershell "%ScriptsDir%\CleanFolders.ps1 -baseDir .\Programs\%SERVICENAME%"
 
 dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.

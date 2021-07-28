@@ -8,6 +8,8 @@ $scriptpath = split-path -parent $MyInvocation.MyCommand.Definition
 
 $currentVersion = Get-ProjectVersion -projectPath $projectPaths[0]
 
+Write-Host "Current version: $currentVersion"
+
 if ($currentVersion -cmatch '(?<major>\d+)\.(?<minor>\d+)\.(?<build>\d+)(\.(?<revision>\d+))?') 
 {
 	$updatedVersion = ($matches['major'] + "." + $matches['minor'] + "." + ([int]$matches['build'] + 1)) 
@@ -16,15 +18,14 @@ if ($currentVersion -cmatch '(?<major>\d+)\.(?<minor>\d+)\.(?<build>\d+)(\.(?<re
 	{
 		$updatedVersion = $updatedVersion + ".0"
 	}
-
 } 
 else 
 {
-
 	$updatedVersion = $currentVersion
-
 }
 
+Write-Host "New version: $updatedVersion"
+	
 . $scriptpath\Set_FileContent.ps1
 
 foreach ($path in $projectPaths)
