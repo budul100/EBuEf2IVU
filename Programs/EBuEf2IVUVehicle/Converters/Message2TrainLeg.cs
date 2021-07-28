@@ -41,12 +41,17 @@ namespace EBuEf2IVUVehicle
         {
             var result = default(TrainLeg);
 
-            var mapping = infrastructureMappings
+            var mapping = default(InfrastructureMapping);
+
+            if (message.SimulationsZeit.HasValue)
+            {
+                mapping = infrastructureMappings
                 .Where(m => m.MessageBetriebsstelle.IsMatch(message.Betriebsstelle))
                 .Where(m => m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
                     && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
                 .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
                 .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis)).FirstOrDefault();
+            }
 
             if (mapping != default)
             {
@@ -81,13 +86,13 @@ namespace EBuEf2IVUVehicle
         private TrainLeg GetTrainLeg(RealTimeMessage message, InfrastructureMapping mapping)
         {
             var ebuefZeitVon = TimeSpan.FromSeconds(mapping.EBuEfVonVerschiebungSekunden.ToInt());
-            var ebuefZeitpunktVon = message.SimulationsZeit.Add(ebuefZeitVon).TimeOfDay;
+            var ebuefZeitpunktVon = message.SimulationsZeit.Value.Add(ebuefZeitVon).TimeOfDay;
 
             var ebuefZeitNach = TimeSpan.FromSeconds(mapping.EBuEfNachVerschiebungSekunden.ToInt());
-            var ebuefZeitpunktNach = message.SimulationsZeit.Add(ebuefZeitNach).TimeOfDay;
+            var ebuefZeitpunktNach = message.SimulationsZeit.Value.Add(ebuefZeitNach).TimeOfDay;
 
             var ivuZeit = TimeSpan.FromSeconds(mapping.IVUVerschiebungSekunden.ToInt());
-            var ivuZeitpunkt = message.SimulationsZeit.Add(ivuZeit).TimeOfDay;
+            var ivuZeitpunkt = message.SimulationsZeit.Value.Add(ivuZeit).TimeOfDay;
 
             var fahrzeuge = message?.Decoder.AsEnumerable();
 
