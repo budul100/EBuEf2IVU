@@ -3,11 +3,20 @@
 SET FRAMEWORK=netcoreapp3.1
 SET RUNTIME=linux-x64
 
+SET ScriptsDir=.\_Scripts\Build
+
 SET TARGETDIR=.
 SET SOURCEDIR=.\bin\Release\%FRAMEWORK%\%RUNTIME%
 SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 
 echo.
+echo ##### Create Library #####
+echo.
+
+CHOICE /C mb /N /M "Shall the [b]uild (x.x._X_.0) or the [m]inor version (x._X_.0.0) be increased?"
+SET VERSIONSELECTION=%ERRORLEVEL%
+echo.
+
 echo.
 echo ***
 echo *** Clean solution ***
@@ -31,6 +40,14 @@ echo *** Build %SERVICENAME% ***
 echo ***
 echo.
 
+if /i "%VERSIONSELECTION%" == "1" (
+	echo.
+	echo Update minor version
+	echo.
+
+	powershell "%ScriptsDir%\Update_VersionMinor.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
+)
+
 dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
 
@@ -39,6 +56,8 @@ echo.
 
 BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
 echo.
+
+powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
@@ -57,6 +76,14 @@ echo *** Build %SERVICENAME% ***
 echo ***
 echo.
 
+if /i "%VERSIONSELECTION%" == "1" (
+	echo.
+	echo Update minor version
+	echo.
+
+	powershell "%ScriptsDir%\Update_VersionMinor.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
+)
+
 dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
 
@@ -65,6 +92,8 @@ echo.
 
 BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
 echo.
+
+powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
@@ -83,6 +112,14 @@ echo *** Build %SERVICENAME% ***
 echo ***
 echo.
 
+if /i "%VERSIONSELECTION%" == "1" (
+	echo.
+	echo Update minor version
+	echo.
+
+	powershell "%ScriptsDir%\Update_VersionMinor.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
+)
+
 dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
 
@@ -91,6 +128,8 @@ echo.
 
 BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
 echo.
+
+powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
