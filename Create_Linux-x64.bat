@@ -1,6 +1,6 @@
 @echo off
 
-SET FRAMEWORK=netcoreapp3.1
+SET FRAMEWORK=net5.0
 SET RUNTIME=linux-x64
 
 SET ScriptsDir=.\_Scripts\Build
@@ -46,7 +46,7 @@ powershell "%ScriptsDir%\CleanFolders.ps1 -baseDir .\Programs\%SERVICENAME%"
 dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
 
-dotnet build -c release -f %FRAMEWORK% .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
+dotnet build -c release -f %FRAMEWORK% -r %RUNTIME% .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
 
 BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
@@ -80,7 +80,7 @@ powershell "%ScriptsDir%\CleanFolders.ps1 -baseDir .\Programs\%SERVICENAME%"
 dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
 
-dotnet build -c release -f %FRAMEWORK% .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
+dotnet build -c release -f %FRAMEWORK% -r %RUNTIME% .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
 
 BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
@@ -114,7 +114,7 @@ powershell "%ScriptsDir%\CleanFolders.ps1 -baseDir .\Programs\%SERVICENAME%"
 dotnet restore .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
 
-dotnet build -c release -f %FRAMEWORK% .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
+dotnet build -c release -f %FRAMEWORK% -r %RUNTIME% .\Programs\%SERVICENAME%\%SERVICENAME%.csproj 
 echo.
 
 BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
