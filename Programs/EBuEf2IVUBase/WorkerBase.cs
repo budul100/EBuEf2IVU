@@ -134,7 +134,7 @@ namespace EBuEf2IVUBase
             {
                 logger?.LogInformation("Sessionstart-Nachricht empfangen.");
 
-                sessionCancellationTokenSource.Cancel();
+                sessionCancellationTokenSource?.Cancel();
 
                 currentState = e.State;
             }
