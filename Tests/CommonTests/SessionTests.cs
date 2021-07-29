@@ -24,21 +24,6 @@ namespace CommonTests
 
         #region Public Methods
 
-        [SetUp]
-        public void Init()
-        {
-            var path = Path.GetFullPath(@"..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
-
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddXmlFile(
-                path: path,
-                optional: false,
-                reloadOnChange: false);
-
-            config = configBuilder.Build();
-            cancellationTokenSource = new CancellationTokenSource();
-        }
-
         [Test]
         public void GetSessionData()
         {
@@ -84,7 +69,7 @@ namespace CommonTests
             var wasCalled = false;
             sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.State == Common.Enums.SessionStatusType.IsRunning;
 
-            Task.WaitAll(sessionStateHandler.RunAsync(cancellationTokenSource.Token));
+            Task.WaitAll(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
             Assert.False(wasCalled);
         }
@@ -110,9 +95,24 @@ namespace CommonTests
             var wasCalled = false;
             sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.State == Common.Enums.SessionStatusType.IsRunning;
 
-            Task.WaitAll(sessionStateHandler.RunAsync(cancellationTokenSource.Token));
+            Task.WaitAll(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
             Assert.True(wasCalled);
+        }
+
+        [SetUp]
+        public void Init()
+        {
+            var path = Path.GetFullPath(@"..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
+
+            var configBuilder = new ConfigurationBuilder();
+            configBuilder.AddXmlFile(
+                path: path,
+                optional: false,
+                reloadOnChange: false);
+
+            config = configBuilder.Build();
+            cancellationTokenSource = new CancellationTokenSource();
         }
 
         #endregion Public Methods
