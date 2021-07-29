@@ -49,7 +49,7 @@ namespace EBuEf2IVUPath
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
             InitializeStateReceiver(workerCancellationToken);
-            await sessionStateHandler.RunAsync(workerCancellationToken);
+            await sessionStateHandler.ExecuteAsync(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
@@ -69,8 +69,8 @@ namespace EBuEf2IVUPath
                     try
                     {
                         await Task.WhenAny(
-                            trainPathReceiver.RunAsync(sessionCancellationToken),
-                            trainPathSender.RunAsnc(sessionCancellationToken));
+                            trainPathReceiver.ExecuteAsync(sessionCancellationToken),
+                            trainPathSender.ExecuteAsync(sessionCancellationToken));
                     }
                     catch (TaskCanceledException)
                     {

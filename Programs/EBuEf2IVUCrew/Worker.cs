@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace EBuEf2IVUCrew
 {
-    internal class Worker
+    public class Worker
         : WorkerBase
     {
         #region Private Fields
@@ -43,7 +43,7 @@ namespace EBuEf2IVUCrew
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
             InitializeStateReceiver(workerCancellationToken);
-            await sessionStateHandler.RunAsync(workerCancellationToken);
+            await sessionStateHandler.ExecuteAsync(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
             {

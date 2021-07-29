@@ -62,6 +62,17 @@ namespace RealtimeSender
             }
         }
 
+        public Task ExecuteAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.Register(() => infosQueue.Clear());
+
+            var result = retryPolicy.ExecuteAsync(
+                action: (token) => RunSenderAsync(token),
+                cancellationToken: cancellationToken);
+
+            return result;
+        }
+
         public void Initialize(string division, string endpoint, int retryTime, DateTime sessionStart)
         {
             converter = new Message2RealtimeInfo(
@@ -78,17 +89,6 @@ namespace RealtimeSender
                     onRetry: (exception, reconnection) => OnRetry(
                         exception: exception,
                         reconnection: reconnection));
-        }
-
-        public Task RunAsnc(CancellationToken cancellationToken)
-        {
-            cancellationToken.Register(() => infosQueue.Clear());
-
-            var result = retryPolicy.ExecuteAsync(
-                action: (token) => RunSenderAsync(token),
-                cancellationToken: cancellationToken);
-
-            return result;
         }
 
         #endregion Public Methods

@@ -14,9 +14,9 @@ namespace Common.Interfaces
 
         void Add(TrainLeg trainLeg);
 
-        void Initialize(string division, string endpoint, int retryTime, DateTime sessionStart);
+        Task ExecuteAsync(CancellationToken cancellationToken);
 
-        Task RunAsnc(CancellationToken cancellationToken);
+        void Initialize(string division, string endpoint, int retryTime, DateTime sessionStart);
 
         #endregion Public Methods
     }

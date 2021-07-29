@@ -54,7 +54,7 @@ namespace EBuEf2IVUVehicle
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
             InitializeStateReceiver(workerCancellationToken);
-            await sessionStateHandler.RunAsync(workerCancellationToken);
+            await sessionStateHandler.ExecuteAsync(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
@@ -74,8 +74,8 @@ namespace EBuEf2IVUVehicle
                     try
                     {
                         await Task.WhenAny(
-                            positionsReceiver.RunAsync(sessionCancellationToken),
-                            realtimeSender.RunAsnc(sessionCancellationToken));
+                            positionsReceiver.ExecuteAsync(sessionCancellationToken),
+                            realtimeSender.ExecuteAsync(sessionCancellationToken));
                     }
                     catch (TaskCanceledException)
                     {

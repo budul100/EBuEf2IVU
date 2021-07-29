@@ -51,6 +51,18 @@ namespace StateHandler
 
         #region Public Methods
 
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
+        {
+            var isSessionStarted = await IsSessionStartedAsync();
+
+            if (isSessionStarted)
+            {
+                SendSessionStatus(SessionStatusType.IsRunning);
+            }
+
+            await stateReceiver.ExecuteAsync(cancellationToken);
+        }
+
         public void Initialize(string host, int port, int retryTime, string sessionStartPattern,
             string sessionStatusPattern)
         {
@@ -62,18 +74,6 @@ namespace StateHandler
 
             sessionStartRegex = GetSessionStartRegex(sessionStartPattern);
             sessionStatusRegex = GetSessionStatusRegex(sessionStatusPattern);
-        }
-
-        public async Task RunAsync(CancellationToken cancellationToken)
-        {
-            var isSessionStarted = await IsSessionStartedAsync();
-
-            if (isSessionStarted)
-            {
-                SendSessionStatus(SessionStatusType.IsRunning);
-            }
-
-            await stateReceiver.RunAsync(cancellationToken);
         }
 
         #endregion Public Methods

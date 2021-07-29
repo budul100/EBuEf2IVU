@@ -46,6 +46,15 @@ namespace MessageReceiver
 
         #region Public Methods
 
+        public Task ExecuteAsync(CancellationToken cancellationToken)
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (t) => RunReceiverAsync(t),
+                cancellationToken: cancellationToken);
+
+            return result;
+        }
+
         public void Initialize(string host, int port, int retryTime, string messageType)
         {
             this.host = host;
@@ -59,15 +68,6 @@ namespace MessageReceiver
                     onRetry: (exception, reconnection) => OnRetry(
                         exception: exception,
                         reconnection: reconnection));
-        }
-
-        public Task RunAsync(CancellationToken cancellationToken)
-        {
-            var result = retryPolicy.ExecuteAsync(
-                action: (t) => RunReceiverAsync(t),
-                cancellationToken: cancellationToken);
-
-            return result;
         }
 
         #endregion Public Methods

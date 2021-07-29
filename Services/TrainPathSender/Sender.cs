@@ -68,6 +68,15 @@ namespace TrainPathSender
             }
         }
 
+        public Task ExecuteAsync(CancellationToken cancellationToken)
+        {
+            var result = retryPolicy.ExecuteAsync(
+                action: (token) => RunSenderAsync(token),
+                cancellationToken: cancellationToken);
+
+            return result;
+        }
+
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
             int retryTime, string sessionKey, DateTime sessionDate, string infrastructureManager,
             string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
@@ -112,15 +121,6 @@ namespace TrainPathSender
                     onRetry: (exception, reconnection) => OnRetry(
                         exception: exception,
                         reconnection: reconnection));
-        }
-
-        public Task RunAsnc(CancellationToken cancellationToken)
-        {
-            var result = retryPolicy.ExecuteAsync(
-                action: (token) => RunSenderAsync(token),
-                cancellationToken: cancellationToken);
-
-            return result;
         }
 
         #endregion Public Methods
