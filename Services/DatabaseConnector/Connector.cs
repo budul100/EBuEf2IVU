@@ -333,7 +333,7 @@ namespace DatabaseConnector
             if (!queryCancellationToken.IsCancellationRequested)
             {
                 logger.LogDebug(
-                    "Suche in der EBuEf-DB nach dme Status der aktuellen Fahrplan-Session.");
+                    "Suche in der EBuEf-DB nach dem Status der aktuellen Fahrplan-Session.");
 
                 using var context = new SitzungContext(connectionString);
 
