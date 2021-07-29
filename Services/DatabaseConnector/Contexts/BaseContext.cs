@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
 
 namespace DatabaseConnector.Contexts
 {
@@ -25,11 +24,9 @@ namespace DatabaseConnector.Contexts
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var conntectionStringBuilder = new MySqlConnectionStringBuilder(connectionString);
-            conntectionStringBuilder.TreatTinyAsBoolean = false;
-
-            optionsBuilder
-                .UseMySql(conntectionStringBuilder.ToString());
+            optionsBuilder.UseMySql(
+                connectionString: connectionString,
+                serverVersion: ServerVersion.AutoDetect(connectionString));
         }
 
         #endregion Protected Methods
