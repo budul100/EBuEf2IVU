@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -6,15 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="3.0.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj" />
     <ProjectReference Include="..\..\Programs\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
+    <ProjectReference Include="..\..\Programs\EBuEf2IVUCrew\EBuEf2IVUCrew.csproj" />
     <ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
     <ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj" />
   </ItemGroup>
