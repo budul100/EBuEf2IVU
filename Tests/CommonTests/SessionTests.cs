@@ -1,10 +1,12 @@
+using Common.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CommonTests
 {
@@ -15,15 +17,15 @@ namespace CommonTests
     {
         #region Private Fields
 
+        private CancellationTokenSource cancellationTokenSource;
         private IConfigurationRoot config;
-        private NullLoggerFactory loggerFactory;
 
         #endregion Private Fields
 
         #region Public Methods
 
         [SetUp]
-        public void _Init()
+        public void Init()
         {
             var path = Path.GetFullPath(@"..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
 
@@ -34,23 +36,24 @@ namespace CommonTests
                 reloadOnChange: false);
 
             config = configBuilder.Build();
-
-            loggerFactory = new NullLoggerFactory();
+            cancellationTokenSource = new CancellationTokenSource();
         }
 
         [Test]
-        public void GetSessionAsync()
+        public void GetSessionData()
         {
             var connectorSettings = config
                 .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
                 .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
 
-            var databaseConnector = new DatabaseConnector.Connector(loggerFactory.CreateLogger<DatabaseConnector.Connector>());
+            var loggerMock = new Mock<ILogger<DatabaseConnector.Connector>>();
+
+            var databaseConnector = new DatabaseConnector.Connector(loggerMock.Object);
 
             databaseConnector.Initialize(
                 connectionString: connectorSettings.ConnectionString,
                 retryTime: connectorSettings.RetryTime,
-                sessionCancellationToken: new CancellationToken());
+                cancellationToken: new CancellationToken());
 
             var query = databaseConnector.GetEBuEfSessionAsync();
             query.Wait();
@@ -58,6 +61,58 @@ namespace CommonTests
             Assert.That(query.Result.IVUDatum == query.Result.IVUDatum.Date, Is.True);
             Assert.That(query.Result.SessionStart.TimeOfDay == new TimeSpan(14, 0, 0), Is.True);
             Assert.That(query.Result.Wochentag == DayOfWeek.Friday, Is.True);
+        }
+
+        [Test]
+        public void GetSessionNotStarted()
+        {
+            var connectorSettings = config
+                .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
+                .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
+
+            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var loggerMock = new Mock<ILogger<StateHandler.Handler>>();
+
+            var databaseConnectorMock = new Mock<IDatabaseConnector>();
+            databaseConnectorMock.Setup(c => c.GetEBuEfSessionActiveAsync()).Returns(Task.FromResult(false));
+
+            var sessionStateHandler = new StateHandler.Handler(
+                logger: loggerMock.Object,
+                databaseConnector: databaseConnectorMock.Object,
+                stateReceiver: messageReceiverMock.Object);
+
+            var wasCalled = false;
+            sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.State == Common.Enums.SessionStatusType.IsRunning;
+
+            Task.WaitAll(sessionStateHandler.RunAsync(cancellationTokenSource.Token));
+
+            Assert.False(wasCalled);
+        }
+
+        [Test]
+        public void GetSessionStarted()
+        {
+            var connectorSettings = config
+                .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
+                .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
+
+            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var loggerMock = new Mock<ILogger<StateHandler.Handler>>();
+
+            var databaseConnectorMock = new Mock<IDatabaseConnector>();
+            databaseConnectorMock.Setup(c => c.GetEBuEfSessionActiveAsync()).Returns(Task.FromResult(true));
+
+            var sessionStateHandler = new StateHandler.Handler(
+                logger: loggerMock.Object,
+                databaseConnector: databaseConnectorMock.Object,
+                stateReceiver: messageReceiverMock.Object);
+
+            var wasCalled = false;
+            sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.State == Common.Enums.SessionStatusType.IsRunning;
+
+            Task.WaitAll(sessionStateHandler.RunAsync(cancellationTokenSource.Token));
+
+            Assert.True(wasCalled);
         }
 
         #endregion Public Methods

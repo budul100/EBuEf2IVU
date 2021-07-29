@@ -1,10 +1,12 @@
 ﻿using Common.Enums;
 using Common.EventsArgs;
+using Common.Extensions;
 using Common.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace StateHandler
 {
@@ -17,6 +19,7 @@ namespace StateHandler
         private const string StatusRegexGroupName = "status";
         private const string StatusRegexGroupWildcard = "$";
 
+        private readonly IDatabaseConnector databaseConnector;
         private readonly ILogger logger;
         private readonly IMessageReceiver stateReceiver;
 
@@ -27,10 +30,11 @@ namespace StateHandler
 
         #region Public Constructors
 
-        public Handler(ILogger<Handler> logger, IMessageReceiver stateReceiver)
+        public Handler(ILogger<Handler> logger, IDatabaseConnector databaseConnector, IMessageReceiver stateReceiver)
         {
             this.logger = logger;
 
+            this.databaseConnector = databaseConnector;
             this.stateReceiver = stateReceiver;
             this.stateReceiver.MessageReceivedEvent += OnStatusReceived;
         }
@@ -60,9 +64,16 @@ namespace StateHandler
             sessionStatusRegex = GetSessionStatusRegex(sessionStatusPattern);
         }
 
-        public void Run(CancellationToken cancellationToken)
+        public async Task RunAsync(CancellationToken cancellationToken)
         {
-            stateReceiver.RunAsync(cancellationToken);
+            var isSessionStarted = await IsSessionStartedAsync();
+
+            if (isSessionStarted)
+            {
+                SendSessionStatus(SessionStatusType.IsRunning);
+            }
+
+            await stateReceiver.RunAsync(cancellationToken);
         }
 
         #endregion Public Methods
@@ -87,6 +98,13 @@ namespace StateHandler
             return result;
         }
 
+        private async Task<bool> IsSessionStartedAsync()
+        {
+            var result = await databaseConnector.GetEBuEfSessionActiveAsync();
+
+            return result;
+        }
+
         private void OnStatusReceived(object sender, MessageReceivedArgs e)
         {
             logger.LogDebug(
@@ -101,40 +119,52 @@ namespace StateHandler
             }
             else
             {
-                var sessionStatus = sessionStatusRegex.IsMatch(e.Content)
+                var sessionStatusText = sessionStatusRegex.IsMatch(e.Content)
                     ? sessionStatusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
                     : default;
 
-                if (sessionStatus == SessionStates.InPreparation.ToString("D"))
-                {
-                    SessionChangedEvent?.Invoke(
-                        sender: this,
-                        e: new StateChangedArgs(SessionStates.InPreparation));
-                }
-                else if (sessionStatus == SessionStates.IsRunning.ToString("D"))
-                {
-                    SessionChangedEvent?.Invoke(
-                        sender: this,
-                        e: new StateChangedArgs(SessionStates.IsRunning));
-                }
-                else if (sessionStatus == SessionStates.IsEnded.ToString("D"))
-                {
-                    SessionChangedEvent?.Invoke(
-                        sender: this,
-                        e: new StateChangedArgs(SessionStates.IsEnded));
-                }
-                else if (sessionStatus == SessionStates.IsPaused.ToString("D"))
-                {
-                    SessionChangedEvent?.Invoke(
-                        sender: this,
-                        e: new StateChangedArgs(SessionStates.IsPaused));
-                }
-                else
+                var sessionStatus = sessionStatusText.GetSessionStatusType();
+
+                if (sessionStatus == default)
                 {
                     logger.LogError(
                         "Unbekannte Status-Nachricht empfangen: {content}",
                         e.Content);
                 }
+                else
+                {
+                    SendSessionStatus(sessionStatus.Value);
+                }
+            }
+        }
+
+        private void SendSessionStatus(SessionStatusType sessionStatus)
+        {
+            switch (sessionStatus)
+            {
+                case SessionStatusType.InPreparation:
+                    SessionChangedEvent?.Invoke(
+                        sender: this,
+                        e: new StateChangedArgs(SessionStatusType.InPreparation));
+                    break;
+
+                case SessionStatusType.IsRunning:
+                    SessionChangedEvent?.Invoke(
+                        sender: this,
+                        e: new StateChangedArgs(SessionStatusType.IsRunning));
+                    break;
+
+                case SessionStatusType.IsEnded:
+                    SessionChangedEvent?.Invoke(
+                        sender: this,
+                        e: new StateChangedArgs(SessionStatusType.IsEnded));
+                    break;
+
+                case SessionStatusType.IsPaused:
+                    SessionChangedEvent?.Invoke(
+                        sender: this,
+                        e: new StateChangedArgs(SessionStatusType.IsPaused));
+                    break;
             }
         }
 

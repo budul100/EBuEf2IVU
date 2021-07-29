@@ -23,7 +23,7 @@ namespace EBuEf2IVUBase
         protected readonly ILogger logger;
         protected readonly IStateHandler sessionStateHandler;
 
-        protected SessionStates currentState;
+        protected SessionStatusType currentState;
         protected EBuEfSession ebuefSession;
         protected DateTime ebuefSessionStart = DateTime.Now;
         protected DateTime ivuSessionDate = DateTime.Now;
@@ -77,7 +77,7 @@ namespace EBuEf2IVUBase
                 : DateTime.Now.Add(sessionShift);
         }
 
-        protected void InitializeDatabaseConnector(CancellationToken sessionCancellationToken)
+        protected void InitializeDatabaseConnector(CancellationToken cancellationToken)
         {
             var connectorSettings = config
                 .GetSection(nameof(EBuEfDBConnector))
@@ -86,7 +86,7 @@ namespace EBuEf2IVUBase
             databaseConnector.Initialize(
                 connectionString: connectorSettings.ConnectionString,
                 retryTime: connectorSettings.RetryTime,
-                sessionCancellationToken: sessionCancellationToken);
+                cancellationToken: cancellationToken);
         }
 
         protected async Task InitializeSessionAsync()
@@ -108,8 +108,10 @@ namespace EBuEf2IVUBase
                 ebuefSessionStart.ToString("hh:mm"));
         }
 
-        protected void InitializeStateReceiver()
+        protected void InitializeStateReceiver(CancellationToken cancellationToken)
         {
+            InitializeDatabaseConnector(cancellationToken);
+
             var settings = config
                 .GetSection(nameof(StatusReceiver))
                 .Get<StatusReceiver>();
@@ -128,7 +130,7 @@ namespace EBuEf2IVUBase
 
         private void OnSessionChanged(object sender, StateChangedArgs e)
         {
-            if (e.State == SessionStates.IsRunning)
+            if (e.State == SessionStatusType.IsRunning)
             {
                 logger?.LogInformation("Sessionstart-Nachricht empfangen.");
 
@@ -136,13 +138,13 @@ namespace EBuEf2IVUBase
 
                 currentState = e.State;
             }
-            else if (e.State == SessionStates.IsPaused)
+            else if (e.State == SessionStatusType.IsPaused)
             {
                 logger?.LogInformation("Sessionpause-Nachricht empfangen.");
 
                 currentState = e.State;
             }
-            else if (e.State == SessionStates.IsEnded)
+            else if (e.State == SessionStatusType.IsEnded)
             {
                 logger?.LogInformation("Sessionende-Nachricht empfangen.");
 

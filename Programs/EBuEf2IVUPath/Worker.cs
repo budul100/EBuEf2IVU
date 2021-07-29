@@ -48,8 +48,8 @@ namespace EBuEf2IVUPath
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            InitializeStateReceiver();
-            sessionStateHandler.Run(workerCancellationToken);
+            InitializeStateReceiver(workerCancellationToken);
+            await sessionStateHandler.RunAsync(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
@@ -186,7 +186,7 @@ namespace EBuEf2IVUPath
 
         private async void OnSessionChangedAsync(object sender, Common.EventsArgs.StateChangedArgs e)
         {
-            if (e.State == SessionStates.InPreparation)
+            if (e.State == SessionStatusType.InPreparation)
             {
                 logger.LogDebug(
                     "Nachricht zum initialen Import der Zugtrassen empfangen.");

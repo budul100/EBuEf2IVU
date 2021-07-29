@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
@@ -16,6 +17,7 @@
     <ProjectReference Include="..\..\Common\Common.csproj" />
     <ProjectReference Include="..\..\Programs\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
     <ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
+    <ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj" />
   </ItemGroup>
 
 </Project>

@@ -97,7 +97,7 @@ namespace TrainPathSenderTests
             databaseConnector.Initialize(
                 connectionString: connectorSettings.ConnectionString,
                 retryTime: connectorSettings.RetryTime,
-                sessionCancellationToken: new CancellationToken());
+                cancellationToken: new CancellationToken());
 
             var query = databaseConnector.GetEBuEfSessionAsync();
             query.Wait();

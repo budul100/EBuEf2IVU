@@ -12,6 +12,8 @@ namespace Common.Interfaces
 
         Task AddRealtimeAsync(TrainLeg leg);
 
+        Task<bool> GetEBuEfSessionActiveAsync();
+
         Task<EBuEfSession> GetEBuEfSessionAsync();
 
         Task<IEnumerable<string>> GetLocationShortnamesAsync(IEnumerable<string> locationTypes);
@@ -27,7 +29,7 @@ namespace Common.Interfaces
 
         Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync();
 
-        void Initialize(string connectionString, int retryTime, CancellationToken sessionCancellationToken);
+        void Initialize(string connectionString, int retryTime, CancellationToken cancellationToken);
 
         Task SetCrewingsAsync(IEnumerable<CrewingElement> crewingElements);
 

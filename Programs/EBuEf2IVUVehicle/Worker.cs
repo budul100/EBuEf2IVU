@@ -53,8 +53,8 @@ namespace EBuEf2IVUVehicle
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            InitializeStateReceiver();
-            sessionStateHandler.Run(workerCancellationToken);
+            InitializeStateReceiver(workerCancellationToken);
+            await sessionStateHandler.RunAsync(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
             {

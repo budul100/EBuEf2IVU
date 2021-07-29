@@ -42,8 +42,8 @@ namespace EBuEf2IVUCrew
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            InitializeStateReceiver();
-            sessionStateHandler.Run(workerCancellationToken);
+            InitializeStateReceiver(workerCancellationToken);
+            await sessionStateHandler.RunAsync(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
@@ -59,7 +59,7 @@ namespace EBuEf2IVUCrew
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
-                    if (currentState == SessionStates.IsRunning)
+                    if (currentState == SessionStatusType.IsRunning)
                     {
                         await CheckCrewsAsync(sessionCancellationToken);
 

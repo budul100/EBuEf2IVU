@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBuEf2IVUCrew", "Programs\E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{B66A038D-89B1-4317-BD2D-85C054B7CA12}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StateReceiver", "Services\StateReceiver\StateReceiver.csproj", "{1CBAA357-9855-4551-8D96-8E576150EDB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StateHandler", "Services\StateHandler\StateHandler.csproj", "{1CBAA357-9855-4551-8D96-8E576150EDB2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrewChecker", "Services\CrewChecker\CrewChecker.csproj", "{DAFDF6EE-8018-4DA1-9018-1BFCF3D439BF}"
 EndProject
@@ -33,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AF50D50
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainPathSenderTests", "Tests\TrainPathSenderTests\TrainPathSenderTests.csproj", "{55E268D8-F5A5-4AD3-A5D0-6B81E571C5EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTests", "Tests\CommonTests\CommonTests.csproj", "{CE3C121B-603E-4380-98D5-77199B49D2B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonTests", "Tests\CommonTests\CommonTests.csproj", "{CE3C121B-603E-4380-98D5-77199B49D2B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

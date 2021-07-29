@@ -51,7 +51,7 @@
     <ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
     <ProjectReference Include="..\..\Services\MessageReceiver\MessageReceiver.csproj" />
     <ProjectReference Include="..\..\Services\RealtimeSender\RealtimeSender.csproj" />
-    <ProjectReference Include="..\..\Services\StateReceiver\StateReceiver.csproj" />
+    <ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj" />
     <ProjectReference Include="..\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
   </ItemGroup>
 

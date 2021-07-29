@@ -8,7 +8,7 @@ namespace Common.EventsArgs
     {
         #region Public Constructors
 
-        public StateChangedArgs(SessionStates state)
+        public StateChangedArgs(SessionStatusType state)
         {
             State = state;
         }
@@ -17,7 +17,7 @@ namespace Common.EventsArgs
 
         #region Public Properties
 
-        public SessionStates State { get; private set; }
+        public SessionStatusType State { get; private set; }
 
         #endregion Public Properties
     }
