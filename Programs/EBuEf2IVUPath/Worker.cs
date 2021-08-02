@@ -48,8 +48,7 @@ namespace EBuEf2IVUPath
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            InitializeStateReceiver(workerCancellationToken);
-            await sessionStateHandler.ExecuteAsync(workerCancellationToken);
+            await InitializeConnectionAsync(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
@@ -58,7 +57,6 @@ namespace EBuEf2IVUPath
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                InitializeDatabaseConnector(sessionCancellationToken);
                 await InitializeSessionAsync();
 
                 InitializePathReceiver();

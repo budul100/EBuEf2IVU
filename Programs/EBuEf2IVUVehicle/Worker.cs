@@ -53,8 +53,7 @@ namespace EBuEf2IVUVehicle
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            InitializeStateReceiver(workerCancellationToken);
-            await sessionStateHandler.ExecuteAsync(workerCancellationToken);
+            await InitializeConnectionAsync(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
@@ -63,7 +62,6 @@ namespace EBuEf2IVUVehicle
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                InitializeDatabaseConnector(sessionCancellationToken);
                 await InitializeSessionAsync();
 
                 InitializePositionReceiver();

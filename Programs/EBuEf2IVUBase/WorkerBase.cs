@@ -68,25 +68,29 @@ namespace EBuEf2IVUBase
             return sessionCancellationTokenSource.Token;
         }
 
-        protected DateTime GetSimTime()
+        protected async Task InitializeConnectionAsync(CancellationToken cancellationToken)
         {
-            var sessionShift = -ebuefSession.Verschiebung;
-
-            return sessionShift == default
-                ? DateTime.Now
-                : DateTime.Now.Add(sessionShift);
-        }
-
-        protected void InitializeDatabaseConnector(CancellationToken cancellationToken)
-        {
-            var connectorSettings = config
+            var databaseConnectionSettings = config
                 .GetSection(nameof(EBuEfDBConnector))
                 .Get<EBuEfDBConnector>();
 
             databaseConnector.Initialize(
-                connectionString: connectorSettings.ConnectionString,
-                retryTime: connectorSettings.RetryTime,
+                connectionString: databaseConnectionSettings.ConnectionString,
+                retryTime: databaseConnectionSettings.RetryTime,
                 cancellationToken: cancellationToken);
+
+            var statucReceiverSettings = config
+                .GetSection(nameof(StatusReceiver))
+                .Get<StatusReceiver>();
+
+            sessionStateHandler.Initialize(
+                host: statucReceiverSettings.Host,
+                port: statucReceiverSettings.Port,
+                retryTime: statucReceiverSettings.RetryTime,
+                startPattern: statucReceiverSettings.StartPattern,
+                statusPattern: statucReceiverSettings.StatusPattern);
+
+            await sessionStateHandler.ExecuteAsync(cancellationToken);
         }
 
         protected async Task InitializeSessionAsync()
@@ -106,22 +110,6 @@ namespace EBuEf2IVUBase
                 "Die IVU-Sitzung läuft am {sessionDate} um {sessionTime}.",
                 ivuSessionDate.ToString("yyyy-MM-dd"),
                 ebuefSessionStart.ToString("hh:mm"));
-        }
-
-        protected void InitializeStateReceiver(CancellationToken cancellationToken)
-        {
-            InitializeDatabaseConnector(cancellationToken);
-
-            var settings = config
-                .GetSection(nameof(StatusReceiver))
-                .Get<StatusReceiver>();
-
-            sessionStateHandler.Initialize(
-                host: settings.Host,
-                port: settings.Port,
-                retryTime: settings.RetryTime,
-                startPattern: settings.StartPattern,
-                statusPattern: settings.StatusPattern);
         }
 
         #endregion Protected Methods

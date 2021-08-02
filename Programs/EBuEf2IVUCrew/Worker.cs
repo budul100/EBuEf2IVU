@@ -1,6 +1,7 @@
 #pragma warning disable CA1031 // Do not catch general exception types
 
 using Common.Enums;
+using Common.Extensions;
 using Common.Interfaces;
 using EBuEf2IVUBase;
 using EnumerableExtensions;
@@ -42,8 +43,7 @@ namespace EBuEf2IVUCrew
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            InitializeStateReceiver(workerCancellationToken);
-            await sessionStateHandler.ExecuteAsync(workerCancellationToken);
+            await InitializeConnectionAsync(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
@@ -52,7 +52,6 @@ namespace EBuEf2IVUCrew
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                InitializeDatabaseConnector(sessionCancellationToken);
                 await InitializeSessionAsync();
 
                 InitializeCrewChecker();
@@ -85,9 +84,9 @@ namespace EBuEf2IVUCrew
 
         private async Task CheckCrewsAsync(CancellationToken sessionCancellationToken)
         {
-            var minTime = GetSimTime()
+            var minTime = ebuefSession.GetSimTime()
                 .Add(queryDurationPast).TimeOfDay;
-            var maxTime = GetSimTime()
+            var maxTime = ebuefSession.GetSimTime()
                 .Add(queryDurationFuture).TimeOfDay;
 
             var trainRuns = await databaseConnector.GetTrainRunsDispoAsync(

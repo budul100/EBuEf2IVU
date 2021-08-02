@@ -1,4 +1,6 @@
 ﻿using Common.Enums;
+using Common.Models;
+using System;
 
 namespace Common.Extensions
 {
@@ -28,6 +30,17 @@ namespace Common.Extensions
             {
                 return default;
             }
+        }
+
+        public static DateTime GetSimTime(this EBuEfSession ebuefSession)
+        {
+            var sessionShift = -ebuefSession.Verschiebung;
+
+            var result = sessionShift == default
+                ? DateTime.Now
+                : DateTime.Now.Add(sessionShift);
+
+            return result;
         }
 
         #endregion Public Methods
