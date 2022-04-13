@@ -382,13 +382,13 @@ namespace DatabaseConnector
                     };
 
                     logger.LogDebug(
-                        "Aktuelle EBuEf-Sitzung gefunden: {session}",
+                        "Aktuelle Fahrplan-Session gefunden: {session}",
                         result);
                 }
                 else
                 {
                     logger.LogError(
-                        "Es wurde keine EBuEf-Session gefunden.");
+                        "Es wurde keine Fahrplan-Session gefunden.");
                 }
             }
 
