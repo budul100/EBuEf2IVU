@@ -151,6 +151,16 @@ namespace EBuEf2IVUCrew
                 retryTime: serviceSettings.RetryTime,
                 division: serviceSettings.Division,
                 planningLevel: serviceSettings.PlanningLevel);
+
+            if (currentState == SessionStatusType.IsRunning)
+            {
+                logger.LogDebug(
+                    "Die EBuEf-DB wird für den Crew-Check alle {interval} Sekunden " +
+                    "nach Zügen im Zeitraum von -{minTime} und +{maxTime} abgefragt.",
+                    serviceInterval.TotalSeconds,
+                    queryDurationPast.ToString(@"hh\:mm"),
+                    queryDurationFuture.ToString(@"hh\:mm"));
+            }
         }
 
         #endregion Private Methods

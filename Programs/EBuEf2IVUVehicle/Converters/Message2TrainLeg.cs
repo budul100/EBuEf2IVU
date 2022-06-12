@@ -46,8 +46,8 @@ namespace EBuEf2IVUVehicle
             if (message.SimulationsZeit.HasValue)
             {
                 mapping = infrastructureMappings
-                .Where(m => m.MessageBetriebsstelle.IsMatch(message.Betriebsstelle))
-                .Where(m => m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
+                .Where(m => m.MessageBetriebsstelle.IsMatch(message.Betriebsstelle)
+                    && m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
                     && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
                 .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
                 .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis)).FirstOrDefault();
