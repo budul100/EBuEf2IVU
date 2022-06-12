@@ -19,13 +19,10 @@ namespace Common.Converters
         {
             var value = reader.Value;
 
-            if (!string.IsNullOrWhiteSpace(value?.ToString())
-                && value.Equals("1"))
-            {
-                return true;
-            }
-
-            return false;
+            return !string.IsNullOrWhiteSpace(value?.ToString())
+                && value.Equals("1")
+                ? true
+                : (object)false;
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

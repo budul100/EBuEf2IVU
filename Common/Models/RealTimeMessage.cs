@@ -41,7 +41,7 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return $@"Zug: {Zugnummer} | Betriebsstelle: {Betriebsstelle} | Signaltyp: {SignalTyp} | " +
+            return $"Zug: {Zugnummer} | Betriebsstelle: {Betriebsstelle} | Signaltyp: {SignalTyp} | " +
                 $@"Startgleis: {StartGleis} | Zielgleis: {ZielGleis} |  Simulationszeit: {SimulationsZeit:hh\:mm}";
         }
 

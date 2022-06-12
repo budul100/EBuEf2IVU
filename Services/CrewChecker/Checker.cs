@@ -1,7 +1,7 @@
 ﻿using Common.Interfaces;
 using Common.Models;
 using CredentialChannelFactory;
-using EnumerableExtensions;
+using CrewChecker.Extensions;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
@@ -42,7 +42,7 @@ namespace CrewChecker
             CancellationToken cancellationToken)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (token) => GetAsync(
+                action: _ => GetAsync(
                     tripNumbers: tripNumbers,
                     date: date),
                 cancellationToken: cancellationToken);
@@ -68,7 +68,7 @@ namespace CrewChecker
             retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
+                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
                     onRetry: (exception, reconnection) => OnRetry(
                         exception: exception,
                         reconnection: reconnection));
@@ -92,42 +92,16 @@ namespace CrewChecker
 
                 if (response.exportCrewAssignmentsResponse.error != default)
                 {
-                    throw new ApplicationException($"Error response received at crew on trip " +
-                        $"request:{response.exportCrewAssignmentsResponse.error.description}");
+                    throw new ApplicationException(
+                        $"Error response received at crew on trip request:{response.exportCrewAssignmentsResponse.error.description}");
                 }
 
                 assignments = response.exportCrewAssignmentsResponse.tripAssignment.ToArray();
             }
 
-            var result = GetCrewingElements(assignments).ToArray();
+            var result = assignments.GetCrewingElements().ToArray();
 
             return result;
-        }
-
-        private IEnumerable<CrewingElement> GetCrewingElements(IEnumerable<tripAssignment> tripAssignments)
-        {
-            if (tripAssignments.AnyItem())
-            {
-                var employeeAssignments = tripAssignments
-                    .Where(a => a.employeeOrigin != default)
-                    .Where(a => a.employeeDestination != default).ToArray();
-
-                foreach (var employeeAssignment in employeeAssignments)
-                {
-                    var result = new CrewingElement
-                    {
-                        BetriebsstelleVon = employeeAssignment.employeeOrigin,
-                        BetriebsstelleNach = employeeAssignment.employeeDestination,
-                        DienstKurzname = employeeAssignment.duty,
-                        PersonalNachname = employeeAssignment.surname,
-                        PersonalNummer = employeeAssignment.personnelNumber,
-                        Zugnummer = employeeAssignment.trip,
-                        ZugnummerVorgaenger = employeeAssignment.previousTripNumber,
-                    };
-
-                    yield return result;
-                }
-            }
         }
 
         private exportCrewAssignmentsForTrips GetRequest(IEnumerable<string> tripNumbers, DateTime date)
@@ -152,8 +126,10 @@ namespace CrewChecker
             while (exception.InnerException != null) exception = exception.InnerException;
 
             logger.LogError(
-                $"Fehler beim Abrufen der Crew-Informationen von IVU.rail: {exception.Message}\r\n" +
-                $"Die Verbindung wird in {reconnection.TotalSeconds} Sekunden wieder versucht.");
+                "Fehler beim Abrufen der Crew-Informationen von IVU.rail: {exceptionMessage}\r\n" +
+                "Die Verbindung wird in {reconnectionPeriod} Sekunden wieder versucht.",
+                exception.Message,
+                reconnection.TotalSeconds);
         }
 
         #endregion Private Methods

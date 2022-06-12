@@ -16,7 +16,7 @@ namespace Common.EventsArgs
 
         #region Public Properties
 
-        public string Content { get; private set; }
+        public string Content { get; }
 
         #endregion Public Properties
     }

@@ -17,7 +17,7 @@ namespace Common.EventsArgs
 
         #region Public Properties
 
-        public SessionStatusType State { get; private set; }
+        public SessionStatusType State { get; }
 
         #endregion Public Properties
     }

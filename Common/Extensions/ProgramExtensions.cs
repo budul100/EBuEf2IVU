@@ -21,8 +21,8 @@ namespace Common.Extensions
         public static IHostBuilder GetHostBuilder(this IHostBuilder defaultBuilder)
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? WindowsServiceLifetimeHostBuilderExtensions.UseWindowsService(defaultBuilder)
-                : SystemdHostBuilderExtensions.UseSystemd(defaultBuilder);
+                ? defaultBuilder.UseWindowsService()
+                : defaultBuilder.UseSystemd();
         }
 
         public static LoggerConfiguration GetSerilogConfiguration(this HostBuilderContext hostingContext,

@@ -3,7 +3,7 @@ using TrainPathImportService;
 
 namespace TrainPathSender.Extensions
 {
-    internal static class TrainRunExtensions
+    internal static class DataExtensions
     {
         #region Public Methods
 
@@ -13,6 +13,22 @@ namespace TrainPathSender.Extensions
             {
                 trainNumber = trainRun.Zugnummer.ToString(),
                 trainProduct = trainRun.Zuggattung,
+            };
+
+            return result;
+        }
+
+        public static TrainPosition GetPositionWithoutTraffic(this TrainPathMessage message)
+        {
+            var result = new TrainPosition
+            {
+                Abfahrt = message.AbfahrtPlan,
+                Ankunft = message.AnkunftPlan,
+                Bemerkungen = message.Bemerkungen,
+                Betriebsstelle = message.Betriebsstelle,
+                Gleis = message.GleisSoll?.ToString(),
+                VerkehrNicht = true,
+                IstDurchfahrt = message.IstDurchfahrt,
             };
 
             return result;

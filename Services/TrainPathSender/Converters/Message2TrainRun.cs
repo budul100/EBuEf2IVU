@@ -3,6 +3,7 @@ using EnumerableExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TrainPathSender.Extensions;
 
 namespace TrainPathSender.Converters
 {
@@ -73,27 +74,11 @@ namespace TrainPathSender.Converters
             foreach (var message in messages)
             {
                 var result = message.AnkunftSoll == default && message.AbfahrtSoll == default
-                    ? GetPositionWithoutTraffic(message)
+                    ? message.GetPositionWithoutTraffic()
                     : GetPositionWithTraffic(message);
 
                 yield return result;
             }
-        }
-
-        private TrainPosition GetPositionWithoutTraffic(TrainPathMessage message)
-        {
-            var result = new TrainPosition
-            {
-                Abfahrt = message.AbfahrtPlan,
-                Ankunft = message.AnkunftPlan,
-                Bemerkungen = message.Bemerkungen,
-                Betriebsstelle = message.Betriebsstelle,
-                Gleis = message.GleisSoll?.ToString(),
-                VerkehrNicht = true,
-                IstDurchfahrt = message.IstDurchfahrt,
-            };
-
-            return result;
         }
 
         private TrainPosition GetPositionWithTraffic(TrainPathMessage message)
@@ -120,7 +105,7 @@ namespace TrainPathSender.Converters
 
             var result = new TrainRun
             {
-                Abfahrt = positions.First().Abfahrt?.TimeOfDay,
+                Abfahrt = positions[0].Abfahrt?.TimeOfDay,
                 Positions = positions,
                 Zuggattung = relevantMessage.Zuggattung,
                 ZugId = relevantMessage.ZugId,

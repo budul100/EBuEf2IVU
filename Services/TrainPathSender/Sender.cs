@@ -21,7 +21,7 @@ namespace TrainPathSender
     {
         #region Private Fields
 
-        private readonly ConcurrentQueue<importTrainPaths> importsQueue = new ConcurrentQueue<importTrainPaths>();
+        private readonly ConcurrentQueue<importTrainPaths> importsQueue = new();
         private readonly ILogger<Sender> logger;
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
@@ -117,7 +117,7 @@ namespace TrainPathSender
             retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
+                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
                     onRetry: (exception, reconnection) => OnRetry(
                         exception: exception,
                         reconnection: reconnection));
@@ -150,7 +150,7 @@ namespace TrainPathSender
                     {
                         logger.LogDebug(
                             "Es werden {Trassenzahl} Trassen an IVU.rail gesendet.",
-                            currentImport.trainPathImportRequest.trainPaths.Count());
+                            currentImport.trainPathImportRequest.trainPaths.Length);
 
                         using var channel = channelFactory.Get();
                         var response = await channel.importTrainPathsAsync(currentImport);

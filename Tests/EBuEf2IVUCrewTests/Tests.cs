@@ -38,8 +38,8 @@ namespace EBuEf2IVUCrewTests
             var host = Host
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
-                .ConfigureAppConfiguration((hostingContext, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices((hostContext, services) => ConfigureServices(services, crewCheckerMock.Object));
+                .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
+                .ConfigureServices((_, services) => ConfigureServices(services, crewCheckerMock.Object));
 
             host.Build().StartAsync(cancellationTokenSource.Token);
 

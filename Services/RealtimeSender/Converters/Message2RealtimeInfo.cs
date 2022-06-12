@@ -1,6 +1,4 @@
-﻿#pragma warning disable CA1031 // Do not catch general exception types
-
-using Common.Models;
+﻿using Common.Models;
 using Microsoft.Extensions.Logging;
 using RealtimeSender.Extensions;
 using RealtimeSender20;
@@ -125,5 +123,3 @@ namespace RealtimeSender.Converters
         #endregion Private Methods
     }
 }
-
-#pragma warning restore CA1031 // Do not catch general exception types

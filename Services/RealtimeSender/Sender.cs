@@ -20,7 +20,7 @@ namespace RealtimeSender
     {
         #region Private Fields
 
-        private readonly ConcurrentQueue<RealTimeInfoTO> infosQueue = new ConcurrentQueue<RealTimeInfoTO>();
+        private readonly ConcurrentQueue<RealTimeInfoTO> infosQueue = new();
         private readonly ILogger logger;
 
         private Message2RealtimeInfo converter;
@@ -85,7 +85,7 @@ namespace RealtimeSender
             retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
+                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
                     onRetry: (exception, reconnection) => OnRetry(
                         exception: exception,
                         reconnection: reconnection));
@@ -115,7 +115,7 @@ namespace RealtimeSender
                     using var client = new RealTimeInformationImportFacadeClient();
                     client.Endpoint.Address = endpointAddress;
 
-                    infosQueue.TryDequeue(out RealTimeInfoTO currentMessage); ;
+                    infosQueue.TryDequeue(out RealTimeInfoTO currentMessage);
 
                     if (currentMessage != default)
                     {
@@ -126,7 +126,7 @@ namespace RealtimeSender
 
                         if (result?.Any() ?? false)
                         {
-                            var relevantValiditation = result.First();
+                            var relevantValiditation = result[0];
                             var relevantMessage = currentMessage;
 
                             if (relevantValiditation.code == 0)

@@ -13,6 +13,8 @@ namespace CommonTests
     // Database must be activated for tests!
     // Check hosts file on C:\Windows\System32\drivers\etc for the following entry:
     // 127.0.0.1 db.ebuef
+    // Check that the DB user ebuef2ivucore with rights for SELECT, INSERT, UPDATE is created
+
     public class SessionTests
     {
         #region Private Fields
@@ -44,7 +46,7 @@ namespace CommonTests
             query.Wait();
 
             Assert.That(query.Result.IVUDatum == query.Result.IVUDatum.Date, Is.True);
-            Assert.That(query.Result.SessionStart.TimeOfDay == new TimeSpan(14, 0, 0), Is.True);
+            Assert.That(query.Result.SessionStart.TimeOfDay == new TimeSpan(10, 0, 0), Is.True);
             Assert.That(query.Result.Wochentag == DayOfWeek.Friday, Is.True);
         }
 

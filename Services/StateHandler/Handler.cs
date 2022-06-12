@@ -3,6 +3,7 @@ using Common.EventsArgs;
 using Common.Extensions;
 using Common.Interfaces;
 using Microsoft.Extensions.Logging;
+using StateHandler.Extensions;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -16,8 +17,6 @@ namespace StateHandler
         #region Private Fields
 
         private const string MessageTypeState = "Sessionstatus";
-        private const string StatusRegexGroupName = "status";
-        private const string StatusRegexGroupWildcard = "$";
 
         private readonly IDatabaseConnector databaseConnector;
         private readonly ILogger logger;
@@ -72,31 +71,13 @@ namespace StateHandler
                 retryTime: retryTime,
                 messageType: MessageTypeState);
 
-            sessionStartRegex = GetSessionStartRegex(sessionStartPattern);
-            sessionStatusRegex = GetSessionStatusRegex(sessionStatusPattern);
+            sessionStartRegex = sessionStartPattern.GetSessionStartRegex();
+            sessionStatusRegex = sessionStatusPattern.GetSessionStatusRegex();
         }
 
         #endregion Public Methods
 
         #region Private Methods
-
-        private static Regex GetSessionStartRegex(string startPattern)
-        {
-            return new Regex(startPattern);
-        }
-
-        private Regex GetSessionStatusRegex(string statusPattern)
-        {
-            // The new value cannot be created with \d!
-
-            var correctedPattern = statusPattern.Replace(
-                oldValue: StatusRegexGroupWildcard,
-                newValue: @$"(?<{StatusRegexGroupName}>[0-9])");
-
-            var result = new Regex(correctedPattern);
-
-            return result;
-        }
 
         private async Task<bool> IsSessionStartedAsync()
         {
@@ -120,7 +101,7 @@ namespace StateHandler
             else
             {
                 var sessionStatusText = sessionStatusRegex.IsMatch(e.Content)
-                    ? sessionStatusRegex.Match(e.Content).Groups[StatusRegexGroupName].Value
+                    ? sessionStatusRegex.Match(e.Content).Groups[PatternExtensions.StatusRegexGroupName].Value
                     : default;
 
                 var sessionStatus = sessionStatusText.GetSessionStatusType();

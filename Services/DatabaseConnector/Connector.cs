@@ -152,10 +152,10 @@ namespace DatabaseConnector
             retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
+                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
                     onRetry: (exception, reconnection) => OnRetry(
                         exception: exception,
-                        reconnection: reconnection),
-                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime));
+                        reconnection: reconnection));
         }
 
         public Task SetCrewingsAsync(IEnumerable<CrewingElement> crewingElements)
@@ -213,63 +213,6 @@ namespace DatabaseConnector
             return result;
         }
 
-        private IEnumerable<TrainPosition> GetTrainPositions<T>(IEnumerable<Halt<T>> halte, bool preferPrognosis)
-            where T : Zug
-        {
-            if (halte.AnyItem())
-            {
-                foreach (var halt in halte)
-                {
-                    var result = new TrainPosition
-                    {
-                        Abfahrt = halt.GetAbfahrtPath(preferPrognosis),
-                        Ankunft = halt.GetAnkunftPath(preferPrognosis),
-                        Bemerkungen = halt.Bemerkungen,
-                        Betriebsstelle = halt.Betriebsstelle,
-                        Gleis = halt.GleisPlan.ToString(),
-                        IstDurchfahrt = halt.IstDurchfahrt,
-                        VerkehrNicht = false,
-                    };
-
-                    yield return result;
-                }
-            }
-        }
-
-        private IEnumerable<TrainRun> GetTrainRuns<T>(IEnumerable<Halt<T>> halte, bool preferPrognosis)
-            where T : Zug
-        {
-            if (halte.AnyItem())
-            {
-                var halteGroups = halte
-                    .GroupBy(h => h.ZugID).ToArray();
-
-                foreach (var halteGroup in halteGroups)
-                {
-                    var ordered = halteGroup
-                        .OrderBy(h => h.SortierZeit).ToArray();
-
-                    var positions = GetTrainPositions(
-                        halte: ordered,
-                        preferPrognosis: preferPrognosis).ToArray();
-
-                    var relevant = ordered.First();
-
-                    var result = new TrainRun
-                    {
-                        Abfahrt = relevant.GetAbfahrt(),
-                        Bemerkungen = relevant.Zug.Bemerkungen,
-                        Positions = positions,
-                        Zuggattung = relevant.Zug.Zuggattung.Kurzname,
-                        ZugId = relevant.ZugID,
-                        Zugnummer = relevant.Zug.Zugnummer,
-                    };
-
-                    yield return result;
-                }
-            }
-        }
-
         private IEnumerable<VehicleAllocation> GetVehicleAllocations(IEnumerable<Aufstellung> aufstellungen)
         {
             if (aufstellungen.Any())
@@ -285,7 +228,7 @@ namespace DatabaseConnector
 
                 logger.LogDebug(
                     "Es wurden {numberTrains} Züge in der Grundaufstellungen gefunden.",
-                    aufstellungenGroups.Count());
+                    aufstellungenGroups.Length);
 
                 foreach (var aufstellungenGroup in aufstellungenGroups)
                 {
@@ -449,8 +392,7 @@ namespace DatabaseConnector
                     .Where(h => (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) <= maxTime)
                     .ToArrayAsync(queryCancellationToken);
 
-                result = GetTrainRuns(
-                    halte: halte,
+                result = halte.GetTrainRuns(
                     preferPrognosis: false).ToArray();
             }
 
@@ -475,8 +417,7 @@ namespace DatabaseConnector
                     .Where(h => h.ZugID == trainId)
                     .ToArrayAsync(queryCancellationToken);
 
-                result = GetTrainRuns(
-                    halte: halte,
+                result = halte.GetTrainRuns(
                     preferPrognosis: preferPrognosis).ToArray();
             }
 
@@ -508,8 +449,7 @@ namespace DatabaseConnector
                 var currentHalte = allHalte
                     .Where(h => h.Zug.Bitmask[weekdayId] == QueryExtensions.PositiveBit).ToArray();
 
-                result = GetTrainRuns(
-                    halte: currentHalte,
+                result = currentHalte.GetTrainRuns(
                     preferPrognosis: preferPrognosis).ToArray();
             }
 

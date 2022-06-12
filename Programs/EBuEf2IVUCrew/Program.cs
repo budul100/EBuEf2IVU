@@ -32,8 +32,8 @@ namespace EBuEf2IVUCrew
                     result = Host
                         .CreateDefaultBuilder(args)
                         .GetHostBuilder()
-                        .ConfigureAppConfiguration((hostingContext, config) => config.ConfigureAppConfiguration(settingsPath))
-                        .ConfigureServices((hostContext, services) => ConfigureServices(services))
+                        .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
+                        .ConfigureServices((_, services) => ConfigureServices(services))
                         .UseSerilog((hostingContext, loggerConfiguration) => hostingContext.GetSerilogConfiguration(loggerConfiguration));
                 });
 

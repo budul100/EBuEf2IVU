@@ -1,5 +1,3 @@
-#pragma warning disable CA1031 // Do not catch general exception types
-
 using Common.EventsArgs;
 using Common.Interfaces;
 using Common.Models;
@@ -80,7 +78,7 @@ namespace EBuEf2IVUVehicle
                         logger.LogInformation(
                             "EBuEf2IVUVehicle wird beendet.");
                     }
-                };
+                }
             }
         }
 
@@ -167,5 +165,3 @@ namespace EBuEf2IVUVehicle
         #endregion Private Methods
     }
 }
-
-#pragma warning disable CA1031 // Do not catch general exception types

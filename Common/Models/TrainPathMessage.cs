@@ -123,7 +123,7 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return $@"ZugId {ZugId} | Betriebsstelle: {Betriebsstelle}";
+            return $"ZugId {ZugId} | Betriebsstelle: {Betriebsstelle}";
         }
 
         #endregion Public Methods

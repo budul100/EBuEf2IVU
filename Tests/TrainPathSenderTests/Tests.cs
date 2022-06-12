@@ -6,9 +6,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using TrainPathSender;
 
 namespace TrainPathSenderTests
@@ -28,8 +26,17 @@ namespace TrainPathSenderTests
 
         #region Public Methods
 
+        [Test]
+        public void ConvertTrainPathMessages()
+        {
+            var content = File.ReadAllText("TrainPathMessages.json");
+            var messages = JsonConvert.DeserializeObject<TrainPathMessage[]>(content);
+
+            Assert.True(messages.Length > 0);
+        }
+
         [SetUp]
-        public void _Init()
+        public void Init()
         {
             var path = Path.GetFullPath(@"..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
 
@@ -77,15 +84,6 @@ namespace TrainPathSenderTests
         }
 
         [Test]
-        public void ConvertTrainPathMessages()
-        {
-            var content = File.ReadAllText("TrainPathMessages.json");
-            var messages = JsonConvert.DeserializeObject<TrainPathMessage[]>(content);
-
-            Assert.True(messages.Any());
-        }
-
-        [Test]
         public void InitialImport()
         {
             var connectorSettings = config
@@ -109,10 +107,10 @@ namespace TrainPathSenderTests
 
             sender.Add(trainRuns);
 
-            Task.WhenAll(sender.ExecuteAsync(new CancellationToken()));
+            sender.ExecuteAsync(new CancellationToken());
 
             // Activate only if a soap server is running to receive a result
-            // Task.WhenAll(sender.RunAsnc(new CancellationToken()));
+            // sender.RunAsnc(new CancellationToken());
         }
 
         #endregion Public Methods

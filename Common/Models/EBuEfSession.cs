@@ -26,7 +26,7 @@ namespace Common.Models
         {
             return @$"EBuEf-Session | Start: {SessionStart:HH\:mm\:ss} | IVU-Datum: {IVUDatum:yyyy-MM-dd} | Wochentag: {Wochentag} | " +
                 @$"Verschiebung: {(Verschiebung >= TimeSpan.Zero ? string.Empty : "-")}{Verschiebung:d\.hh\:mm\:ss} | " +
-                @$"Key: {SessionKey} | Fahrplan-Id: {FahrplanId} ";
+                $"Key: {SessionKey} | Fahrplan-Id: {FahrplanId} ";
         }
 
         #endregion Public Methods

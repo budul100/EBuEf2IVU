@@ -28,11 +28,9 @@ namespace RealtimeSender.Extensions
 
         public static int GetEventcode(this TrainLeg leg)
         {
-            int result;
-
             if (leg.IstPrognose)
             {
-                result = leg.IVULegTyp switch
+                return leg.IVULegTyp switch
                 {
                     LegType.Ankunft => RealtimeInfoConstants.EventCodeArrivalPrognosis,
                     _ => RealtimeInfoConstants.EventCodeDeparturePrognosis,
@@ -40,15 +38,13 @@ namespace RealtimeSender.Extensions
             }
             else
             {
-                result = leg.IVULegTyp switch
+                return leg.IVULegTyp switch
                 {
                     LegType.Durchfahrt => RealtimeInfoConstants.EventCodePassing,
                     LegType.Ankunft => RealtimeInfoConstants.EventCodeArrival,
                     _ => RealtimeInfoConstants.EventCodeDeparture,
                 };
             }
-
-            return result;
         }
 
         public static int GetTrainCombinationComplete(this IEnumerable<VehicleTO> vehicles)

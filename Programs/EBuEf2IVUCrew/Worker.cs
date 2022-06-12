@@ -1,5 +1,3 @@
-#pragma warning disable CA1031 // Do not catch general exception types
-
 using Common.Enums;
 using Common.Extensions;
 using Common.Interfaces;
@@ -150,13 +148,11 @@ namespace EBuEf2IVUCrew
                 username: serviceSettings.Username,
                 password: serviceSettings.Password,
                 isHttps: serviceSettings.IsHttps,
+                retryTime: serviceSettings.RetryTime,
                 division: serviceSettings.Division,
-                planningLevel: serviceSettings.PlanningLevel,
-                retryTime: serviceSettings.RetryTime);
+                planningLevel: serviceSettings.PlanningLevel);
         }
 
         #endregion Private Methods
     }
 }
-
-#pragma warning restore CA1031 // Do not catch general exception types

@@ -64,7 +64,7 @@ namespace MessageReceiver
             retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: (p) => TimeSpan.FromSeconds(retryTime),
+                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
                     onRetry: (exception, reconnection) => OnRetry(
                         exception: exception,
                         reconnection: reconnection));
@@ -127,7 +127,7 @@ namespace MessageReceiver
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var result = await udpClient.ReceiveAsync();
+                var result = await udpClient.ReceiveAsync(cancellationToken);
                 SendMessageReceived(result);
             }
         }
@@ -141,7 +141,7 @@ namespace MessageReceiver
                 var content = Encoding.ASCII.GetString(
                     bytes: bytes.ToArray(),
                     index: 0,
-                    count: bytes.Count()).TrimEnd(EndChar);
+                    count: bytes.Length).TrimEnd(EndChar);
 
                 if (!string.IsNullOrWhiteSpace(content))
                 {
