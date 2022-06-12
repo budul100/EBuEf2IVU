@@ -1,6 +1,6 @@
 @echo off
 
-SET FRAMEWORK=net5.0
+SET FRAMEWORK=net6.0
 SET RUNTIME=linux-x64
 
 SET ScriptsDir=.\_Scripts\Build
@@ -10,7 +10,7 @@ SET SOURCEDIR=.\bin\Release\%FRAMEWORK%\%RUNTIME%
 SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 
 echo.
-echo ##### Create libraries #####
+echo ##### Create EBuEf2IVU #####
 echo.
 
 CHOICE /C mb /N /M "Shall the [b]uild (x.x._X_.0) or the [m]inor version (x._X_.0.0) be increased?"
@@ -44,7 +44,7 @@ if /i "%VERSIONSELECTION%" == "1" (
 	echo.
 )
 
-BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
+BASH Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME%
 echo.
 
 powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
@@ -72,7 +72,7 @@ if /i "%VERSIONSELECTION%" == "1" (
 	echo.
 )
 
-BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
+BASH Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME%
 echo.
 
 powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
@@ -100,7 +100,7 @@ if /i "%VERSIONSELECTION%" == "1" (
 	echo.
 )
 
-BASH -c "sh Create_Linux-x64.sh %SERVICENAME%"
+BASH Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME%
 echo.
 
 powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
@@ -115,4 +115,5 @@ REM ****************************************************************************
 
 dotnet restore
 
+echo.
 pause

@@ -1,21 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Moq" Version="4.18.1"/>
+		<PackageReference Include="NUnit" Version="3.13.3"/>
+		<PackageReference Include="NUnit3TestAdapter" Version="4.2.1"/>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0"/>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Moq" Version="4.18.1" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Common\Common.csproj"/>
+		<ProjectReference Include="..\..\Programs\EBuEf2IVUBase\EBuEf2IVUBase.csproj"/>
+		<ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj"/>
+		<ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj"/>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.csproj" />
-    <ProjectReference Include="..\..\Programs\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
-    <ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
-    <ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj" />
-  </ItemGroup>
 </Project>
