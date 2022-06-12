@@ -1,24 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+	<TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="budul.StringExtensions" Version="1.16.0" />
-    <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
-    <PackageReference Include="Packaging.Targets" Version="0.1.189" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+	<PackageReference Include="budul.StringExtensions" Version="1.17.0" />
+	<PackageReference Include="CommandLineParser" Version="2.9.1" />
+	<PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="6.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+	<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="6.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.0" />
+	<PackageReference Include="Packaging.Targets" Version="0.1.220">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
+	<PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
+	<PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+	<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.csproj" />
+	<ProjectReference Include="..\..\Common\Common.csproj" />
   </ItemGroup>
 </Project>
