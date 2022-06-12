@@ -1,5 +1,3 @@
-#pragma warning disable CA1031 // Do not catch general exception types
-
 using Common.Enums;
 using Common.Interfaces;
 using Common.Models;
@@ -75,7 +73,7 @@ namespace EBuEf2IVUPath
                         logger.LogInformation(
                             "EBuEf2IVUPath wird beendet.");
                     }
-                };
+                }
             }
         }
 
