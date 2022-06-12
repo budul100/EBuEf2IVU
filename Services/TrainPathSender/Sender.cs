@@ -144,7 +144,7 @@ namespace TrainPathSender
             {
                 if (!importsQueue.IsEmpty)
                 {
-                    importsQueue.TryDequeue(out importTrainPaths currentImport);
+                    importsQueue.TryPeek(out importTrainPaths currentImport);
 
                     if (currentImport != default)
                     {
@@ -162,6 +162,8 @@ namespace TrainPathSender
                                 response.trainPathImportResponse.protocolTransactionId);
                         }
                     }
+
+                    importsQueue.TryDequeue(out _);
                 }
             }
         }

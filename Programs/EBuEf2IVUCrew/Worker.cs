@@ -41,7 +41,7 @@ namespace EBuEf2IVUCrew
 
         protected override async Task ExecuteAsync(CancellationToken workerCancellationToken)
         {
-            await InitializeConnectionAsync(workerCancellationToken);
+            _ = InitializeConnectionAsync(workerCancellationToken);
 
             while (!workerCancellationToken.IsCancellationRequested)
             {

@@ -150,6 +150,8 @@ namespace RealtimeSender
                             }
                         }
                     }
+
+                    infosQueue.TryDequeue(out _);
                 }
             }
         }
