@@ -109,7 +109,7 @@ namespace EBuEf2IVUBase
             logger.LogDebug(
                 "Die IVU-Sitzung läuft am {sessionDate} um {sessionTime}.",
                 ivuSessionDate.ToString("yyyy-MM-dd"),
-                ebuefSessionStart.ToString("hh:mm"));
+                ebuefSessionStart.ToString("HH:mm"));
         }
 
         #endregion Protected Methods
