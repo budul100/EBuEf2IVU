@@ -1,42 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Configuration>
-  <Serilog>
-    <MinimumLevel>Debug</MinimumLevel>
-    <!--<WriteTo name="Console">
-      <Args>
-        <theme>Serilog.Sinks.SystemConsole.Themes.SystemConsoleTheme::Literate, Serilog.Sinks.Console</theme>
-      </Args>
-    </WriteTo>-->
-    <WriteTo name="File">
-      <Args>
-        <path>/var/log/ebuef2ivu/ebuef2ivucrew.log</path>
-        <rollingInterval>Day</rollingInterval>
-      </Args>
-    </WriteTo>
-  </Serilog>
-  <EBuEfDBConnector>
-    <ConnectionString>SERVER=db.ebuef;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
-    <RetryTime>30</RetryTime>
-  </EBuEfDBConnector>
-  <StatusReceiver>
-    <Host>224.0.0.8</Host>
-    <Port>4454</Port>
-    <RetryTime>30</RetryTime>
-    <StartPattern>ZN SET DISPATCH</StartPattern>
-    <StatusPattern>SESSION NEW STATUS $</StatusPattern>
-  </StatusReceiver>
-  <CrewChecker>
-    <Host>ivu.ebuef</Host>
-    <Port>20000</Port>
-    <Path>intf.crewontrip.impl/CrewOnTripWebFacadeBean</Path>
-    <IsHttps>false</IsHttps>
-    <Username>crewontrip</Username>
-    <Password>crewontrip</Password>
-    <RetryTime>30</RetryTime>
-    <AbfrageIntervalSek>60</AbfrageIntervalSek>
-    <AbfrageVergangenheitMin>15</AbfrageVergangenheitMin>
-    <AbfrageZukunftMin>60</AbfrageZukunftMin>
-    <Division>EBUEF</Division>
-    <PlanningLevel>ACTUAL</PlanningLevel>
-  </CrewChecker>
+	<Serilog>
+		<MinimumLevel>Debug</MinimumLevel>
+		<!--<WriteTo name="Console">
+	  <Args>
+		<theme>Serilog.Sinks.SystemConsole.Themes.SystemConsoleTheme::Literate, Serilog.Sinks.Console</theme>
+	  </Args>
+	</WriteTo>-->
+		<WriteTo name="File">
+			<Args>
+				<path>/var/log/ebuef2ivu/ebuef2ivucrew.log</path>
+				<rollingInterval>Day</rollingInterval>
+			</Args>
+		</WriteTo>
+	</Serilog>
+	<EBuEfDBConnector>
+		<ConnectionString>SERVER=db.ebuef;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
+		<RetryTime>30</RetryTime>
+	</EBuEfDBConnector>
+	<StatusReceiver>
+		<Host>224.0.0.8</Host>
+		<Port>4454</Port>
+		<RetryTime>30</RetryTime>
+		<StartPattern>ZN SET DISPATCH</StartPattern>
+		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
+	</StatusReceiver>
+	<CrewChecker>
+		<Host>ivu.ebuef</Host>
+		<Port>20000</Port>
+		<Path>intf.crewontrip.impl/CrewOnTripWebFacadeBean</Path>
+		<IsHttps>false</IsHttps>
+		<Username>crewontrip</Username>
+		<Password>crewontrip</Password>
+		<RetryTime>30</RetryTime>
+		<AbfrageIntervalSek>60</AbfrageIntervalSek>
+		<AbfrageVergangenheitMin>15</AbfrageVergangenheitMin>
+		<AbfrageZukunftMin>60</AbfrageZukunftMin>
+		<Division>EBUEF</Division>
+		<PlanningLevel>ACTUAL</PlanningLevel>
+	</CrewChecker>
 </Configuration>

@@ -63,6 +63,7 @@ namespace EBuEf2IVUCrewTests
             {
                 IVUDatum = DateTime.Today,
                 SessionStart = DateTime.Now,
+                Status = Common.Enums.SessionStatusType.IsRunning,
             };
 
             var trainRunsMock = new List<TrainRun> { Mock.Of<TrainRun>() };
