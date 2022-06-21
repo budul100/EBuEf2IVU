@@ -320,6 +320,7 @@ namespace DatabaseConnector
                         IVUDatum = sitzung.IvuDate ?? DateTime.Today,
                         SessionKey = sitzung.SessionKey,
                         SessionStart = sitzung.SimStartzeit.ToDateTime().ToLocalTime(),
+                        Status = (SessionStatusType)sitzung.Status,
                         Verschiebung = timeshift,
                         Wochentag = sitzung.SimWochentag.GetWochentag(),
                     };

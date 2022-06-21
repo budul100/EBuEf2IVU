@@ -60,6 +60,8 @@ namespace EBuEf2IVUPath
                 InitializePathReceiver();
                 await InitializePathSenderAsync();
 
+                _ = SendInitialPathes();
+
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
@@ -184,13 +186,23 @@ namespace EBuEf2IVUPath
         {
             if (e.State == SessionStatusType.InPreparation)
             {
+                await SendInitialPathes();
+            }
+        }
+
+        private async Task SendInitialPathes()
+        {
+            if (currentState == SessionStatusType.InPreparation)
+            {
                 logger.LogDebug(
-                    "Nachricht zum initialen Import der Zugtrassen empfangen.");
+                    "Die aktuelle Session ist in der Vorbereitung. Das ist der Auftrag " +
+                    "zum initialen Import der Zugtrassen.");
 
                 if (ebuefSession == default)
                 {
                     logger.LogWarning(
-                        "Das initiale Sitzungsupdate wurde bisher nicht empfangen. Daher können keine Zugtrassen importiert werden.");
+                        "Das initiale Sitzungsupdate wurde bisher nicht empfangen. " +
+                        "Daher können keine Zugtrassen importiert werden.");
                 }
                 else
                 {

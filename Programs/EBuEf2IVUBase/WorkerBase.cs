@@ -102,6 +102,8 @@ namespace EBuEf2IVUBase
 
             ebuefSession = await databaseConnector.GetEBuEfSessionAsync();
 
+            currentState = ebuefSession.Status;
+
             ivuSessionDate = ebuefSession.IVUDatum;
             ebuefSessionStart = ivuSessionDate
                 .Add(ebuefSession.SessionStart.TimeOfDay);
