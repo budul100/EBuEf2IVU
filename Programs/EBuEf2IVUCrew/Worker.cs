@@ -148,9 +148,9 @@ namespace EBuEf2IVUCrew
                 username: serviceSettings.Username,
                 password: serviceSettings.Password,
                 isHttps: serviceSettings.IsHttps,
-                retryTime: serviceSettings.RetryTime,
                 division: serviceSettings.Division,
-                planningLevel: serviceSettings.PlanningLevel);
+                planningLevel: serviceSettings.PlanningLevel,
+                retryTime: serviceSettings.RetryTime);
 
             if (currentState == SessionStatusType.IsRunning)
             {

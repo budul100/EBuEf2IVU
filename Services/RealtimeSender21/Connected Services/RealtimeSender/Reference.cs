@@ -7,28 +7,28 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace RealtimeSender20
+namespace RealtimeSender21
 {
     
     
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", ConfigurationName="RealtimeSender20.RealTimeInformationImportFacade")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", ConfigurationName="RealtimeSender21.RealTimeInformationImportFacade")]
     internal interface RealTimeInformationImportFacade
     {
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(AbstractRealTimeInfoTO))]
-        System.Threading.Tasks.Task<RealtimeSender20.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender20.importRealTimeInfoRequest request);
+        System.Threading.Tasks.Task<RealtimeSender21.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender21.importRealTimeInfo request);
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(AbstractRealTimeInfoTO))]
-        System.Threading.Tasks.Task<RealtimeSender20.periodicTaskResponse1> periodicTaskAsync(RealtimeSender20.periodicTaskRequest request);
+        System.Threading.Tasks.Task<RealtimeSender21.periodicTaskResponse1> periodicTaskAsync(RealtimeSender21.periodicTask1 request);
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class RealTimeInfoTO : AbstractRealTimeInfoTO
@@ -37,7 +37,7 @@ namespace RealtimeSender20
         private DetailTO[] detailsField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("details", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("details", IsNullable=true, Order=0)]
         public DetailTO[] details
         {
             get
@@ -52,7 +52,7 @@ namespace RealtimeSender20
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class DetailTO
@@ -92,7 +92,7 @@ namespace RealtimeSender20
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class periodicTaskResponse
@@ -116,7 +116,7 @@ namespace RealtimeSender20
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class periodicTask
@@ -140,7 +140,7 @@ namespace RealtimeSender20
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class ValidationErrorTO
@@ -180,7 +180,7 @@ namespace RealtimeSender20
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class VehicleCompositionTO
@@ -252,7 +252,7 @@ namespace RealtimeSender20
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class VehicleTO
@@ -357,7 +357,7 @@ namespace RealtimeSender20
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(RealTimeInfoTO))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws")]
     public partial class AbstractRealTimeInfoTO
@@ -368,6 +368,10 @@ namespace RealtimeSender20
         private string divisionField;
         
         private string stopAreaField;
+        
+        private string gateField;
+        
+        private string directionField;
         
         private long timeStampField;
         
@@ -471,6 +475,34 @@ namespace RealtimeSender20
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=3)]
+        public string gate
+        {
+            get
+            {
+                return this.gateField;
+            }
+            set
+            {
+                this.gateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=4)]
+        public string direction
+        {
+            get
+            {
+                return this.directionField;
+            }
+            set
+            {
+                this.directionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=5)]
         public long timeStamp
         {
             get
@@ -484,7 +516,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=4)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=6)]
         public int delta
         {
             get
@@ -512,7 +544,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("vehicles", Order=5)]
+        [System.Xml.Serialization.XmlElementAttribute("vehicles", IsNullable=true, Order=7)]
         public VehicleTO[] vehicles
         {
             get
@@ -526,8 +558,8 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=6)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("vehicleComposition", IsNullable=false)]
+        [System.Xml.Serialization.XmlArrayAttribute(Order=8)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("vehicleComposition")]
         public VehicleCompositionTO[] vehicleCompositions
         {
             get
@@ -541,7 +573,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=7)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=9)]
         public long trainCombinationComplete
         {
             get
@@ -569,7 +601,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=8)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=10)]
         public long tripIdentificationDate
         {
             get
@@ -597,7 +629,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=9)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=11)]
         public string tripNumber
         {
             get
@@ -611,7 +643,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=10)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=12)]
         public string tripStartLocation
         {
             get
@@ -625,7 +657,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=11)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=13)]
         public string track
         {
             get
@@ -639,7 +671,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=12)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=14)]
         public string tracksection
         {
             get
@@ -653,7 +685,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=13)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=15)]
         public int trackposition
         {
             get
@@ -681,7 +713,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=14)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=16)]
         public string vehicleNumber
         {
             get
@@ -695,7 +727,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=15)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=17)]
         public string employeeId
         {
             get
@@ -709,7 +741,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=16)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=18)]
         public string deviceId
         {
             get
@@ -723,7 +755,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=17)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=19)]
         public string plannedTripNumber
         {
             get
@@ -737,7 +769,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=18)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=20)]
         public long plannedTripIdentificationDate
         {
             get
@@ -765,7 +797,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=19)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=21)]
         public string version
         {
             get
@@ -779,7 +811,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=20)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=22)]
         public int shuntingTrip
         {
             get
@@ -807,7 +839,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=21)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=23)]
         public int classifier
         {
             get
@@ -835,7 +867,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=22)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=24)]
         public string nextStopArea
         {
             get
@@ -849,7 +881,7 @@ namespace RealtimeSender20
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=23)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=25)]
         public int distanceToStopArea
         {
             get
@@ -878,95 +910,95 @@ namespace RealtimeSender20
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    internal partial class importRealTimeInfoRequest
+    internal partial class importRealTimeInfo
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("realTimeInfoTO", IsNullable=false)]
-        public RealtimeSender20.RealTimeInfoTO[] importRealTimeInfo;
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="importRealTimeInfo", Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("realTimeInfoTO")]
+        public RealtimeSender21.RealTimeInfoTO[] importRealTimeInfo1;
         
-        public importRealTimeInfoRequest()
+        public importRealTimeInfo()
         {
         }
         
-        public importRealTimeInfoRequest(RealtimeSender20.RealTimeInfoTO[] importRealTimeInfo)
+        public importRealTimeInfo(RealtimeSender21.RealTimeInfoTO[] importRealTimeInfo1)
         {
-            this.importRealTimeInfo = importRealTimeInfo;
+            this.importRealTimeInfo1 = importRealTimeInfo1;
         }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     internal partial class importRealTimeInfoResponse
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="importRealTimeInfoResponse", Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("result", IsNullable=false)]
-        public RealtimeSender20.ValidationErrorTO[] importRealTimeInfoResponse1;
+        [System.Xml.Serialization.XmlArrayItemAttribute("result")]
+        public RealtimeSender21.ValidationErrorTO[] importRealTimeInfoResponse1;
         
         public importRealTimeInfoResponse()
         {
         }
         
-        public importRealTimeInfoResponse(RealtimeSender20.ValidationErrorTO[] importRealTimeInfoResponse1)
+        public importRealTimeInfoResponse(RealtimeSender21.ValidationErrorTO[] importRealTimeInfoResponse1)
         {
             this.importRealTimeInfoResponse1 = importRealTimeInfoResponse1;
         }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    internal partial class periodicTaskRequest
+    internal partial class periodicTask1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
-        public RealtimeSender20.periodicTask periodicTask;
+        public RealtimeSender21.periodicTask periodicTask;
         
-        public periodicTaskRequest()
+        public periodicTask1()
         {
         }
         
-        public periodicTaskRequest(RealtimeSender20.periodicTask periodicTask)
+        public periodicTask1(RealtimeSender21.periodicTask periodicTask)
         {
             this.periodicTask = periodicTask;
         }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     internal partial class periodicTaskResponse1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
-        public RealtimeSender20.periodicTaskResponse periodicTaskResponse;
+        public RealtimeSender21.periodicTaskResponse periodicTaskResponse;
         
         public periodicTaskResponse1()
         {
         }
         
-        public periodicTaskResponse1(RealtimeSender20.periodicTaskResponse periodicTaskResponse)
+        public periodicTaskResponse1(RealtimeSender21.periodicTaskResponse periodicTaskResponse)
         {
             this.periodicTaskResponse = periodicTaskResponse;
         }
     }
     
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
-    internal interface RealTimeInformationImportFacadeChannel : RealtimeSender20.RealTimeInformationImportFacade, System.ServiceModel.IClientChannel
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
+    internal interface RealTimeInformationImportFacadeChannel : RealtimeSender21.RealTimeInformationImportFacade, System.ServiceModel.IClientChannel
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
-    internal partial class RealTimeInformationImportFacadeClient : System.ServiceModel.ClientBase<RealtimeSender20.RealTimeInformationImportFacade>, RealtimeSender20.RealTimeInformationImportFacade
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
+    internal partial class RealTimeInformationImportFacadeClient : System.ServiceModel.ClientBase<RealtimeSender21.RealTimeInformationImportFacade>, RealtimeSender21.RealTimeInformationImportFacade
     {
         
         /// <summary>
@@ -979,7 +1011,7 @@ namespace RealtimeSender20
         public RealTimeInformationImportFacadeClient() : 
                 base(RealTimeInformationImportFacadeClient.GetDefaultBinding(), RealTimeInformationImportFacadeClient.GetDefaultEndpointAddress())
         {
-            this.Endpoint.Name = EndpointConfiguration.RealTimeInformationImportFacadePort.ToString();
+            this.Endpoint.Name = EndpointConfiguration.RealtimeImportWebFacadeBeanPort.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
         
@@ -1010,29 +1042,29 @@ namespace RealtimeSender20
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<RealtimeSender20.importRealTimeInfoResponse> RealtimeSender20.RealTimeInformationImportFacade.importRealTimeInfoAsync(RealtimeSender20.importRealTimeInfoRequest request)
+        System.Threading.Tasks.Task<RealtimeSender21.importRealTimeInfoResponse> RealtimeSender21.RealTimeInformationImportFacade.importRealTimeInfoAsync(RealtimeSender21.importRealTimeInfo request)
         {
             return base.Channel.importRealTimeInfoAsync(request);
         }
         
-        public System.Threading.Tasks.Task<RealtimeSender20.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender20.RealTimeInfoTO[] importRealTimeInfo)
+        public System.Threading.Tasks.Task<RealtimeSender21.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender21.RealTimeInfoTO[] importRealTimeInfo1)
         {
-            RealtimeSender20.importRealTimeInfoRequest inValue = new RealtimeSender20.importRealTimeInfoRequest();
-            inValue.importRealTimeInfo = importRealTimeInfo;
-            return ((RealtimeSender20.RealTimeInformationImportFacade)(this)).importRealTimeInfoAsync(inValue);
+            RealtimeSender21.importRealTimeInfo inValue = new RealtimeSender21.importRealTimeInfo();
+            inValue.importRealTimeInfo1 = importRealTimeInfo1;
+            return ((RealtimeSender21.RealTimeInformationImportFacade)(this)).importRealTimeInfoAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<RealtimeSender20.periodicTaskResponse1> RealtimeSender20.RealTimeInformationImportFacade.periodicTaskAsync(RealtimeSender20.periodicTaskRequest request)
+        System.Threading.Tasks.Task<RealtimeSender21.periodicTaskResponse1> RealtimeSender21.RealTimeInformationImportFacade.periodicTaskAsync(RealtimeSender21.periodicTask1 request)
         {
             return base.Channel.periodicTaskAsync(request);
         }
         
-        public System.Threading.Tasks.Task<RealtimeSender20.periodicTaskResponse1> periodicTaskAsync(RealtimeSender20.periodicTask periodicTask)
+        public System.Threading.Tasks.Task<RealtimeSender21.periodicTaskResponse1> periodicTaskAsync(RealtimeSender21.periodicTask periodicTask)
         {
-            RealtimeSender20.periodicTaskRequest inValue = new RealtimeSender20.periodicTaskRequest();
+            RealtimeSender21.periodicTask1 inValue = new RealtimeSender21.periodicTask1();
             inValue.periodicTask = periodicTask;
-            return ((RealtimeSender20.RealTimeInformationImportFacade)(this)).periodicTaskAsync(inValue);
+            return ((RealtimeSender21.RealTimeInformationImportFacade)(this)).periodicTaskAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()
@@ -1047,7 +1079,7 @@ namespace RealtimeSender20
         
         private static System.ServiceModel.Channels.Binding GetBindingForEndpoint(EndpointConfiguration endpointConfiguration)
         {
-            if ((endpointConfiguration == EndpointConfiguration.RealTimeInformationImportFacadePort))
+            if ((endpointConfiguration == EndpointConfiguration.RealtimeImportWebFacadeBeanPort))
             {
                 System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
                 result.MaxBufferSize = int.MaxValue;
@@ -1061,27 +1093,28 @@ namespace RealtimeSender20
         
         private static System.ServiceModel.EndpointAddress GetEndpointAddress(EndpointConfiguration endpointConfiguration)
         {
-            if ((endpointConfiguration == EndpointConfiguration.RealTimeInformationImportFacadePort))
+            if ((endpointConfiguration == EndpointConfiguration.RealtimeImportWebFacadeBeanPort))
             {
-                return new System.ServiceModel.EndpointAddress("http://localhost/de/RealTimeInformationImportFacadeBean");
+                return new System.ServiceModel.EndpointAddress("http://bnb22010.ivu-ag.com:20020/intf.realtime.standardimport.impl/RealtimeImport" +
+                        "WebFacadeBean");
             }
             throw new System.InvalidOperationException(string.Format("Es wurde kein Endpunkt mit dem Namen \"{0}\" gefunden.", endpointConfiguration));
         }
         
         private static System.ServiceModel.Channels.Binding GetDefaultBinding()
         {
-            return RealTimeInformationImportFacadeClient.GetBindingForEndpoint(EndpointConfiguration.RealTimeInformationImportFacadePort);
+            return RealTimeInformationImportFacadeClient.GetBindingForEndpoint(EndpointConfiguration.RealtimeImportWebFacadeBeanPort);
         }
         
         private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress()
         {
-            return RealTimeInformationImportFacadeClient.GetEndpointAddress(EndpointConfiguration.RealTimeInformationImportFacadePort);
+            return RealTimeInformationImportFacadeClient.GetEndpointAddress(EndpointConfiguration.RealtimeImportWebFacadeBeanPort);
         }
         
         public enum EndpointConfiguration
         {
             
-            RealTimeInformationImportFacadePort,
+            RealtimeImportWebFacadeBeanPort,
         }
     }
 }

@@ -57,7 +57,8 @@ namespace EBuEf2IVUVehicle
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
 
-            services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();
+            services.AddSingleton<IRealtimeSender20, RealtimeSender20.Sender>();
+            services.AddSingleton<IRealtimeSender21, RealtimeSender21.Sender>();
         }
 
         #endregion Private Methods

@@ -22,14 +22,17 @@ namespace EBuEf2IVUVehicle
 
         private readonly Message2TrainLeg converter;
         private readonly IMessageReceiver positionsReceiver;
-        private readonly IRealtimeSender realtimeSender;
+        private readonly IRealtimeSender20 realtimeSender20;
+        private readonly IRealtimeSender21 realtimeSender21;
+        private bool useInterfaceServer;
 
         #endregion Private Fields
 
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
-            IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, ILogger<Worker> logger)
+            IDatabaseConnector databaseConnector, IRealtimeSender20 realtimeSender20, IRealtimeSender21 realtimeSender21,
+            ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
         {
             this.sessionStateHandler.SessionStartedEvent += OnSessionStart;
@@ -37,7 +40,8 @@ namespace EBuEf2IVUVehicle
             this.positionsReceiver = positionsReceiver;
             this.positionsReceiver.MessageReceivedEvent += OnMessageReceived;
 
-            this.realtimeSender = realtimeSender;
+            this.realtimeSender20 = realtimeSender20;
+            this.realtimeSender21 = realtimeSender21;
 
             converter = new Message2TrainLeg(
                 config: config,
@@ -69,9 +73,18 @@ namespace EBuEf2IVUVehicle
                 {
                     try
                     {
-                        await Task.WhenAny(
-                            positionsReceiver.ExecuteAsync(sessionCancellationToken),
-                            realtimeSender.ExecuteAsync(sessionCancellationToken));
+                        if (useInterfaceServer)
+                        {
+                            await Task.WhenAny(
+                                positionsReceiver.ExecuteAsync(sessionCancellationToken),
+                                realtimeSender20.ExecuteAsync(sessionCancellationToken));
+                        }
+                        else
+                        {
+                            await Task.WhenAny(
+                                positionsReceiver.ExecuteAsync(sessionCancellationToken),
+                                realtimeSender21.ExecuteAsync(sessionCancellationToken));
+                        }
                     }
                     catch (TaskCanceledException)
                     {
@@ -105,11 +118,29 @@ namespace EBuEf2IVUVehicle
                 .GetSection(nameof(Settings.RealtimeSender))
                 .Get<Settings.RealtimeSender>();
 
-            realtimeSender.Initialize(
-                division: settings.Division,
-                endpoint: settings.Endpoint,
-                retryTime: settings.RetryTime,
-                sessionStart: ebuefSessionStart);
+            useInterfaceServer = settings.UseInterfaceServer;
+
+            if (useInterfaceServer)
+            {
+                realtimeSender20.Initialize(
+                    endpoint: settings.Endpoint,
+                    division: settings.Division,
+                    sessionStart: ebuefSessionStart,
+                    retryTime: settings.RetryTime);
+            }
+            else
+            {
+                realtimeSender21.Initialize(
+                    host: settings.Host,
+                    port: settings.Port,
+                    path: settings.Path,
+                    username: settings.Username,
+                    password: settings.Password,
+                    isHttps: settings.IsHttps,
+                    division: settings.Division,
+                    sessionStart: ebuefSessionStart,
+                    retryTime: settings.RetryTime);
+            }
         }
 
         private async void OnMessageReceived(object sender, MessageReceivedArgs e)
@@ -128,7 +159,15 @@ namespace EBuEf2IVUVehicle
 
                     if (trainLeg != default)
                     {
-                        realtimeSender.Add(trainLeg);
+                        if (useInterfaceServer)
+                        {
+                            realtimeSender20.Add(trainLeg);
+                        }
+                        else
+                        {
+                            realtimeSender21.Add(trainLeg);
+                        }
+
                         await databaseConnector.AddRealtimeAsync(trainLeg);
                     }
                     else
@@ -159,7 +198,14 @@ namespace EBuEf2IVUVehicle
 
             var allocations = await databaseConnector.GetVehicleAllocationsAsync();
 
-            realtimeSender.Add(allocations);
+            if (useInterfaceServer)
+            {
+                realtimeSender20.Add(allocations);
+            }
+            else
+            {
+                realtimeSender21.Add(allocations);
+            }
         }
 
         #endregion Private Methods

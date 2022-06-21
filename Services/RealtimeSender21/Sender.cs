@@ -1,30 +1,29 @@
 ﻿using Common.Interfaces;
 using Common.Models;
+using CredentialChannelFactory;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
-using RealtimeSender.Converters;
-using RealtimeSender20;
+using RealtimeSender21.Converters;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RealtimeSender
+namespace RealtimeSender21
 {
     public class Sender
-        : IRealtimeSender
+        : IRealtimeSender21
     {
         #region Private Fields
 
         private readonly ConcurrentQueue<RealTimeInfoTO> infosQueue = new();
         private readonly ILogger logger;
 
+        private Factory<RealTimeInformationImportFacadeChannel> channelFactory;
         private Message2RealtimeInfo converter;
-        private EndpointAddress endpointAddress;
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
@@ -66,21 +65,64 @@ namespace RealtimeSender
         {
             cancellationToken.Register(() => infosQueue.Clear());
 
-            var result = retryPolicy.ExecuteAsync(
+            var result = retryPolicy?.ExecuteAsync(
                 action: (token) => RunSenderAsync(token),
                 cancellationToken: cancellationToken);
 
             return result;
         }
 
-        public void Initialize(string division, string endpoint, int retryTime, DateTime sessionStart)
+        public void Initialize(string host, int port, string path, string username, string password,
+            bool isHttps, string division, DateTime sessionStart, int retryTime)
         {
+            if (string.IsNullOrWhiteSpace(host))
+            {
+                throw new ArgumentException(
+                    $"\"{nameof(host)}\" darf nicht NULL oder ein Leerraumzeichen sein.",
+                    nameof(host));
+            }
+
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentException(
+                    $"\"{nameof(path)}\" kann nicht NULL oder leer sein.",
+                    nameof(path));
+            }
+
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new ArgumentException(
+                    $"\"{nameof(username)}\" kann nicht NULL oder leer sein.",
+                    nameof(username));
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentException(
+                    $"\"{nameof(password)}\" darf nicht NULL oder ein Leerraumzeichen sein.",
+                    nameof(password));
+            }
+
+            if (string.IsNullOrWhiteSpace(division))
+            {
+                throw new ArgumentException(
+                    $"\"{nameof(division)}\" darf nicht NULL oder ein Leerraumzeichen sein.",
+                    nameof(division));
+            }
+
             converter = new Message2RealtimeInfo(
                 logger: logger,
                 division: division,
                 sessionStart: sessionStart);
 
-            endpointAddress = new EndpointAddress(endpoint);
+            channelFactory = new Factory<RealTimeInformationImportFacadeChannel>(
+                host: host,
+                port: port,
+                path: path,
+                userName: username,
+                password: password,
+                isHttps: isHttps,
+                notIgnoreCertificateErrors: true);
 
             retryPolicy = Policy
                 .Handle<Exception>()
@@ -112,16 +154,15 @@ namespace RealtimeSender
             {
                 if (!infosQueue.IsEmpty)
                 {
-                    using var client = new RealTimeInformationImportFacadeClient();
-                    client.Endpoint.Address = endpointAddress;
-
                     infosQueue.TryDequeue(out RealTimeInfoTO currentMessage);
 
                     if (currentMessage != default)
                     {
-                        var importInfo = new RealTimeInfoTO[1] { currentMessage };
+                        var importInfo = new importRealTimeInfo(new RealTimeInfoTO[] { currentMessage });
 
-                        var response = await client.importRealTimeInfoAsync(importInfo);
+                        var sender = channelFactory.Get();
+
+                        var response = await sender.importRealTimeInfoAsync(importInfo);
                         var result = response.importRealTimeInfoResponse1?.ToArray();
 
                         if (result?.Any() ?? false)

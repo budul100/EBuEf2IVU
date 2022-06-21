@@ -1,12 +1,11 @@
 ﻿using Common.Models;
 using Microsoft.Extensions.Logging;
-using RealtimeSender.Extensions;
-using RealtimeSender20;
+using RealtimeSender20.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RealtimeSender.Converters
+namespace RealtimeSender20.Converters
 {
     internal class Message2RealtimeInfo
     {

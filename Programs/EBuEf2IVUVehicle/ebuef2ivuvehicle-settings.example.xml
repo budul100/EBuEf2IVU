@@ -32,8 +32,15 @@
   </PositionsReceiver>
   <RealtimeSender>
 	<Division>EBUEF</Division>
-	  <Endpoint>http://ivu.ebuef:8080</Endpoint>
-	<RetryTime>30</RetryTime>
+	  <!--<Endpoint>http://ivu.ebuef:8080</Endpoint>-->
+	  <!--<UseInterfaceServer>true</UseInterfaceServer>-->
+	  <Host>ivu.ebuef</Host>
+	  <Port>20020</Port>
+	  <Path>intf.realtime.standardimport.impl/RealtimeImportWebFacadeBean</Path>
+	  <IsHttps>false</IsHttps>
+	  <Username>crewontrip</Username>
+	  <Password>crewontrip</Password>
+	  <RetryTime>30</RetryTime>
   </RealtimeSender>
   <InfrastructureMappings>
 	<InfrastructureMapping name="XAB_A">

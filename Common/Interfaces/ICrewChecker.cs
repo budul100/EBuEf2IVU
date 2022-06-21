@@ -13,8 +13,8 @@ namespace Common.Interfaces
         Task<IEnumerable<CrewingElement>> GetCrewingElementsAsync(IEnumerable<string> tripNumbers,
             DateTime date, CancellationToken cancellationToken);
 
-        void Initialize(string host, int port, string path, string username, string password, bool isHttps,
-            int retryTime, string division, string planningLevel);
+        void Initialize(string host, int port, string path, string username, string password,
+            bool isHttps, string division, string planningLevel, int retryTime);
 
         #endregion Public Methods
     }

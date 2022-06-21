@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Common.Interfaces
 {
-    public interface IRealtimeSender
+    public interface IRealtimeSender20
     {
         #region Public Methods
 
@@ -16,7 +16,7 @@ namespace Common.Interfaces
 
         Task ExecuteAsync(CancellationToken cancellationToken);
 
-        void Initialize(string division, string endpoint, int retryTime, DateTime sessionStart);
+        void Initialize(string endpoint, string division, DateTime sessionStart, int retryTime);
 
         #endregion Public Methods
     }

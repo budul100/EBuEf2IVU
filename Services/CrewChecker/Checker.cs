@@ -51,8 +51,43 @@ namespace CrewChecker
         }
 
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
-            int retryTime, string division, string planningLevel)
+            string division, string planningLevel, int retryTime)
         {
+            if (string.IsNullOrWhiteSpace(host))
+            {
+                throw new ArgumentException(
+                    $"\"{nameof(host)}\" darf nicht NULL oder ein Leerraumzeichen sein.",
+                    nameof(host));
+            }
+
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentException(
+                    $"\"{nameof(path)}\" kann nicht NULL oder leer sein.",
+                    nameof(path));
+            }
+
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new ArgumentException(
+                    $"\"{nameof(username)}\" kann nicht NULL oder leer sein.",
+                    nameof(username));
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentException(
+                    $"\"{nameof(password)}\" darf nicht NULL oder ein Leerraumzeichen sein.",
+                    nameof(password));
+            }
+
+            if (string.IsNullOrWhiteSpace(division))
+            {
+                throw new ArgumentException(
+                    $"\"{nameof(division)}\" darf nicht NULL oder ein Leerraumzeichen sein.",
+                    nameof(division));
+            }
+
             this.division = division;
             this.planningLevel = planningLevel;
 
