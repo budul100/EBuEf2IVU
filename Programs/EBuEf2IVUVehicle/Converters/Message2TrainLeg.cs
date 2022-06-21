@@ -46,11 +46,12 @@ namespace EBuEf2IVUVehicle
             if (message.SimulationsZeit.HasValue)
             {
                 mapping = infrastructureMappings
-                .Where(m => m.MessageBetriebsstelle.IsMatch(message.Betriebsstelle)
-                    && m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
-                    && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
-                .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
-                .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis)).FirstOrDefault();
+                    .Where(m => m != default
+                        && m.MessageBetriebsstelle.IsMatch(message.Betriebsstelle)
+                        && m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
+                        && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
+                    .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
+                    .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis)).FirstOrDefault();
             }
 
             if (mapping != default)
@@ -71,9 +72,8 @@ namespace EBuEf2IVUVehicle
             }
             else
             {
-                logger.LogWarning(
-                    "Es wurde kein Mapping für die eingegangene Nachricht gefunden: {message}",
-                    message);
+                result = GetTrainLeg(
+                    message: message);
             }
 
             return result;
@@ -82,6 +82,25 @@ namespace EBuEf2IVUVehicle
         #endregion Public Methods
 
         #region Private Methods
+
+        private TrainLeg GetTrainLeg(RealTimeMessage message)
+        {
+            var ivuZeitpunkt = message.SimulationsZeit.Value.TimeOfDay;
+            var fahrzeuge = message?.Decoder.AsEnumerable();
+
+            var result = new TrainLeg
+            {
+                Fahrzeuge = fahrzeuge,
+                IstPrognose = message.Modus == MessageType.Prognose,
+                IVUGleis = message.ZielGleis,
+                IVULegTyp = LegType.Ankunft,
+                IVUNetzpunkt = message.Betriebsstelle,
+                IVUZeitpunkt = ivuSessionDate.Add(ivuZeitpunkt),
+                Zugnummer = message.Zugnummer,
+            };
+
+            return result;
+        }
 
         private TrainLeg GetTrainLeg(RealTimeMessage message, InfrastructureMapping mapping)
         {
