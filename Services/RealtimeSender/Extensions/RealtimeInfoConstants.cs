@@ -1,4 +1,4 @@
-﻿namespace RealtimeSender20.Extensions
+﻿namespace RealtimeSender.Extensions
 {
     internal static class RealtimeInfoConstants
     {

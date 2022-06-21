@@ -35,9 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBuEf2IVUVehicle", "Program
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBuEf2IVUCrewTests", "Tests\EBuEf2IVUCrewTests\EBuEf2IVUCrewTests.csproj", "{62026C2A-20B1-4E71-A316-95B5451803DA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealtimeSender20", "Services\RealtimeSender20\RealtimeSender20.csproj", "{0A5D7024-FAAE-42C5-9663-F37E6EF89581}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealtimeSenderIS", "Services\RealtimeSenderIS\RealtimeSenderIS.csproj", "{0A5D7024-FAAE-42C5-9663-F37E6EF89581}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealtimeSender21", "Services\RealtimeSender21\RealtimeSender21.csproj", "{7913460D-2CCC-4102-B359-46DC3AD78B2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealtimeSender", "Services\RealtimeSender\RealtimeSender.csproj", "{7913460D-2CCC-4102-B359-46DC3AD78B2F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

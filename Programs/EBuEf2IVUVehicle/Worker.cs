@@ -22,8 +22,8 @@ namespace EBuEf2IVUVehicle
 
         private readonly Message2TrainLeg converter;
         private readonly IMessageReceiver positionsReceiver;
-        private readonly IRealtimeSender20 realtimeSender20;
-        private readonly IRealtimeSender21 realtimeSender21;
+        private readonly IRealtimeSenderIS realtimeSender20;
+        private readonly IRealtimeSender realtimeSender21;
         private bool useInterfaceServer;
 
         #endregion Private Fields
@@ -31,7 +31,7 @@ namespace EBuEf2IVUVehicle
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
-            IDatabaseConnector databaseConnector, IRealtimeSender20 realtimeSender20, IRealtimeSender21 realtimeSender21,
+            IDatabaseConnector databaseConnector, IRealtimeSenderIS realtimeSender20, IRealtimeSender realtimeSender21,
             ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
         {

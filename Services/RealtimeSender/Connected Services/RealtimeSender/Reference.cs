@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace RealtimeSender21
+namespace RealtimeSender
 {
     
     
@@ -19,12 +19,12 @@ namespace RealtimeSender21
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(AbstractRealTimeInfoTO))]
-        System.Threading.Tasks.Task<RealtimeSender21.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender21.importRealTimeInfo request);
+        System.Threading.Tasks.Task<RealtimeSender.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender.importRealTimeInfo request);
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(AbstractRealTimeInfoTO))]
-        System.Threading.Tasks.Task<RealtimeSender21.periodicTaskResponse1> periodicTaskAsync(RealtimeSender21.periodicTask1 request);
+        System.Threading.Tasks.Task<RealtimeSender.periodicTaskResponse1> periodicTaskAsync(RealtimeSender.periodicTask1 request);
     }
     
     /// <remarks/>
@@ -918,13 +918,13 @@ namespace RealtimeSender21
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="importRealTimeInfo", Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("realTimeInfoTO")]
-        public RealtimeSender21.RealTimeInfoTO[] importRealTimeInfo1;
+        public RealtimeSender.RealTimeInfoTO[] importRealTimeInfo1;
         
         public importRealTimeInfo()
         {
         }
         
-        public importRealTimeInfo(RealtimeSender21.RealTimeInfoTO[] importRealTimeInfo1)
+        public importRealTimeInfo(RealtimeSender.RealTimeInfoTO[] importRealTimeInfo1)
         {
             this.importRealTimeInfo1 = importRealTimeInfo1;
         }
@@ -939,13 +939,13 @@ namespace RealtimeSender21
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="importRealTimeInfoResponse", Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("result")]
-        public RealtimeSender21.ValidationErrorTO[] importRealTimeInfoResponse1;
+        public RealtimeSender.ValidationErrorTO[] importRealTimeInfoResponse1;
         
         public importRealTimeInfoResponse()
         {
         }
         
-        public importRealTimeInfoResponse(RealtimeSender21.ValidationErrorTO[] importRealTimeInfoResponse1)
+        public importRealTimeInfoResponse(RealtimeSender.ValidationErrorTO[] importRealTimeInfoResponse1)
         {
             this.importRealTimeInfoResponse1 = importRealTimeInfoResponse1;
         }
@@ -959,13 +959,13 @@ namespace RealtimeSender21
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
-        public RealtimeSender21.periodicTask periodicTask;
+        public RealtimeSender.periodicTask periodicTask;
         
         public periodicTask1()
         {
         }
         
-        public periodicTask1(RealtimeSender21.periodicTask periodicTask)
+        public periodicTask1(RealtimeSender.periodicTask periodicTask)
         {
             this.periodicTask = periodicTask;
         }
@@ -979,26 +979,26 @@ namespace RealtimeSender21
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://web.facade.ejb.fzd.mb.ivu.de/jaws", Order=0)]
-        public RealtimeSender21.periodicTaskResponse periodicTaskResponse;
+        public RealtimeSender.periodicTaskResponse periodicTaskResponse;
         
         public periodicTaskResponse1()
         {
         }
         
-        public periodicTaskResponse1(RealtimeSender21.periodicTaskResponse periodicTaskResponse)
+        public periodicTaskResponse1(RealtimeSender.periodicTaskResponse periodicTaskResponse)
         {
             this.periodicTaskResponse = periodicTaskResponse;
         }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
-    internal interface RealTimeInformationImportFacadeChannel : RealtimeSender21.RealTimeInformationImportFacade, System.ServiceModel.IClientChannel
+    internal interface RealTimeInformationImportFacadeChannel : RealtimeSender.RealTimeInformationImportFacade, System.ServiceModel.IClientChannel
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.3")]
-    internal partial class RealTimeInformationImportFacadeClient : System.ServiceModel.ClientBase<RealtimeSender21.RealTimeInformationImportFacade>, RealtimeSender21.RealTimeInformationImportFacade
+    internal partial class RealTimeInformationImportFacadeClient : System.ServiceModel.ClientBase<RealtimeSender.RealTimeInformationImportFacade>, RealtimeSender.RealTimeInformationImportFacade
     {
         
         /// <summary>
@@ -1042,29 +1042,29 @@ namespace RealtimeSender21
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<RealtimeSender21.importRealTimeInfoResponse> RealtimeSender21.RealTimeInformationImportFacade.importRealTimeInfoAsync(RealtimeSender21.importRealTimeInfo request)
+        System.Threading.Tasks.Task<RealtimeSender.importRealTimeInfoResponse> RealtimeSender.RealTimeInformationImportFacade.importRealTimeInfoAsync(RealtimeSender.importRealTimeInfo request)
         {
             return base.Channel.importRealTimeInfoAsync(request);
         }
         
-        public System.Threading.Tasks.Task<RealtimeSender21.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender21.RealTimeInfoTO[] importRealTimeInfo1)
+        public System.Threading.Tasks.Task<RealtimeSender.importRealTimeInfoResponse> importRealTimeInfoAsync(RealtimeSender.RealTimeInfoTO[] importRealTimeInfo1)
         {
-            RealtimeSender21.importRealTimeInfo inValue = new RealtimeSender21.importRealTimeInfo();
+            RealtimeSender.importRealTimeInfo inValue = new RealtimeSender.importRealTimeInfo();
             inValue.importRealTimeInfo1 = importRealTimeInfo1;
-            return ((RealtimeSender21.RealTimeInformationImportFacade)(this)).importRealTimeInfoAsync(inValue);
+            return ((RealtimeSender.RealTimeInformationImportFacade)(this)).importRealTimeInfoAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<RealtimeSender21.periodicTaskResponse1> RealtimeSender21.RealTimeInformationImportFacade.periodicTaskAsync(RealtimeSender21.periodicTask1 request)
+        System.Threading.Tasks.Task<RealtimeSender.periodicTaskResponse1> RealtimeSender.RealTimeInformationImportFacade.periodicTaskAsync(RealtimeSender.periodicTask1 request)
         {
             return base.Channel.periodicTaskAsync(request);
         }
         
-        public System.Threading.Tasks.Task<RealtimeSender21.periodicTaskResponse1> periodicTaskAsync(RealtimeSender21.periodicTask periodicTask)
+        public System.Threading.Tasks.Task<RealtimeSender.periodicTaskResponse1> periodicTaskAsync(RealtimeSender.periodicTask periodicTask)
         {
-            RealtimeSender21.periodicTask1 inValue = new RealtimeSender21.periodicTask1();
+            RealtimeSender.periodicTask1 inValue = new RealtimeSender.periodicTask1();
             inValue.periodicTask = periodicTask;
-            return ((RealtimeSender21.RealTimeInformationImportFacade)(this)).periodicTaskAsync(inValue);
+            return ((RealtimeSender.RealTimeInformationImportFacade)(this)).periodicTaskAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()

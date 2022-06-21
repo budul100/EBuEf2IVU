@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RealtimeSender21.Extensions
+namespace RealtimeSenderIS.Extensions
 {
     internal static class SenderExtensions
     {

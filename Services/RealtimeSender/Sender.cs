@@ -4,7 +4,7 @@ using CredentialChannelFactory;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
-using RealtimeSender21.Converters;
+using RealtimeSender.Converters;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,10 +12,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RealtimeSender21
+namespace RealtimeSender
 {
     public class Sender
-        : IRealtimeSender21
+        : IRealtimeSender
     {
         #region Private Fields
 

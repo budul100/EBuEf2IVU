@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Common.Interfaces
 {
-    public interface IRealtimeSender20
+    public interface IRealtimeSenderIS
     {
         #region Public Methods
 

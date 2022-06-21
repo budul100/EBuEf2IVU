@@ -3,7 +3,7 @@ using Common.Models;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
-using RealtimeSender20.Converters;
+using RealtimeSenderIS.Converters;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,10 +12,10 @@ using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RealtimeSender20
+namespace RealtimeSenderIS
 {
     public class Sender
-        : IRealtimeSender20
+        : IRealtimeSenderIS
     {
         #region Private Fields
 
