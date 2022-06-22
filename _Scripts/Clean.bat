@@ -1,4 +1,4 @@
-ECHO off
+@echo off
 
 pushd ..
 

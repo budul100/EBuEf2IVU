@@ -159,7 +159,6 @@ namespace RealtimeSender
                     if (currentMessage != default)
                     {
                         var importInfo = new importRealTimeInfo(new RealTimeInfoTO[] { currentMessage });
-
                         var sender = channelFactory.Get();
 
                         var response = await sender.importRealTimeInfoAsync(importInfo);
@@ -168,27 +167,23 @@ namespace RealtimeSender
                         if (result?.Any() ?? false)
                         {
                             var relevantValiditation = result[0];
-                            var relevantMessage = currentMessage;
 
-                            if (relevantValiditation.code == 0)
-                            {
-                                logger.LogDebug(
-                                    "Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet " +
-                                    "(Zug: {trainNumber}, Betriebsstelle: {location}, Decoder: {decoder}).",
-                                    relevantMessage.tripNumber,
-                                    relevantMessage.stopArea,
-                                    relevantMessage.vehicles.FirstOrDefault()?.number);
-                            }
-                            else
-                            {
-                                logger.LogError(
-                                    "Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen " +
-                                    "(Zug: {trainNumber}, Betriebsstelle: {location}, Decoder: {decoder}): {message}.",
-                                    relevantValiditation.message,
-                                    relevantMessage.tripNumber,
-                                    relevantMessage.stopArea,
-                                    relevantMessage.vehicles.FirstOrDefault()?.number);
-                            }
+                            logger.LogError(
+                                "Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen " +
+                                "(Zug: {trainNumber}, Betriebsstelle: {location}, Decoder: {decoder}): {message}.",
+                                currentMessage.tripNumber,
+                                currentMessage.stopArea,
+                                currentMessage.vehicles.FirstOrDefault()?.number,
+                                relevantValiditation.message);
+                        }
+                        else
+                        {
+                            logger.LogDebug(
+                                "Ist-Zeit-Nachricht wurde erfolgreich an IVU.rail gesendet " +
+                                "(Zug: {trainNumber}, Betriebsstelle: {location}, Decoder: {decoder}).",
+                                currentMessage.tripNumber,
+                                currentMessage.stopArea,
+                                currentMessage.vehicles.FirstOrDefault()?.number);
                         }
                     }
 

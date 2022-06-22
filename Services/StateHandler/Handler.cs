@@ -79,9 +79,9 @@ namespace StateHandler
 
         #region Private Methods
 
-        private async Task<bool> IsSessionStartedAsync()
+        private Task<bool> IsSessionStartedAsync()
         {
-            var result = await databaseConnector.GetEBuEfSessionActiveAsync();
+            var result = databaseConnector.GetEBuEfSessionActiveAsync();
 
             return result;
         }

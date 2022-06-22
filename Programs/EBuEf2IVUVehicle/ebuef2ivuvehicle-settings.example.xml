@@ -31,8 +31,8 @@
 		<RetryTime>30</RetryTime>
 	</PositionsReceiver>
 	<RealtimeSender>
-		<!--<Host>bnb22010.ivu-ag.com</Host>-->
-		<Host>ivu.ebuef</Host>
+		<Host>172.18.145.225</Host>
+		<!--<Host>ivu.ebuef</Host>-->
 		<Port>20000</Port>
 		<Path>intf.realtime.standardimport.impl/RealtimeImportWebFacadeBean</Path>
 		<IsHttps>false</IsHttps>
@@ -40,7 +40,7 @@
 		<Password>ivu$admin</Password>
 		<!--<UseInterfaceServer>true</UseInterfaceServer>-->
 		<!--<Endpoint>http://ivu.ebuef:8080</Endpoint>-->
-		<Division>EBUEF</Division>
+		<Division>LD</Division>
 		<RetryTime>30</RetryTime>
 	</RealtimeSender>
 	<InfrastructureMappings>
