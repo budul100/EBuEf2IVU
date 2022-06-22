@@ -31,7 +31,6 @@
 		<RetryTime>30</RetryTime>
 	</PositionsReceiver>
 	<RealtimeSender>
-		<Division>EBUEF</Division>
 		<!--<Host>bnb22010.ivu-ag.com</Host>-->
 		<Host>ivu.ebuef</Host>
 		<Port>20000</Port>
@@ -39,9 +38,10 @@
 		<IsHttps>false</IsHttps>
 		<Username>ivu</Username>
 		<Password>ivu$admin</Password>
-		<RetryTime>30</RetryTime>
 		<!--<UseInterfaceServer>true</UseInterfaceServer>-->
 		<!--<Endpoint>http://ivu.ebuef:8080</Endpoint>-->
+		<Division>EBUEF</Division>
+		<RetryTime>30</RetryTime>
 	</RealtimeSender>
 	<InfrastructureMappings>
 		<InfrastructureMapping name="XAB_A">
