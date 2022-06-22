@@ -76,7 +76,7 @@ namespace RealTimeSenderTests
             Task.WhenAny(
                 _ = sender.ExecuteAsync(token));
 
-            Thread.Sleep(60000);
+            Thread.Sleep(6000);
 
             tokenSource.Cancel();
         }
