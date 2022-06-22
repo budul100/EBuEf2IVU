@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealtimeSenderIS", "Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealtimeSender", "Services\RealtimeSender\RealtimeSender.csproj", "{7913460D-2CCC-4102-B359-46DC3AD78B2F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealTimeSenderTests", "Tests\RealTimeSenderTests\RealTimeSenderTests.csproj", "{68CF2CEB-D3A4-4A3A-8FCC-DB06A3592DA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,10 @@ Global
 		{7913460D-2CCC-4102-B359-46DC3AD78B2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7913460D-2CCC-4102-B359-46DC3AD78B2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7913460D-2CCC-4102-B359-46DC3AD78B2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68CF2CEB-D3A4-4A3A-8FCC-DB06A3592DA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68CF2CEB-D3A4-4A3A-8FCC-DB06A3592DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68CF2CEB-D3A4-4A3A-8FCC-DB06A3592DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68CF2CEB-D3A4-4A3A-8FCC-DB06A3592DA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,6 +130,7 @@ Global
 		{62026C2A-20B1-4E71-A316-95B5451803DA} = {0AF50D50-8827-4EE7-BA50-79DDCED4B1F6}
 		{0A5D7024-FAAE-42C5-9663-F37E6EF89581} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
 		{7913460D-2CCC-4102-B359-46DC3AD78B2F} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
+		{68CF2CEB-D3A4-4A3A-8FCC-DB06A3592DA1} = {0AF50D50-8827-4EE7-BA50-79DDCED4B1F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E929A830-61A1-48FF-9596-23961F1A08C4}

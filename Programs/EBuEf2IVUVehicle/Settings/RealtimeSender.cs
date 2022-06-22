@@ -1,6 +1,6 @@
 ﻿namespace EBuEf2IVUVehicle.Settings
 {
-    internal class RealtimeSender
+    public class RealtimeSender
     {
         #region Public Properties
 

@@ -42,7 +42,7 @@ namespace CrewChecker
             CancellationToken cancellationToken)
         {
             var result = retryPolicy.ExecuteAsync(
-                action: _ => GetAsync(
+                action: _ => GetCrewsForTrips(
                     tripNumbers: tripNumbers,
                     date: date),
                 cancellationToken: cancellationToken);
@@ -113,7 +113,7 @@ namespace CrewChecker
 
         #region Private Methods
 
-        private async Task<IEnumerable<CrewingElement>> GetAsync(IEnumerable<string> tripNumbers, DateTime date)
+        private async Task<IEnumerable<CrewingElement>> GetCrewsForTrips(IEnumerable<string> tripNumbers, DateTime date)
         {
             var assignments = default(IEnumerable<tripAssignment>);
 

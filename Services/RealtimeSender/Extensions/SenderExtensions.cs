@@ -44,20 +44,24 @@ namespace RealtimeSender.Extensions
 
         public static IEnumerable<VehicleTO> GetVehicleTOs(this IEnumerable<string> vehicles)
         {
-            var position = 0;
-            foreach (string vehicle in vehicles)
+            if (vehicles?.Any() ?? false)
             {
-                if (!string.IsNullOrEmpty(vehicle))
-                {
-                    var result = new VehicleTO
-                    {
-                        orientation = 0,
-                        position = ++position,
-                        positionSpecified = true,
-                        number = vehicle
-                    };
+                var position = 0;
 
-                    yield return result;
+                foreach (string vehicle in vehicles)
+                {
+                    if (!string.IsNullOrEmpty(vehicle))
+                    {
+                        var result = new VehicleTO
+                        {
+                            orientation = 0,
+                            position = ++position,
+                            positionSpecified = true,
+                            number = vehicle
+                        };
+
+                        yield return result;
+                    }
                 }
             }
         }

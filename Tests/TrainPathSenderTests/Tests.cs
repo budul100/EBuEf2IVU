@@ -108,9 +108,6 @@ namespace TrainPathSenderTests
             sender.Add(trainRuns);
 
             sender.ExecuteAsync(new CancellationToken());
-
-            // Activate only if a soap server is running to receive a result
-            // sender.RunAsnc(new CancellationToken());
         }
 
         #endregion Public Methods
