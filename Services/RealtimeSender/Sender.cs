@@ -19,9 +19,8 @@ namespace RealtimeSender
     {
         #region Private Fields
 
-        private readonly ConcurrentQueue<RealTimeInfoTO> infosQueue = new();
         private readonly ILogger logger;
-
+        private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new();
         private Factory<RealTimeInformationImportFacadeChannel> channelFactory;
         private Message2RealtimeInfo converter;
         private AsyncRetryPolicy retryPolicy;
@@ -43,10 +42,12 @@ namespace RealtimeSender
         {
             foreach (var allocation in trainAllocations)
             {
-                var info = converter.Get(allocation);
+                var message = converter.Get(allocation);
 
-                if (info != default)
-                    infosQueue.Enqueue(info);
+                if (message != default)
+                {
+                    messagesQueue.Enqueue(message);
+                }
             }
         }
 
@@ -54,16 +55,18 @@ namespace RealtimeSender
         {
             if (trainLeg != default)
             {
-                var info = converter.Get(trainLeg);
+                var message = converter.Get(trainLeg);
 
-                if (info != default)
-                    infosQueue.Enqueue(info);
+                if (message != default)
+                {
+                    messagesQueue.Enqueue(message);
+                }
             }
         }
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            cancellationToken.Register(() => infosQueue.Clear());
+            cancellationToken.Register(() => messagesQueue.Clear());
 
             var result = retryPolicy?.ExecuteAsync(
                 action: (token) => RunSenderAsync(token),
@@ -152,9 +155,9 @@ namespace RealtimeSender
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                if (!infosQueue.IsEmpty)
+                if (!messagesQueue.IsEmpty)
                 {
-                    infosQueue.TryPeek(out RealTimeInfoTO currentMessage);
+                    messagesQueue.TryPeek(out RealTimeInfoTO currentMessage);
 
                     if (currentMessage != default)
                     {
@@ -187,7 +190,7 @@ namespace RealtimeSender
                         }
                     }
 
-                    infosQueue.TryDequeue(out _);
+                    messagesQueue.TryDequeue(out _);
                 }
             }
         }

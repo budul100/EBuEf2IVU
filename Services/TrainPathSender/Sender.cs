@@ -64,12 +64,16 @@ namespace TrainPathSender
                 var imports = trainRunConverter.Get(filtereds);
 
                 if (imports != default)
+                {
                     importsQueue.Enqueue(imports);
+                }
             }
         }
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            cancellationToken.Register(() => importsQueue.Clear());
+
             var result = retryPolicy.ExecuteAsync(
                 action: (token) => RunSenderAsync(token),
                 cancellationToken: cancellationToken);
