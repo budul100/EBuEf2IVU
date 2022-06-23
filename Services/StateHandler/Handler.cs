@@ -145,6 +145,10 @@ namespace StateHandler
                     sender: this,
                     e: new StateChangedArgs(SessionStatus));
             }
+            else
+            {
+                logger?.LogDebug("Der Status der Session hat sich nicht geändert.");
+            }
         }
 
         private async Task SetSessionStatusInitally()

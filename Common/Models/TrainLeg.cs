@@ -40,6 +40,18 @@ namespace Common.Models
 
         public override string ToString()
         {
+            if (string.IsNullOrWhiteSpace(EBuEfBetriebsstelleVon))
+            {
+                return $@"Zug: {Zugnummer} | EBuEf nach: {EBuEfBetriebsstelleNach}/{EBuEfGleisNach} um {EBuEfZeitpunktNach:hh\:mm} | " +
+                    $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeitpunkt:HH\:mm} ({IVULegTyp})";
+            }
+
+            if (string.IsNullOrWhiteSpace(EBuEfBetriebsstelleNach))
+            {
+                return $@"Zug: {Zugnummer} | EBuEf von: {EBuEfBetriebsstelleVon}/{EBuEfGleisVon} um {EBuEfZeitpunktVon:hh\:mm} | " +
+                    $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeitpunkt:HH\:mm} ({IVULegTyp})";
+            }
+
             return $@"Zug: {Zugnummer} | EBuEf von: {EBuEfBetriebsstelleVon}/{EBuEfGleisVon} um {EBuEfZeitpunktVon:hh\:mm} | " +
                 $@"EBuEf nach: {EBuEfBetriebsstelleNach}/{EBuEfGleisNach} um {EBuEfZeitpunktNach:hh\:mm} | " +
                 $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeitpunkt:HH\:mm} ({IVULegTyp})";

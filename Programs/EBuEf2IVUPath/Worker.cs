@@ -56,8 +56,6 @@ namespace EBuEf2IVUPath
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                isSessionInitialized = false;
-
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
@@ -81,6 +79,8 @@ namespace EBuEf2IVUPath
                     catch (TaskCanceledException)
                     { }
                 }
+
+                isSessionInitialized = false;
 
                 logger.LogInformation(
                     "EBuEf2IVUPath wird gestoppt.");

@@ -53,8 +53,6 @@ namespace EBuEf2IVUCrew
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                isSessionInitialized = false;
-
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
@@ -80,6 +78,8 @@ namespace EBuEf2IVUCrew
                     catch (TaskCanceledException)
                     { }
                 }
+
+                isSessionInitialized = false;
 
                 logger.LogInformation(
                     "EBuEf2IVUCrew wird gestoppt.");

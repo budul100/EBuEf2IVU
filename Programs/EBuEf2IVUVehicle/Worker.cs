@@ -22,8 +22,8 @@ namespace EBuEf2IVUVehicle
 
         private readonly Message2TrainLeg converter;
         private readonly IMessageReceiver positionsReceiver;
-        private readonly IRealtimeSenderIS realtimeSender20;
-        private readonly IRealtimeSender realtimeSender21;
+        private readonly IRealtimeSender realtimeSender;
+        private readonly IRealtimeSenderIS realtimeSenderIS;
         private bool isSessionInitialized;
         private bool useInterfaceServer;
 
@@ -41,8 +41,8 @@ namespace EBuEf2IVUVehicle
             this.positionsReceiver = positionsReceiver;
             this.positionsReceiver.MessageReceivedEvent += OnMessageReceived;
 
-            this.realtimeSender20 = realtimeSender20;
-            this.realtimeSender21 = realtimeSender21;
+            this.realtimeSenderIS = realtimeSender20;
+            this.realtimeSender = realtimeSender21;
 
             converter = new Message2TrainLeg(
                 config: config,
@@ -65,8 +65,6 @@ namespace EBuEf2IVUVehicle
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                isSessionInitialized = false;
-
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
@@ -78,13 +76,13 @@ namespace EBuEf2IVUVehicle
                             {
                                 await Task.WhenAny(
                                     positionsReceiver.ExecuteAsync(sessionCancellationToken),
-                                    realtimeSender20.ExecuteAsync(sessionCancellationToken));
+                                    realtimeSenderIS.ExecuteAsync(sessionCancellationToken));
                             }
                             else
                             {
                                 await Task.WhenAny(
                                     positionsReceiver.ExecuteAsync(sessionCancellationToken),
-                                    realtimeSender21.ExecuteAsync(sessionCancellationToken));
+                                    realtimeSender.ExecuteAsync(sessionCancellationToken));
                             }
                         }
                         else
@@ -99,6 +97,8 @@ namespace EBuEf2IVUVehicle
                     catch (TaskCanceledException)
                     { }
                 }
+
+                isSessionInitialized = false;
 
                 logger.LogInformation(
                     "EBuEf2IVUVehicle wird gestoppt.");
@@ -138,7 +138,7 @@ namespace EBuEf2IVUVehicle
 
             if (useInterfaceServer)
             {
-                realtimeSender20.Initialize(
+                realtimeSenderIS.Initialize(
                     endpoint: settings.Endpoint,
                     division: settings.Division,
                     sessionStart: ebuefSessionStart,
@@ -146,7 +146,7 @@ namespace EBuEf2IVUVehicle
             }
             else
             {
-                realtimeSender21.Initialize(
+                realtimeSender.Initialize(
                     host: settings.Host,
                     port: settings.Port,
                     path: settings.Path,
@@ -177,11 +177,11 @@ namespace EBuEf2IVUVehicle
                     {
                         if (useInterfaceServer)
                         {
-                            realtimeSender20.Add(trainLeg);
+                            realtimeSenderIS.Add(trainLeg);
                         }
                         else
                         {
-                            realtimeSender21.Add(trainLeg);
+                            realtimeSender.Add(trainLeg);
                         }
 
                         await databaseConnector.AddRealtimeAsync(trainLeg);
@@ -228,11 +228,11 @@ namespace EBuEf2IVUVehicle
 
             if (useInterfaceServer)
             {
-                realtimeSender20.Add(allocations);
+                realtimeSenderIS.Add(allocations);
             }
             else
             {
-                realtimeSender21.Add(allocations);
+                realtimeSender.Add(allocations);
             }
         }
 

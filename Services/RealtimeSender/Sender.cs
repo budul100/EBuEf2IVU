@@ -154,7 +154,7 @@ namespace RealtimeSender
             {
                 if (!infosQueue.IsEmpty)
                 {
-                    infosQueue.TryDequeue(out RealTimeInfoTO currentMessage);
+                    infosQueue.TryPeek(out RealTimeInfoTO currentMessage);
 
                     if (currentMessage != default)
                     {
