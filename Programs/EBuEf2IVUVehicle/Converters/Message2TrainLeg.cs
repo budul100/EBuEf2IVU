@@ -39,15 +39,12 @@ namespace EBuEf2IVUVehicle
 
         public TrainLeg Convert(RealTimeMessage message)
         {
-            var result = default(TrainLeg);
-
             var mapping = default(InfrastructureMapping);
 
             if (message.SimulationsZeit.HasValue)
             {
                 mapping = infrastructureMappings
-                    .Where(m => m != default
-                        && m.MessageBetriebsstelle.IsMatch(message.Betriebsstelle)
+                    .Where(m => m?.MessageBetriebsstelle.IsMatch(message.Betriebsstelle) == true
                         && m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
                         && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
                     .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
@@ -61,22 +58,21 @@ namespace EBuEf2IVUVehicle
                     || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != LegType.Durchfahrt))
                 {
                     logger.LogWarning(
-                        "Der IVUTrainPositionType des Mappings {mappingType} entspricht nicht dem SignalTyp der eingegangenen Nachricht: {message}",
+                        "Der IVUTrainPositionType des Mappings {mappingType} entspricht nicht " +
+                        "dem SignalTyp der eingegangenen Nachricht: {message}",
                         mapping.IVUTrainPositionType,
                         message);
                 }
 
-                result = GetTrainLeg(
+                return GetTrainLeg(
                     message: message,
                     mapping: mapping);
             }
             else
             {
-                result = GetTrainLeg(
+                return GetTrainLeg(
                     message: message);
             }
-
-            return result;
         }
 
         #endregion Public Methods
