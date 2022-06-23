@@ -18,12 +18,13 @@ namespace EBuEf2IVUBase
     {
         #region Protected Fields
 
+        protected static readonly TimeSpan delay = TimeSpan.FromMilliseconds(10);
+
         protected readonly IConfiguration config;
         protected readonly IDatabaseConnector databaseConnector;
         protected readonly ILogger logger;
         protected readonly IStateHandler sessionStateHandler;
 
-        protected SessionStatusType currentState;
         protected EBuEfSession ebuefSession;
         protected DateTime ebuefSessionStart = DateTime.Now;
         protected DateTime ivuSessionDate = DateTime.Now;
@@ -70,6 +71,9 @@ namespace EBuEf2IVUBase
 
         protected async Task InitializeConnectionAsync(CancellationToken cancellationToken)
         {
+            logger.LogInformation(
+                "Die Datenbank-Verbindungen und der Session-State-Empfänger werden gestartet.");
+
             var databaseConnectionSettings = config
                 .GetSection(nameof(EBuEfDBConnector))
                 .Get<EBuEfDBConnector>();
@@ -97,21 +101,23 @@ namespace EBuEf2IVUBase
         {
             if (databaseConnector == default)
             {
-                throw new ApplicationException("The database connector must be initialized firstly.");
+                throw new ApplicationException(
+                    "Der Datenbank-Connector muss zuerst initialisiert werden.");
             }
 
             ebuefSession = await databaseConnector.GetEBuEfSessionAsync();
 
-            currentState = ebuefSession.Status;
+            if (ebuefSession != default)
+            {
+                ivuSessionDate = ebuefSession.IVUDatum;
+                ebuefSessionStart = ivuSessionDate
+                    .Add(ebuefSession.SessionStart.TimeOfDay);
 
-            ivuSessionDate = ebuefSession.IVUDatum;
-            ebuefSessionStart = ivuSessionDate
-                .Add(ebuefSession.SessionStart.TimeOfDay);
-
-            logger.LogDebug(
-                "Die IVU-Sitzung läuft am {sessionDate} um {sessionTime}.",
-                ivuSessionDate.ToString("yyyy-MM-dd"),
-                ebuefSessionStart.ToString("HH:mm"));
+                logger.LogDebug(
+                    "Die IVU-Sitzung läuft am {sessionDate} um {sessionTime}.",
+                    ivuSessionDate.ToString("yyyy-MM-dd"),
+                    ebuefSessionStart.ToString("HH:mm"));
+            }
         }
 
         #endregion Protected Methods
@@ -120,25 +126,9 @@ namespace EBuEf2IVUBase
 
         private void OnSessionChanged(object sender, StateChangedArgs e)
         {
-            if (e.State == SessionStatusType.IsRunning)
+            if (e.State == SessionStatusType.IsEnded)
             {
-                logger?.LogInformation("Sessionstart-Nachricht empfangen.");
-
                 sessionCancellationTokenSource?.Cancel();
-
-                currentState = e.State;
-            }
-            else if (e.State == SessionStatusType.IsPaused)
-            {
-                logger?.LogInformation("Sessionpause-Nachricht empfangen.");
-
-                currentState = e.State;
-            }
-            else if (e.State == SessionStatusType.IsEnded)
-            {
-                logger?.LogInformation("Sessionende-Nachricht empfangen.");
-
-                currentState = e.State;
             }
         }
 

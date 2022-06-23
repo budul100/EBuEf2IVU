@@ -23,6 +23,7 @@ namespace EBuEf2IVUPath
 
         private readonly IMessageReceiver trainPathReceiver;
         private readonly ITrainPathSender trainPathSender;
+        private bool isSessionInitialized;
 
         #endregion Private Fields
 
@@ -48,34 +49,41 @@ namespace EBuEf2IVUPath
         {
             _ = InitializeConnectionAsync(workerCancellationToken);
 
+            InitializePathReceiver();
+            await InitializePathSenderAsync();
+
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                logger.LogInformation(
-                    "Nachrichtenempfänger und IVU-Sender von EBuEf2IVUPath werden gestartet.");
-
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                await InitializeSessionAsync();
-
-                InitializePathReceiver();
-                await InitializePathSenderAsync();
-
-                _ = SendInitialPathes();
+                isSessionInitialized = false;
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
-                        await Task.WhenAny(
-                            trainPathReceiver.ExecuteAsync(sessionCancellationToken),
-                            trainPathSender.ExecuteAsync(sessionCancellationToken));
+                        if (isSessionInitialized
+                            && sessionStateHandler.SessionStatus != SessionStatusType.IsPaused)
+                        {
+                            await Task.WhenAny(
+                                trainPathReceiver.ExecuteAsync(sessionCancellationToken),
+                                trainPathSender.ExecuteAsync(sessionCancellationToken));
+                        }
+                        else
+                        {
+                            // Allow other tasks to run
+
+                            await Task.Delay(
+                                delay: delay,
+                                cancellationToken: sessionCancellationToken);
+                        }
                     }
                     catch (TaskCanceledException)
-                    {
-                        logger.LogInformation(
-                            "EBuEf2IVUPath wird beendet.");
-                    }
+                    { }
                 }
+
+                logger.LogInformation(
+                    "EBuEf2IVUPath wird gestoppt.");
             }
         }
 
@@ -103,6 +111,9 @@ namespace EBuEf2IVUPath
 
         private void InitializePathReceiver()
         {
+            logger.LogInformation(
+                "Der Nachrichten-Empfänger von EBuEf2IVUPath wird gestartet.");
+
             var receiverSettings = config
                 .GetSection(nameof(Settings.TrainPathReceiver))
                 .Get<Settings.TrainPathReceiver>();
@@ -116,6 +127,9 @@ namespace EBuEf2IVUPath
 
         private async Task InitializePathSenderAsync()
         {
+            logger.LogInformation(
+                "Der Trassen-Sender von EBuEf2IVUPath wird gestartet.");
+
             var senderSettings = config
                 .GetSection(nameof(Settings.TrainPathSender))
                 .Get<Settings.TrainPathSender>();
@@ -184,46 +198,47 @@ namespace EBuEf2IVUPath
 
         private async void OnSessionChangedAsync(object sender, Common.EventsArgs.StateChangedArgs e)
         {
-            if (e.State == SessionStatusType.InPreparation)
+            if (!isSessionInitialized
+                && (sessionStateHandler.SessionStatus == SessionStatusType.InPreparation
+                || sessionStateHandler.SessionStatus == SessionStatusType.IsRunning))
             {
-                await SendInitialPathes();
+                await InitializeSessionAsync();
+                await SendInitialPathesAsync();
+
+                isSessionInitialized = true;
             }
         }
 
-        private async Task SendInitialPathes()
+        private async Task SendInitialPathesAsync()
         {
-            if (currentState == SessionStatusType.InPreparation)
-            {
-                logger.LogDebug(
-                    "Die aktuelle Session ist in der Vorbereitung. Das ist der Auftrag " +
-                    "zum initialen Import der Zugtrassen.");
+            logger.LogInformation(
+                "Die initialen Zugtrassen werden importiert.");
 
-                if (ebuefSession == default)
+            if (ebuefSession == default)
+            {
+                logger.LogWarning(
+                    "Das initiale Sitzungsupdate wurde bisher nicht empfangen. " +
+                    "Daher können keine Zugtrassen importiert werden.");
+            }
+            else
+            {
+                var senderSettings = config
+                    .GetSection(nameof(Settings.TrainPathSender))
+                    .Get<Settings.TrainPathSender>();
+
+                var trainRuns = await databaseConnector.GetTrainRunsPlanAsync(
+                    timetableId: ebuefSession.FahrplanId,
+                    weekday: ebuefSession.Wochentag,
+                    preferPrognosis: senderSettings.PreferPrognosis);
+
+                if (trainRuns.AnyItem())
                 {
-                    logger.LogWarning(
-                        "Das initiale Sitzungsupdate wurde bisher nicht empfangen. " +
-                        "Daher können keine Zugtrassen importiert werden.");
+                    trainPathSender.Add(trainRuns);
                 }
                 else
                 {
-                    var senderSettings = config
-                        .GetSection(nameof(Settings.TrainPathSender))
-                        .Get<Settings.TrainPathSender>();
-
-                    var trainRuns = await databaseConnector.GetTrainRunsPlanAsync(
-                        timetableId: ebuefSession.FahrplanId,
-                        weekday: ebuefSession.Wochentag,
-                        preferPrognosis: senderSettings.PreferPrognosis);
-
-                    if (trainRuns.AnyItem())
-                    {
-                        trainPathSender.Add(trainRuns);
-                    }
-                    else
-                    {
-                        logger.LogDebug(
-                            "In der Datenbank wurden keine Zugtrassen gefunden.");
-                    }
+                    logger.LogDebug(
+                        "In der Datenbank wurden keine Zugtrassen gefunden.");
                 }
             }
         }

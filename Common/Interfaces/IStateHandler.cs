@@ -1,4 +1,5 @@
-﻿using Common.EventsArgs;
+﻿using Common.Enums;
+using Common.EventsArgs;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,9 +12,13 @@ namespace Common.Interfaces
 
         event EventHandler<StateChangedArgs> SessionChangedEvent;
 
-        event EventHandler SessionStartedEvent;
-
         #endregion Public Events
+
+        #region Public Properties
+
+        SessionStatusType SessionStatus { get; }
+
+        #endregion Public Properties
 
         #region Public Methods
 

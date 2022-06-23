@@ -1,3 +1,4 @@
+using Common.Enums;
 using Common.EventsArgs;
 using Common.Interfaces;
 using Common.Models;
@@ -6,7 +7,6 @@ using EBuEf2IVUVehicle.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +24,7 @@ namespace EBuEf2IVUVehicle
         private readonly IMessageReceiver positionsReceiver;
         private readonly IRealtimeSenderIS realtimeSender20;
         private readonly IRealtimeSender realtimeSender21;
+        private bool isSessionInitialized;
         private bool useInterfaceServer;
 
         #endregion Private Fields
@@ -35,7 +36,7 @@ namespace EBuEf2IVUVehicle
             ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
         {
-            this.sessionStateHandler.SessionStartedEvent += OnSessionStart;
+            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
 
             this.positionsReceiver = positionsReceiver;
             this.positionsReceiver.MessageReceivedEvent += OnMessageReceived;
@@ -57,41 +58,50 @@ namespace EBuEf2IVUVehicle
         {
             _ = InitializeConnectionAsync(workerCancellationToken);
 
+            InitializePositionReceiver();
+            InitializeRealtimeSender();
+
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                logger.LogInformation(
-                    "Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Sender von EBuEf2IVUVehicle werden gestartet.");
-
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                await InitializeSessionAsync();
-
-                InitializePositionReceiver();
-                InitializeRealtimeSender();
+                isSessionInitialized = false;
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
-                        if (useInterfaceServer)
+                        if (isSessionInitialized
+                            && sessionStateHandler.SessionStatus != SessionStatusType.IsPaused)
                         {
-                            await Task.WhenAny(
-                                positionsReceiver.ExecuteAsync(sessionCancellationToken),
-                                realtimeSender20.ExecuteAsync(sessionCancellationToken));
+                            if (useInterfaceServer)
+                            {
+                                await Task.WhenAny(
+                                    positionsReceiver.ExecuteAsync(sessionCancellationToken),
+                                    realtimeSender20.ExecuteAsync(sessionCancellationToken));
+                            }
+                            else
+                            {
+                                await Task.WhenAny(
+                                    positionsReceiver.ExecuteAsync(sessionCancellationToken),
+                                    realtimeSender21.ExecuteAsync(sessionCancellationToken));
+                            }
                         }
                         else
                         {
-                            await Task.WhenAny(
-                                positionsReceiver.ExecuteAsync(sessionCancellationToken),
-                                realtimeSender21.ExecuteAsync(sessionCancellationToken));
+                            // Allow other tasks to run
+
+                            await Task.Delay(
+                                delay: delay,
+                                cancellationToken: sessionCancellationToken);
                         }
                     }
                     catch (TaskCanceledException)
-                    {
-                        logger.LogInformation(
-                            "EBuEf2IVUVehicle wird beendet.");
-                    }
+                    { }
                 }
+
+                logger.LogInformation(
+                    "EBuEf2IVUVehicle wird gestoppt.");
             }
         }
 
@@ -101,6 +111,9 @@ namespace EBuEf2IVUVehicle
 
         private void InitializePositionReceiver()
         {
+            logger.LogInformation(
+                "Der Nachrichten-Empfänger von EBuEf2IVUVehicle wird gestartet.");
+
             var settings = config
                 .GetSection(nameof(PositionsReceiver))
                 .Get<PositionsReceiver>();
@@ -114,6 +127,9 @@ namespace EBuEf2IVUVehicle
 
         private void InitializeRealtimeSender()
         {
+            logger.LogInformation(
+                "Der Ist-Daten-Sender von EBuEf2IVUVehicle wird gestartet.");
+
             var settings = config
                 .GetSection(nameof(Settings.RealtimeSender))
                 .Get<Settings.RealtimeSender>();
@@ -191,10 +207,22 @@ namespace EBuEf2IVUVehicle
             }
         }
 
-        private async void OnSessionStart(object sender, EventArgs e)
+        private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
+        {
+            if (!isSessionInitialized
+                && e.State == SessionStatusType.IsRunning)
+            {
+                await InitializeSessionAsync();
+                await SendInitialAllocationsAsync();
+
+                isSessionInitialized = true;
+            }
+        }
+
+        private async Task SendInitialAllocationsAsync()
         {
             logger.LogDebug(
-                "Nachricht zum initialen Setzen der Fahrzeug-Grundaufstellung empfangen.");
+                "Die initiale Fahrzeug-Grundaufstellung wird gesendet.");
 
             var allocations = await databaseConnector.GetVehicleAllocationsAsync();
 

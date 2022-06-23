@@ -71,7 +71,7 @@ namespace CommonTests
             var wasCalled = false;
             sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.State == Common.Enums.SessionStatusType.IsRunning;
 
-            Task.WaitAll(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
+            Task.WaitAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
             Assert.False(wasCalled);
         }
@@ -97,7 +97,7 @@ namespace CommonTests
             var wasCalled = false;
             sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.State == Common.Enums.SessionStatusType.IsRunning;
 
-            Task.WaitAll(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
+            Task.WaitAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
             Assert.True(wasCalled);
         }

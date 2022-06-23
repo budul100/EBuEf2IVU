@@ -1,4 +1,5 @@
 using Common.Enums;
+using Common.EventsArgs;
 using Common.Extensions;
 using Common.Interfaces;
 using EBuEf2IVUBase;
@@ -20,6 +21,7 @@ namespace EBuEf2IVUCrew
 
         private readonly ICrewChecker crewChecker;
 
+        private bool isSessionInitialized;
         private TimeSpan queryDurationFuture;
         private TimeSpan queryDurationPast;
         private TimeSpan serviceInterval;
@@ -32,6 +34,8 @@ namespace EBuEf2IVUCrew
             ICrewChecker crewChecker, ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
         {
+            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
+
             this.crewChecker = crewChecker;
         }
 
@@ -43,36 +47,42 @@ namespace EBuEf2IVUCrew
         {
             _ = InitializeConnectionAsync(workerCancellationToken);
 
+            InitializeCrewChecker();
+
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                logger.LogInformation(
-                    "Nachrichtenempfänger, Datenbank-Verbindungen und IVU-Connector von EBuEf2IVUCrew werden gestartet.");
-
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                await InitializeSessionAsync();
-
-                InitializeCrewChecker();
+                isSessionInitialized = false;
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
-                    if (currentState == SessionStatusType.IsRunning)
+                    try
                     {
-                        await CheckCrewsAsync(sessionCancellationToken);
-
-                        try
+                        if (isSessionInitialized
+                            && sessionStateHandler.SessionStatus != SessionStatusType.IsPaused)
                         {
+                            await CheckCrewsAsync(sessionCancellationToken);
+
                             await Task.Delay(
                                 delay: serviceInterval,
                                 cancellationToken: sessionCancellationToken);
                         }
-                        catch (TaskCanceledException)
+                        else
                         {
-                            logger.LogInformation(
-                                "EBuEf2IVUCrew wird beendet.");
+                            // Allow other tasks to run
+
+                            await Task.Delay(
+                                delay: delay,
+                                cancellationToken: sessionCancellationToken);
                         }
                     }
+                    catch (TaskCanceledException)
+                    { }
                 }
+
+                logger.LogInformation(
+                    "EBuEf2IVUCrew wird gestoppt.");
             }
         }
 
@@ -122,9 +132,17 @@ namespace EBuEf2IVUCrew
 
         private void InitializeCrewChecker()
         {
+            logger.LogInformation(
+                "IVU-Connector für EBuEf2IVUCrew wird gestartet.");
+
             var serviceSettings = config
                 .GetSection(nameof(Settings.CrewChecker))
                 .Get<Settings.CrewChecker>();
+
+            serviceInterval = new TimeSpan(
+                hours: 0,
+                minutes: 0,
+                seconds: serviceSettings.AbfrageIntervalSek);
 
             queryDurationPast = new TimeSpan(
                 hours: 0,
@@ -136,11 +154,6 @@ namespace EBuEf2IVUCrew
                 minutes: serviceSettings.AbfrageZukunftMin,
                 seconds: 0);
 
-            serviceInterval = new TimeSpan(
-                hours: 0,
-                minutes: 0,
-                seconds: serviceSettings.AbfrageIntervalSek);
-
             crewChecker.Initialize(
                 host: serviceSettings.Host,
                 port: serviceSettings.Port,
@@ -151,15 +164,23 @@ namespace EBuEf2IVUCrew
                 division: serviceSettings.Division,
                 planningLevel: serviceSettings.PlanningLevel,
                 retryTime: serviceSettings.RetryTime);
+        }
 
-            if (currentState == SessionStatusType.IsRunning)
+        private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
+        {
+            if (!isSessionInitialized
+                && e.State == SessionStatusType.IsRunning)
             {
+                await InitializeSessionAsync();
+
                 logger.LogDebug(
                     "Die EBuEf-DB wird für den Crew-Check alle {interval} Sekunden " +
                     "nach Zügen im Zeitraum von -{minTime} und +{maxTime} abgefragt.",
                     serviceInterval.TotalSeconds,
                     queryDurationPast.ToString(@"hh\:mm"),
                     queryDurationFuture.ToString(@"hh\:mm"));
+
+                isSessionInitialized = true;
             }
         }
 

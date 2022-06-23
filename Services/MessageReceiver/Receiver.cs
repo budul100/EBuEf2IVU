@@ -92,12 +92,15 @@ namespace MessageReceiver
             {
                 while (exception.InnerException != null) exception = exception.InnerException;
 
-                logger.LogError(
-                    "Fehler beim Nachrichtenempfänger an {address}: {message}\r\n" +
-                    "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
-                    $"{host}:{port}",
-                    exception.Message,
-                    reconnection.TotalSeconds);
+                if (exception.GetType() != typeof(OperationCanceledException))
+                {
+                    logger.LogError(
+                        "Fehler beim Nachrichtenempfänger an {address}: {message}\r\n" +
+                        "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
+                        $"{host}:{port}",
+                        exception.Message,
+                        reconnection.TotalSeconds);
+                }
             }
         }
 

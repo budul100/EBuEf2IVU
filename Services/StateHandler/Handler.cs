@@ -44,20 +44,19 @@ namespace StateHandler
 
         public event EventHandler<StateChangedArgs> SessionChangedEvent;
 
-        public event EventHandler SessionStartedEvent;
-
         #endregion Public Events
+
+        #region Public Properties
+
+        public SessionStatusType SessionStatus { get; private set; }
+
+        #endregion Public Properties
 
         #region Public Methods
 
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            var isSessionStarted = await IsSessionStartedAsync();
-
-            if (isSessionStarted)
-            {
-                SendSessionStatus(SessionStatusType.IsRunning);
-            }
+            await SetSessionStatusInitally();
 
             await stateReceiver.ExecuteAsync(cancellationToken);
         }
@@ -79,11 +78,15 @@ namespace StateHandler
 
         #region Private Methods
 
-        private Task<bool> IsSessionStartedAsync()
+        private SessionStatusType? GetSessionStatus(string message)
         {
-            var result = databaseConnector.GetEBuEfSessionActiveAsync();
+            var sessionStatusText = sessionStatusRegex.IsMatch(message)
+                ? sessionStatusRegex.Match(message).Groups[PatternExtensions.StatusRegexGroupName].Value
+                : default;
 
-            return result;
+            var sessionStatus = sessionStatusText.GetSessionStatusType();
+
+            return sessionStatus;
         }
 
         private void OnStatusReceived(object sender, MessageReceivedArgs e)
@@ -94,17 +97,11 @@ namespace StateHandler
 
             if (sessionStartRegex.IsMatch(e.Content))
             {
-                SessionStartedEvent?.Invoke(
-                    sender: this,
-                    e: null);
+                SetSessionStatus(SessionStatusType.IsRunning);
             }
             else
             {
-                var sessionStatusText = sessionStatusRegex.IsMatch(e.Content)
-                    ? sessionStatusRegex.Match(e.Content).Groups[PatternExtensions.StatusRegexGroupName].Value
-                    : default;
-
-                var sessionStatus = sessionStatusText.GetSessionStatusType();
+                var sessionStatus = GetSessionStatus(e.Content);
 
                 if (sessionStatus == default)
                 {
@@ -114,38 +111,49 @@ namespace StateHandler
                 }
                 else
                 {
-                    SendSessionStatus(sessionStatus.Value);
+                    SetSessionStatus(sessionStatus.Value);
                 }
             }
         }
 
-        private void SendSessionStatus(SessionStatusType sessionStatus)
+        private void SetSessionStatus(SessionStatusType newSessionStatus)
         {
-            switch (sessionStatus)
+            if (newSessionStatus != SessionStatus)
             {
-                case SessionStatusType.InPreparation:
-                    SessionChangedEvent?.Invoke(
-                        sender: this,
-                        e: new StateChangedArgs(SessionStatusType.InPreparation));
-                    break;
+                SessionStatus = newSessionStatus;
 
-                case SessionStatusType.IsRunning:
-                    SessionChangedEvent?.Invoke(
-                        sender: this,
-                        e: new StateChangedArgs(SessionStatusType.IsRunning));
-                    break;
+                switch (SessionStatus)
+                {
+                    case SessionStatusType.InPreparation:
+                        logger?.LogInformation("Die Session wird vorbereitet.");
+                        break;
 
-                case SessionStatusType.IsEnded:
-                    SessionChangedEvent?.Invoke(
-                        sender: this,
-                        e: new StateChangedArgs(SessionStatusType.IsEnded));
-                    break;
+                    case SessionStatusType.IsRunning:
+                        logger?.LogInformation("Die Session wurde gestartet.");
+                        break;
 
-                case SessionStatusType.IsPaused:
-                    SessionChangedEvent?.Invoke(
-                        sender: this,
-                        e: new StateChangedArgs(SessionStatusType.IsPaused));
-                    break;
+                    case SessionStatusType.IsEnded:
+                        logger?.LogInformation("Die Session wurde beendet.");
+                        break;
+
+                    case SessionStatusType.IsPaused:
+                        logger?.LogInformation("Die Session wird pausiert.");
+                        break;
+                }
+
+                SessionChangedEvent?.Invoke(
+                    sender: this,
+                    e: new StateChangedArgs(SessionStatus));
+            }
+        }
+
+        private async Task SetSessionStatusInitally()
+        {
+            var currentSession = await databaseConnector.GetEBuEfSessionAsync();
+
+            if (currentSession != default)
+            {
+                SetSessionStatus(currentSession.Status);
             }
         }
 
