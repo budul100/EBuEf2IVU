@@ -24,6 +24,7 @@ namespace EBuEf2IVUVehicle
         private readonly IMessageReceiver positionsReceiver;
         private readonly IRealtimeSender realtimeSender;
         private readonly IRealtimeSenderIS realtimeSenderIS;
+        private bool ignorePrognosis;
         private bool isSessionInitialized;
         private bool useInterfaceServer;
 
@@ -32,7 +33,7 @@ namespace EBuEf2IVUVehicle
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
-            IDatabaseConnector databaseConnector, IRealtimeSenderIS realtimeSender20, IRealtimeSender realtimeSender21,
+            IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, IRealtimeSenderIS realtimeSenderIS,
             ILogger<Worker> logger)
             : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
         {
@@ -41,8 +42,8 @@ namespace EBuEf2IVUVehicle
             this.positionsReceiver = positionsReceiver;
             this.positionsReceiver.MessageReceivedEvent += OnMessageReceived;
 
-            this.realtimeSenderIS = realtimeSender20;
-            this.realtimeSender = realtimeSender21;
+            this.realtimeSenderIS = realtimeSenderIS;
+            this.realtimeSender = realtimeSender;
 
             converter = new Message2TrainLeg(
                 config: config,
@@ -134,6 +135,7 @@ namespace EBuEf2IVUVehicle
                 .GetSection(nameof(Settings.RealtimeSender))
                 .Get<Settings.RealtimeSender>();
 
+            ignorePrognosis = settings.IgnorePrognosis;
             useInterfaceServer = settings.UseInterfaceServer;
 
             if (useInterfaceServer)
@@ -169,7 +171,16 @@ namespace EBuEf2IVUVehicle
             {
                 var message = JsonConvert.DeserializeObject<RealTimeMessage>(e.Content);
 
-                if (!string.IsNullOrWhiteSpace(message?.Zugnummer))
+                if (string.IsNullOrWhiteSpace(message?.Zugnummer))
+                {
+                    logger.LogDebug("In der Nachricht ist keine Zugnummer enthalten und wird daher verworfen.");
+                }
+                else if (ignorePrognosis
+                    && message.Modus == MessageType.Prognose)
+                {
+                    logger.LogDebug("In der Nachricht enthält eine Prognose, diese wird laut aktueller Einstellung verworfen.");
+                }
+                else
                 {
                     var trainLeg = converter.Convert(message);
 

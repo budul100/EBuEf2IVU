@@ -10,6 +10,8 @@
 
         public string Host { get; set; }
 
+        public bool IgnorePrognosis { get; set; }
+
         public bool IsHttps { get; set; }
 
         public string Password { get; set; }
