@@ -77,7 +77,7 @@ namespace CommonTests
         }
 
         [Test]
-        public void GetSessionStarted()
+        public void GetSessionStartedAsync()
         {
             var connectorSettings = config
                 .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
@@ -87,7 +87,9 @@ namespace CommonTests
             var loggerMock = new Mock<ILogger<StateHandler.Handler>>();
 
             var databaseConnectorMock = new Mock<IDatabaseConnector>();
-            databaseConnectorMock.Setup(c => c.GetEBuEfSessionActiveAsync()).Returns(Task.FromResult(true));
+            databaseConnectorMock
+                .Setup(c => c.GetEBuEfSessionAsync())
+                .Returns(Task.FromResult(new Common.Models.EBuEfSession { Status = Common.Enums.SessionStatusType.IsRunning }));
 
             var sessionStateHandler = new StateHandler.Handler(
                 logger: loggerMock.Object,
@@ -97,7 +99,7 @@ namespace CommonTests
             var wasCalled = false;
             sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.State == Common.Enums.SessionStatusType.IsRunning;
 
-            Task.WaitAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
+            Task.WhenAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
             Assert.True(wasCalled);
         }
