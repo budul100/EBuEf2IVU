@@ -11,6 +11,8 @@ namespace Common.Models
 
         public DateTime IVUDatum { get; set; }
 
+        public string Name { get; set; }
+
         public string SessionKey { get; set; }
 
         public DateTime SessionStart { get; set; }
@@ -27,9 +29,9 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return @$"EBuEf-Session | Start: {SessionStart:HH\:mm\:ss} | IVU-Datum: {IVUDatum:yyyy-MM-dd} | Wochentag: {Wochentag} | " +
-                @$"Verschiebung: {(Verschiebung >= TimeSpan.Zero ? string.Empty : "-")}{Verschiebung:d\.hh\:mm\:ss} | " +
-                $"Key: {SessionKey} | Fahrplan-Id: {FahrplanId} | Status: {Status}";
+            return $"EBuEf-Session '{Name}' | Status: {Status} | Key: {SessionKey} | Fahrplan-Id: {FahrplanId} | " +
+                @$"Start: {SessionStart:HH\:mm\:ss} | IVU-Datum: {IVUDatum:yyyy-MM-dd} | Wochentag: {Wochentag} | " +
+                @$"Verschiebung: {(Verschiebung >= TimeSpan.Zero ? string.Empty : "-")}{Verschiebung:d\.hh\:mm\:ss}";
         }
 
         #endregion Public Methods

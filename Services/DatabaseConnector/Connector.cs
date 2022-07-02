@@ -318,6 +318,7 @@ namespace DatabaseConnector
                     {
                         FahrplanId = sitzung.FahrplanId,
                         IVUDatum = sitzung.IvuDate ?? DateTime.Today,
+                        Name = sitzung.Name,
                         SessionKey = sitzung.SessionKey,
                         SessionStart = sitzung.SimStartzeit.ToDateTime().ToLocalTime(),
                         Status = (SessionStatusType)sitzung.Status,

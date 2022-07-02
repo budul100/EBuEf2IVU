@@ -17,6 +17,9 @@ namespace DatabaseConnector.Models
         [Column("sim_ivutag")]
         public DateTime? IvuDate { get; set; }
 
+        [Column("name")]
+        public string Name { get; set; }
+
         [Column("sessionkey")]
         public string SessionKey { get; set; }
 

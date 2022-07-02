@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using System;
 
 namespace DatabaseConnector.Contexts
 {
@@ -11,14 +13,14 @@ namespace DatabaseConnector.Contexts
 
         #endregion Private Fields
 
-        #region Public Constructors
+        #region Protected Constructors
 
-        public BaseContext(string connectionString)
+        protected BaseContext(string connectionString)
         {
             this.connectionString = connectionString;
         }
 
-        #endregion Public Constructors
+        #endregion Protected Constructors
 
         #region Protected Methods
 
@@ -26,9 +28,19 @@ namespace DatabaseConnector.Contexts
         {
             optionsBuilder.UseMySql(
                 connectionString: connectionString,
-                serverVersion: ServerVersion.AutoDetect(connectionString));
+                serverVersion: ServerVersion.AutoDetect(connectionString),
+                mySqlOptionsAction: o => o.DefaultDataTypeMappings(NoneBooleanTypeMapping()));
         }
 
         #endregion Protected Methods
+
+        #region Private Methods
+
+        private static Func<MySqlDefaultDataTypeMappings, MySqlDefaultDataTypeMappings> NoneBooleanTypeMapping()
+        {
+            return m => m.WithClrBoolean(MySqlBooleanType.None);
+        }
+
+        #endregion Private Methods
     }
 }
