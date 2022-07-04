@@ -25,17 +25,9 @@ namespace EBuEf2IVUCrew
 
             Parser.Default
                 .ParseArguments<CommandLineArgs>(args)
-                .WithParsed(options =>
-                {
-                    var settingsPath = options.GetSettingsPath(SettingsFileName);
-
-                    result = Host
-                        .CreateDefaultBuilder(args)
-                        .GetHostBuilder()
-                        .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                        .ConfigureServices((_, services) => ConfigureServices(services))
-                        .UseSerilog((hostingContext, loggerConfiguration) => hostingContext.GetSerilogConfiguration(loggerConfiguration));
-                });
+                .WithParsed(options => result = GetHostBuilder(
+                    options: options,
+                    args: args));
 
             return result;
         }
@@ -58,6 +50,20 @@ namespace EBuEf2IVUCrew
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
 
             services.AddSingleton<ICrewChecker, CrewChecker.Checker>();
+        }
+
+        private static IHostBuilder GetHostBuilder(CommandLineArgs options, string[] args)
+        {
+            var settingsPath = options.GetSettingsPath(SettingsFileName);
+
+            var result = Host
+                .CreateDefaultBuilder(args)
+                .GetHostBuilder()
+                .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
+                .ConfigureServices((_, services) => ConfigureServices(services))
+                .UseSerilog((hostingContext, loggerConfiguration) => hostingContext.GetSerilogConfiguration(loggerConfiguration));
+
+            return result;
         }
 
         #endregion Private Methods
