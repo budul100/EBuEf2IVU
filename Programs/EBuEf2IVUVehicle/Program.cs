@@ -19,19 +19,6 @@ namespace EBuEf2IVUVehicle
 
         #region Public Methods
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            var result = default(IHostBuilder);
-
-            Parser.Default
-                .ParseArguments<CommandLineArgs>(args)
-                .WithParsed(options => result = GetHostBuilder(
-                    options: options,
-                    args: args));
-
-            return result;
-        }
-
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
@@ -51,6 +38,19 @@ namespace EBuEf2IVUVehicle
 
             services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();
             services.AddSingleton<IRealtimeSenderIS, RealtimeSenderIS.Sender>();
+        }
+
+        private static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            var result = default(IHostBuilder);
+
+            Parser.Default
+                .ParseArguments<CommandLineArgs>(args)
+                .WithParsed(options => result = GetHostBuilder(
+                    options: options,
+                    args: args));
+
+            return result;
         }
 
         private static IHostBuilder GetHostBuilder(CommandLineArgs options, string[] args)

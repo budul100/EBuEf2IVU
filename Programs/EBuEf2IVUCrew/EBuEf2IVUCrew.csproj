@@ -11,14 +11,14 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<OutputPath/>
+		<OutputPath />
 		<Optimize>false</Optimize>
 		<BumpLabel>dev</BumpLabel>
 		<BumpLabelDigits>4</BumpLabelDigits>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)|$(BuildingInsideVisualStudio)'=='Release|AnyCPU|True'">
-		<OutputPath/>
+		<OutputPath />
 		<DebugType>none</DebugType>
 		<DebugSymbols>false</DebugSymbols>
 		<BumpMinor>True</BumpMinor>
@@ -26,16 +26,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true"/>
+		<RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Common\Common.csproj"/>
-		<ProjectReference Include="..\..\Services\CrewChecker\CrewChecker.csproj"/>
-		<ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj"/>
-		<ProjectReference Include="..\..\Services\MessageReceiver\MessageReceiver.csproj"/>
-		<ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj"/>
-		<ProjectReference Include="..\EBuEf2IVUBase\EBuEf2IVUBase.csproj"/>
+		<ProjectReference Include="..\..\Commons\Commons.csproj" />
+		<ProjectReference Include="..\..\Services\CrewChecker\CrewChecker.csproj" />
+		<ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
+		<ProjectReference Include="..\..\Services\MessageReceiver\MessageReceiver.csproj" />
+		<ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj" />
+		<ProjectReference Include="..\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
