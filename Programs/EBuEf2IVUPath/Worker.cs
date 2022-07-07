@@ -23,6 +23,7 @@ namespace EBuEf2IVUPath
 
         private readonly IMessageReceiver trainPathReceiver;
         private readonly ITrainPathSender trainPathSender;
+
         private bool isSessionInitialized;
 
         #endregion Private Fields

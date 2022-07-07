@@ -24,6 +24,7 @@ namespace EBuEf2IVUVehicle
         private readonly IMessageReceiver positionsReceiver;
         private readonly IRealtimeSender realtimeSender;
         private readonly IRealtimeSenderIS realtimeSenderIS;
+
         private bool ignorePrognosis;
         private bool isSessionInitialized;
         private bool useInterfaceServer;
