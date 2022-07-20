@@ -136,6 +136,7 @@ namespace TrainPathSender
             while (exception.InnerException != null) exception = exception.InnerException;
 
             logger.LogError(
+                exception,
                 "Fehler beim Senden der Trassendaten an IVU.rail: {message}\r\n" +
                 "Die Verbindung wird in {reconection} Sekunden wieder versucht.",
                 exception.Message,

@@ -108,11 +108,12 @@ namespace RealtimeSenderIS.Converters
 
                     return result;
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
                     logger.LogError(
+                        exception,
                         "Fehler beim Erzeugen einer Ist-Zeit-Nachrichten für IVU.rail: {message}",
-                        ex.Message);
+                        exception.Message);
                 }
             }
 

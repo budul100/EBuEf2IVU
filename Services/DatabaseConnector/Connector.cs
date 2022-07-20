@@ -263,6 +263,7 @@ namespace DatabaseConnector
             while (exception.InnerException != null) exception = exception.InnerException;
 
             logger.LogError(
+                exception,
                 "Fehler beim Verbinden mit der EBuEf-Datenbank: {message}\r\n" +
                 "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
                 exception.Message,

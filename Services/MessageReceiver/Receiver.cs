@@ -81,6 +81,7 @@ namespace MessageReceiver
                 var socketException = exception as SocketException;
 
                 logger.LogError(
+                    socketException,
                     "Fehler beim Nachrichtenempfänger an {address}: {message} (Code: {code})\r\n" +
                     "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
                     $"{host}:{port}",
@@ -95,6 +96,7 @@ namespace MessageReceiver
                 if (exception.GetType() != typeof(OperationCanceledException))
                 {
                     logger.LogError(
+                        exception,
                         "Fehler beim Nachrichtenempfänger an {address}: {message}\r\n" +
                         "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
                         $"{host}:{port}",

@@ -237,12 +237,14 @@ namespace EBuEf2IVUVehicle
             catch (JsonReaderException readerException)
             {
                 logger.LogError(
+                    readerException,
                     "Die Nachricht kann nicht gelesen werden: {message}",
                     readerException.Message);
             }
             catch (JsonSerializationException serializationException)
             {
                 logger.LogError(
+                    serializationException,
                     "Die Nachricht kann nicht in eine Echtzeitmeldung umgeformt werden: {message}",
                     serializationException.Message);
             }

@@ -146,6 +146,7 @@ namespace RealtimeSender
             while (exception.InnerException != null) exception = exception.InnerException;
 
             logger.LogError(
+                exception,
                 "Fehler beim Senden der Ist-Zeiten an IVU.rail: {message}\r\n" +
                 "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
                 exception.Message,

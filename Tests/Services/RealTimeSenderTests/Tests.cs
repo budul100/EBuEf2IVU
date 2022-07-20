@@ -59,8 +59,9 @@ namespace RealTimeSenderTests
             {
                 IVUNetzpunkt = "ABC",
                 IVUZeitpunkt = DateTime.Now,
-                IVUGleis = "123",
+                IVUGleis = "9",
                 IVULegTyp = Common.Enums.LegType.Abfahrt,
+                Zugnummer = "123"
             };
 
             sender.Add(trainLeg);
@@ -85,18 +86,18 @@ namespace RealTimeSenderTests
             services.AddSingleton<IRealtimeSender, Sender>();
         }
 
-        private static Mock<ILogger<Sender>> GetLoggerMock(Action socketExceptionCallback)
+        private static Mock<ILogger<Sender>> GetLoggerMock(Action errorCallback)
         {
             var result = new Mock<ILogger<Sender>>();
 
             result
                 .Setup(x => x.Log(
-                    It.IsAny<LogLevel>(),
+                    It.Is<LogLevel>(l => l == LogLevel.Error),
                     It.IsAny<EventId>(),
                     It.IsAny<It.IsAnyType>(),
                     It.IsAny<SocketException>(),
                     (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
-                .Callback(() => socketExceptionCallback?.Invoke());
+                .Callback(() => errorCallback?.Invoke());
 
             return result;
         }

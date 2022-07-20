@@ -161,6 +161,7 @@ namespace CrewChecker
             while (exception.InnerException != null) exception = exception.InnerException;
 
             logger.LogError(
+                exception,
                 "Fehler beim Abrufen der Crew-Informationen von IVU.rail: {exceptionMessage}\r\n" +
                 "Die Verbindung wird in {reconnectionPeriod} Sekunden wieder versucht.",
                 exception.Message,
