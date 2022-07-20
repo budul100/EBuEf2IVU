@@ -35,9 +35,10 @@ namespace EBuEf2IVUPathTests
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices((_, services) => ConfigureServices(services, databaseConnectorMock, stateHandlerMock));
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock))
+                .Build();
 
-            host.Build().StartAsync(cancellationTokenSource.Token);
+            host.StartAsync(cancellationTokenSource.Token);
             Assert.False(wasCalled);
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));

@@ -18,6 +18,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\Programs\EBuEf2IVUVehicle\EBuEf2IVUVehicle.csproj" />
 	  <ProjectReference Include="..\..\..\Services\RealtimeSender\RealtimeSender.csproj" />
+	  <ProjectReference Include="..\..\Commons\EBuEf2IVUTestBase\EBuEf2IVUTestBase.csproj" />
 	</ItemGroup>
 
 </Project>

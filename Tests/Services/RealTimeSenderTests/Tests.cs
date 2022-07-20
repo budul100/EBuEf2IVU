@@ -1,49 +1,48 @@
+using Common.Extensions;
+using Common.Interfaces;
 using Common.Models;
+using EBuEf2IVUTestBase;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using NUnit.Framework;
 using RealtimeSender;
 using System;
 using System.IO;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace RealTimeSenderTests
 {
     public class Tests
+        : TestsBase
     {
-        #region Private Fields
-
-        private IConfigurationRoot config;
-        private NullLoggerFactory loggerFactory;
-        private Sender sender;
-
-        #endregion Private Fields
-
         #region Public Methods
 
-        [SetUp]
-        public void Init()
+        [Test]
+        public void SendRealtime()
         {
-            var path = Path.GetFullPath(@"..\..\..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml");
+            var hasSocketException = false;
 
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddXmlFile(
-                path: path,
-                optional: false,
-                reloadOnChange: false);
+            var loggerMock = GetLoggerMock(() => hasSocketException = true);
 
-            config = configBuilder.Build();
+            var settingsPath = Path.GetFullPath(@"..\..\..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml");
 
-            loggerFactory = new NullLoggerFactory();
-            var logger = loggerFactory.CreateLogger<Sender>();
+            var host = Host
+                .CreateDefaultBuilder()
+                .GetHostBuilder()
+                .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
+                .ConfigureServices(services => ConfigureServices(services, loggerMock))
+                .Build();
 
-            var senderSettings = config
+            var senderSettings = host.Services.GetService<IConfiguration>()
                 .GetSection(nameof(EBuEf2IVUVehicle.Settings.RealtimeSender))
                 .Get<EBuEf2IVUVehicle.Settings.RealtimeSender>();
 
-            sender = new Sender(logger);
+            var sender = host.Services.GetService<IRealtimeSender>();
 
             sender.Initialize(
                 host: senderSettings.Host,
@@ -55,13 +54,6 @@ namespace RealTimeSenderTests
                 division: senderSettings.Division,
                 sessionStart: DateTime.Now,
                 retryTime: senderSettings.RetryTime);
-        }
-
-        [Test]
-        public void SendRealtime()
-        {
-            var tokenSource = new CancellationTokenSource();
-            var token = tokenSource.Token;
 
             var trainLeg = new TrainLeg
             {
@@ -73,14 +65,42 @@ namespace RealTimeSenderTests
 
             sender.Add(trainLeg);
 
+            var cancellationTokenSource = new CancellationTokenSource();
+
             Task.WhenAny(
-                _ = sender.ExecuteAsync(token));
+                _ = sender.ExecuteAsync(cancellationTokenSource.Token));
 
             Thread.Sleep(6000);
 
-            tokenSource.Cancel();
+            Assert.True(hasSocketException);
         }
 
         #endregion Public Methods
+
+        #region Private Methods
+
+        private static void ConfigureServices(IServiceCollection services, Mock<ILogger<Sender>> loggerMock)
+        {
+            services.AddSingleton(loggerMock.Object);
+            services.AddSingleton<IRealtimeSender, Sender>();
+        }
+
+        private static Mock<ILogger<Sender>> GetLoggerMock(Action socketExceptionCallback)
+        {
+            var result = new Mock<ILogger<Sender>>();
+
+            result
+                .Setup(x => x.Log(
+                    It.IsAny<LogLevel>(),
+                    It.IsAny<EventId>(),
+                    It.IsAny<It.IsAnyType>(),
+                    It.IsAny<SocketException>(),
+                    (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
+                .Callback(() => socketExceptionCallback?.Invoke());
+
+            return result;
+        }
+
+        #endregion Private Methods
     }
 }

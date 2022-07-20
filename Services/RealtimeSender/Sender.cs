@@ -21,6 +21,7 @@ namespace RealtimeSender
 
         private readonly ILogger logger;
         private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new();
+
         private Factory<RealTimeInformationImportFacadeChannel> channelFactory;
         private Message2RealtimeInfo converter;
         private AsyncRetryPolicy retryPolicy;

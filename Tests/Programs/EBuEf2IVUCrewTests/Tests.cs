@@ -41,9 +41,10 @@ namespace EBuEf2IVUCrewTests
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices((_, services) => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, crewCheckerMock));
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, crewCheckerMock))
+                .Build();
 
-            host.Build().StartAsync(cancellationTokenSource.Token);
+            host.StartAsync(cancellationTokenSource.Token);
             Assert.True(wasCalled);
         }
 
@@ -65,9 +66,10 @@ namespace EBuEf2IVUCrewTests
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices((_, services) => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, crewCheckerMock));
+                .ConfigureServices((_, services) => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, crewCheckerMock))
+                .Build();
 
-            host.Build().StartAsync(cancellationTokenSource.Token);
+            host.StartAsync(cancellationTokenSource.Token);
             Assert.False(wasCalled);
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
