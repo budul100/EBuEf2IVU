@@ -16,11 +16,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Commons\Commons.csproj" />
-		<ProjectReference Include="..\..\Programs\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
-		<ProjectReference Include="..\..\Programs\EBuEf2IVUCrew\EBuEf2IVUCrew.csproj" />
-		<ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
-		<ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj" />
+	  <ProjectReference Include="..\..\..\Programs\EBuEf2IVUVehicle\EBuEf2IVUVehicle.csproj" />
+	  <ProjectReference Include="..\..\..\Services\RealtimeSender\RealtimeSender.csproj" />
 	</ItemGroup>
 
 </Project>

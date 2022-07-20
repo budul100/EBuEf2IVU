@@ -126,7 +126,7 @@ namespace EBuEf2IVUBase
 
         private void OnSessionChanged(object sender, StateChangedArgs e)
         {
-            if (e.State == SessionStatusType.IsEnded)
+            if (e.StateType == StateType.IsEnded)
             {
                 sessionCancellationTokenSource?.Cancel();
             }

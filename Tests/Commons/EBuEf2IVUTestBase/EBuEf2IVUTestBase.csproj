@@ -1,7 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<IsPackable>false</IsPackable>
+		<IsTestProject>false</IsTestProject>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,8 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Programs\EBuEf2IVUVehicle\EBuEf2IVUVehicle.csproj" />
-	  <ProjectReference Include="..\..\Services\RealtimeSender\RealtimeSender.csproj" />
+		<ProjectReference Include="..\..\..\Commons\Commons.csproj" />
 	</ItemGroup>
 
 </Project>

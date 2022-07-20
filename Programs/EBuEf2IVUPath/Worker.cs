@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace EBuEf2IVUPath
 {
-    internal class Worker
+    public class Worker
         : WorkerBase
     {
         #region Private Fields
@@ -24,6 +24,7 @@ namespace EBuEf2IVUPath
         private readonly IMessageReceiver trainPathReceiver;
         private readonly ITrainPathSender trainPathSender;
 
+        private bool initalPathsSent;
         private bool isSessionInitialized;
 
         #endregion Private Fields
@@ -32,7 +33,9 @@ namespace EBuEf2IVUPath
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
             IMessageReceiver trainPathReceiver, ITrainPathSender trainPathSender, ILogger<Worker> logger)
-            : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
+            : base(config: config, sessionStateHandler: sessionStateHandler,
+                  databaseConnector: databaseConnector, logger: logger,
+                  assembly: Assembly.GetExecutingAssembly())
         {
             this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
 
@@ -57,12 +60,14 @@ namespace EBuEf2IVUPath
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
+                _ = HandleSessionStateAsync(sessionStateHandler.StateType);
+
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
                         if (isSessionInitialized
-                            && sessionStateHandler.SessionStatus != SessionStatusType.IsPaused)
+                            && sessionStateHandler.StateType != StateType.IsPaused)
                         {
                             await Task.WhenAny(
                                 trainPathReceiver.ExecuteAsync(sessionCancellationToken),
@@ -81,6 +86,7 @@ namespace EBuEf2IVUPath
                     { }
                 }
 
+                initalPathsSent = false;
                 isSessionInitialized = false;
 
                 logger.LogInformation(
@@ -108,6 +114,27 @@ namespace EBuEf2IVUPath
             }
 
             return result;
+        }
+
+        private async Task HandleSessionStateAsync(StateType stateType)
+        {
+            if (stateType == StateType.IsEnded
+                || stateType == StateType.IsPaused)
+            {
+                isSessionInitialized = false;
+            }
+            else if ((stateType == StateType.InPreparation || stateType == StateType.IsRunning)
+                && !isSessionInitialized)
+            {
+                await InitializeSessionAsync();
+                isSessionInitialized = true;
+
+                if (!initalPathsSent)
+                {
+                    await SendInitialPathesAsync();
+                    initalPathsSent = true;
+                }
+            }
         }
 
         private void InitializePathReceiver()
@@ -199,15 +226,7 @@ namespace EBuEf2IVUPath
 
         private async void OnSessionChangedAsync(object sender, Common.EventsArgs.StateChangedArgs e)
         {
-            if (!isSessionInitialized
-                && (sessionStateHandler.SessionStatus == SessionStatusType.InPreparation
-                || sessionStateHandler.SessionStatus == SessionStatusType.IsRunning))
-            {
-                await InitializeSessionAsync();
-                await SendInitialPathesAsync();
-
-                isSessionInitialized = true;
-            }
+            await HandleSessionStateAsync(e.StateType);
         }
 
         private async Task SendInitialPathesAsync()

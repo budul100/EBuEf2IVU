@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace EBuEf2IVUVehicle
 {
-    internal class Worker
+    public class Worker
         : WorkerBase
     {
         #region Private Fields
@@ -26,6 +26,7 @@ namespace EBuEf2IVUVehicle
         private readonly IRealtimeSenderIS realtimeSenderIS;
 
         private bool ignorePrognosis;
+        private bool initalAllocationsSent;
         private bool isSessionInitialized;
         private bool useInterfaceServer;
 
@@ -36,12 +37,15 @@ namespace EBuEf2IVUVehicle
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
             IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, IRealtimeSenderIS realtimeSenderIS,
             ILogger<Worker> logger)
-            : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
+            : base(
+                  config: config, sessionStateHandler: sessionStateHandler,
+                  databaseConnector: databaseConnector, logger: logger,
+                  assembly: Assembly.GetExecutingAssembly())
         {
             this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
 
             this.positionsReceiver = positionsReceiver;
-            this.positionsReceiver.MessageReceivedEvent += OnMessageReceived;
+            this.positionsReceiver.MessageReceivedEvent += OnMessageReceivedAsync;
 
             this.realtimeSenderIS = realtimeSenderIS;
             this.realtimeSender = realtimeSender;
@@ -67,12 +71,14 @@ namespace EBuEf2IVUVehicle
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
+                _ = HandleSessionStateAsync(sessionStateHandler.StateType);
+
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
                         if (isSessionInitialized
-                            && sessionStateHandler.SessionStatus != SessionStatusType.IsPaused)
+                            && sessionStateHandler.StateType != StateType.IsPaused)
                         {
                             if (useInterfaceServer)
                             {
@@ -100,6 +106,7 @@ namespace EBuEf2IVUVehicle
                     { }
                 }
 
+                initalAllocationsSent = false;
                 isSessionInitialized = false;
 
                 logger.LogInformation(
@@ -110,6 +117,28 @@ namespace EBuEf2IVUVehicle
         #endregion Protected Methods
 
         #region Private Methods
+
+        private async Task HandleSessionStateAsync(StateType stateType)
+        {
+            if (stateType == StateType.IsEnded
+                || stateType == StateType.IsPaused)
+            {
+                isSessionInitialized = false;
+            }
+            else if (stateType == StateType.IsRunning
+                && !isSessionInitialized)
+            {
+                await InitializeSessionAsync();
+
+                isSessionInitialized = true;
+
+                if (!initalAllocationsSent)
+                {
+                    await SendInitialAllocationsAsync();
+                    initalAllocationsSent = true;
+                }
+            }
+        }
 
         private void InitializePositionReceiver()
         {
@@ -162,7 +191,7 @@ namespace EBuEf2IVUVehicle
             }
         }
 
-        private async void OnMessageReceived(object sender, MessageReceivedArgs e)
+        private async void OnMessageReceivedAsync(object sender, MessageReceivedArgs e)
         {
             logger.LogDebug(
                 "Positions-Nachricht empfangen: {content}",
@@ -221,14 +250,7 @@ namespace EBuEf2IVUVehicle
 
         private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
         {
-            if (!isSessionInitialized
-                && e.State == SessionStatusType.IsRunning)
-            {
-                await InitializeSessionAsync();
-                await SendInitialAllocationsAsync();
-
-                isSessionInitialized = true;
-            }
+            await HandleSessionStateAsync(e.StateType);
         }
 
         private async Task SendInitialAllocationsAsync()

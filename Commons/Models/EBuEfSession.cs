@@ -17,7 +17,7 @@ namespace Common.Models
 
         public DateTime SessionStart { get; set; }
 
-        public SessionStatusType Status { get; set; }
+        public StateType Status { get; set; }
 
         public TimeSpan Verschiebung { get; set; }
 

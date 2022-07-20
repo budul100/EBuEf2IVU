@@ -26,7 +26,7 @@ namespace RealTimeSenderTests
         [SetUp]
         public void Init()
         {
-            var path = Path.GetFullPath(@"..\..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml");
+            var path = Path.GetFullPath(@"..\..\..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml");
 
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddXmlFile(

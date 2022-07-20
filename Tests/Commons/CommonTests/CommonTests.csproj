@@ -12,10 +12,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Commons\Commons.csproj" />
-		<ProjectReference Include="..\..\Programs\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
-		<ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
-		<ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj" />
+		<ProjectReference Include="..\..\..\Commons\Commons.csproj" />
+		<ProjectReference Include="..\..\..\Programs\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
+		<ProjectReference Include="..\..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
+		<ProjectReference Include="..\..\..\Services\StateHandler\StateHandler.csproj" />
 	</ItemGroup>
 
 </Project>

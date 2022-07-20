@@ -281,7 +281,7 @@ namespace DatabaseConnector
                 using var context = new SitzungContext(connectionString);
 
                 result = await context.Sitzungen
-                    .Where(s => s.Status == Convert.ToByte(SessionStatusType.IsRunning))
+                    .Where(s => s.Status == Convert.ToByte(StateType.IsRunning))
                     .AnyAsync(queryCancellationToken);
             }
 
@@ -300,11 +300,11 @@ namespace DatabaseConnector
                 using var context = new SitzungContext(connectionString);
 
                 var sitzung = await context.Sitzungen
-                    .Where(s => s.Status == Convert.ToByte(SessionStatusType.InPreparation)
-                        || s.Status == Convert.ToByte(SessionStatusType.IsRunning)
-                        || s.Status == Convert.ToByte(SessionStatusType.IsPaused))
-                    .OrderByDescending(s => s.Status == Convert.ToByte(SessionStatusType.IsRunning))
-                    .ThenByDescending(s => s.Status == Convert.ToByte(SessionStatusType.IsPaused))
+                    .Where(s => s.Status == Convert.ToByte(StateType.InPreparation)
+                        || s.Status == Convert.ToByte(StateType.IsRunning)
+                        || s.Status == Convert.ToByte(StateType.IsPaused))
+                    .OrderByDescending(s => s.Status == Convert.ToByte(StateType.IsRunning))
+                    .ThenByDescending(s => s.Status == Convert.ToByte(StateType.IsPaused))
                     .FirstOrDefaultAsync(queryCancellationToken);
 
                 if (sitzung != default)
@@ -321,7 +321,7 @@ namespace DatabaseConnector
                         Name = sitzung.Name,
                         SessionKey = sitzung.SessionKey,
                         SessionStart = sitzung.SimStartzeit.ToDateTime().ToLocalTime(),
-                        Status = (SessionStatusType)sitzung.Status,
+                        Status = (StateType)sitzung.Status,
                         Verschiebung = timeshift,
                         Wochentag = sitzung.SimWochentag.GetWochentag(),
                     };

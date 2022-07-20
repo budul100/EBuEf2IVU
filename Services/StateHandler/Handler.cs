@@ -48,7 +48,7 @@ namespace StateHandler
 
         #region Public Properties
 
-        public SessionStatusType SessionStatus { get; private set; }
+        public StateType StateType { get; private set; }
 
         #endregion Public Properties
 
@@ -78,7 +78,7 @@ namespace StateHandler
 
         #region Private Methods
 
-        private SessionStatusType? GetSessionStatus(string message)
+        private StateType? GetSessionStatus(string message)
         {
             var sessionStatusText = sessionStatusRegex.IsMatch(message)
                 ? sessionStatusRegex.Match(message).Groups[PatternExtensions.StatusRegexGroupName].Value
@@ -97,7 +97,7 @@ namespace StateHandler
 
             if (sessionStartRegex.IsMatch(e.Content))
             {
-                SetSessionStatus(SessionStatusType.IsRunning);
+                SetSessionStatus(StateType.IsRunning);
             }
             else
             {
@@ -116,34 +116,34 @@ namespace StateHandler
             }
         }
 
-        private void SetSessionStatus(SessionStatusType newSessionStatus)
+        private void SetSessionStatus(StateType newSessionStatus)
         {
-            if (newSessionStatus != SessionStatus)
+            if (newSessionStatus != StateType)
             {
-                SessionStatus = newSessionStatus;
+                StateType = newSessionStatus;
 
-                switch (SessionStatus)
+                switch (StateType)
                 {
-                    case SessionStatusType.InPreparation:
+                    case StateType.InPreparation:
                         logger?.LogInformation("Die Session wird vorbereitet.");
                         break;
 
-                    case SessionStatusType.IsRunning:
+                    case StateType.IsRunning:
                         logger?.LogInformation("Die Session wurde gestartet.");
                         break;
 
-                    case SessionStatusType.IsEnded:
+                    case StateType.IsEnded:
                         logger?.LogInformation("Die Session wurde beendet.");
                         break;
 
-                    case SessionStatusType.IsPaused:
+                    case StateType.IsPaused:
                         logger?.LogInformation("Die Session wird pausiert.");
                         break;
                 }
 
                 SessionChangedEvent?.Invoke(
                     sender: this,
-                    e: new StateChangedArgs(SessionStatus));
+                    e: new StateChangedArgs(StateType));
             }
             else
             {

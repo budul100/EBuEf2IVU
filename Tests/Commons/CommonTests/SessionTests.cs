@@ -69,7 +69,7 @@ namespace CommonTests
                 stateReceiver: messageReceiverMock.Object);
 
             var wasCalled = false;
-            sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.State == Common.Enums.SessionStatusType.IsRunning;
+            sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.StateType == Common.Enums.StateType.IsRunning;
 
             Task.WaitAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
@@ -89,7 +89,7 @@ namespace CommonTests
             var databaseConnectorMock = new Mock<IDatabaseConnector>();
             databaseConnectorMock
                 .Setup(c => c.GetEBuEfSessionAsync())
-                .Returns(Task.FromResult(new Common.Models.EBuEfSession { Status = Common.Enums.SessionStatusType.IsRunning }));
+                .Returns(Task.FromResult(new Common.Models.EBuEfSession { Status = Common.Enums.StateType.IsRunning }));
 
             var sessionStateHandler = new StateHandler.Handler(
                 logger: loggerMock.Object,
@@ -97,7 +97,7 @@ namespace CommonTests
                 stateReceiver: messageReceiverMock.Object);
 
             var wasCalled = false;
-            sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.State == Common.Enums.SessionStatusType.IsRunning;
+            sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.StateType == Common.Enums.StateType.IsRunning;
 
             Task.WhenAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
@@ -107,7 +107,7 @@ namespace CommonTests
         [SetUp]
         public void Init()
         {
-            var path = Path.GetFullPath(@"..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
+            var path = Path.GetFullPath(@"..\..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
 
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddXmlFile(

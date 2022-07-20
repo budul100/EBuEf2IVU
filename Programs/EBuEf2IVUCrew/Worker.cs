@@ -32,7 +32,9 @@ namespace EBuEf2IVUCrew
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
             ICrewChecker crewChecker, ILogger<Worker> logger)
-            : base(config, sessionStateHandler, databaseConnector, logger, Assembly.GetExecutingAssembly())
+            : base(config: config, sessionStateHandler: sessionStateHandler,
+                  databaseConnector: databaseConnector, logger: logger,
+                  assembly: Assembly.GetExecutingAssembly())
         {
             this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
 
@@ -53,12 +55,14 @@ namespace EBuEf2IVUCrew
             {
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
+                _ = HandleSessionStateAsync(sessionStateHandler.StateType);
+
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
                         if (isSessionInitialized
-                            && sessionStateHandler.SessionStatus != SessionStatusType.IsPaused)
+                            && sessionStateHandler.StateType != StateType.IsPaused)
                         {
                             await CheckCrewsAsync(sessionCancellationToken);
 
@@ -130,6 +134,29 @@ namespace EBuEf2IVUCrew
             }
         }
 
+        private async Task HandleSessionStateAsync(StateType stateType)
+        {
+            if (stateType == StateType.IsEnded
+                || stateType == StateType.IsPaused)
+            {
+                isSessionInitialized = false;
+            }
+            else if (stateType == StateType.IsRunning
+                && !isSessionInitialized)
+            {
+                await InitializeSessionAsync();
+
+                logger.LogDebug(
+                    "Die EBuEf-DB wird für den Crew-Check alle {interval} Sekunden " +
+                    "nach Zügen im Zeitraum von -{minTime} und +{maxTime} abgefragt.",
+                    serviceInterval.TotalSeconds,
+                    queryDurationPast.ToString(@"hh\:mm"),
+                    queryDurationFuture.ToString(@"hh\:mm"));
+
+                isSessionInitialized = true;
+            }
+        }
+
         private void InitializeCrewChecker()
         {
             logger.LogInformation(
@@ -168,20 +195,7 @@ namespace EBuEf2IVUCrew
 
         private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
         {
-            if (!isSessionInitialized
-                && e.State == SessionStatusType.IsRunning)
-            {
-                await InitializeSessionAsync();
-
-                logger.LogDebug(
-                    "Die EBuEf-DB wird für den Crew-Check alle {interval} Sekunden " +
-                    "nach Zügen im Zeitraum von -{minTime} und +{maxTime} abgefragt.",
-                    serviceInterval.TotalSeconds,
-                    queryDurationPast.ToString(@"hh\:mm"),
-                    queryDurationFuture.ToString(@"hh\:mm"));
-
-                isSessionInitialized = true;
-            }
+            await HandleSessionStateAsync(e.StateType);
         }
 
         #endregion Private Methods

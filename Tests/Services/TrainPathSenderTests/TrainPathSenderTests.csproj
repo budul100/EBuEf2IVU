@@ -14,8 +14,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Programs\EBuEf2IVUPath\EBuEf2IVUPath.csproj"/>
-		<ProjectReference Include="..\..\Services\TrainPathSender\TrainPathSender.csproj"/>
+		<ProjectReference Include="..\..\..\Programs\EBuEf2IVUPath\EBuEf2IVUPath.csproj"/>
+		<ProjectReference Include="..\..\..\Services\TrainPathSender\TrainPathSender.csproj"/>
 	</ItemGroup>
 
 	<ItemGroup>

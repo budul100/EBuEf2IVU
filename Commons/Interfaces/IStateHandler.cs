@@ -16,7 +16,7 @@ namespace Common.Interfaces
 
         #region Public Properties
 
-        SessionStatusType SessionStatus { get; }
+        StateType StateType { get; }
 
         #endregion Public Properties
 

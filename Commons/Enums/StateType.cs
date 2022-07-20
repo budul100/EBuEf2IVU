@@ -1,6 +1,6 @@
 ﻿namespace Common.Enums
 {
-    public enum SessionStatusType
+    public enum StateType
     {
         InPreparation = 1,
 

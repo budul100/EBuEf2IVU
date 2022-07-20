@@ -8,23 +8,23 @@ namespace Common.Extensions
     {
         #region Public Methods
 
-        public static SessionStatusType? GetSessionStatusType(this string sessionStatus)
+        public static StateType? GetSessionStatusType(this string sessionStatus)
         {
-            if (sessionStatus == SessionStatusType.InPreparation.ToString("D"))
+            if (sessionStatus == StateType.InPreparation.ToString("D"))
             {
-                return SessionStatusType.InPreparation;
+                return StateType.InPreparation;
             }
-            else if (sessionStatus == SessionStatusType.IsRunning.ToString("D"))
+            else if (sessionStatus == StateType.IsRunning.ToString("D"))
             {
-                return SessionStatusType.IsRunning;
+                return StateType.IsRunning;
             }
-            else if (sessionStatus == SessionStatusType.IsEnded.ToString("D"))
+            else if (sessionStatus == StateType.IsEnded.ToString("D"))
             {
-                return SessionStatusType.IsEnded;
+                return StateType.IsEnded;
             }
-            else if (sessionStatus == SessionStatusType.IsPaused.ToString("D"))
+            else if (sessionStatus == StateType.IsPaused.ToString("D"))
             {
-                return SessionStatusType.IsPaused;
+                return StateType.IsPaused;
             }
             else
             {

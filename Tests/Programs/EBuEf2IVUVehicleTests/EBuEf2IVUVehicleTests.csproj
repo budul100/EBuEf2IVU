@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Programs\EBuEf2IVUVehicle\EBuEf2IVUVehicle.csproj" />
+		<ProjectReference Include="..\..\Commons\EBuEf2IVUTestBase\EBuEf2IVUTestBase.csproj" />
+	</ItemGroup>
+
+</Project>
