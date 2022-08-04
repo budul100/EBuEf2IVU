@@ -55,6 +55,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainPathSenderTests", "Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Message2LegConverter", "Services\Message2LegConverter\Message2LegConverter.csproj", "{7223DA49-C402-4B7F-AC1A-B4185E47044E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Message2LegConverterTests", "Tests\Services\Message2LegConverterTests\Message2LegConverterTests.csproj", "{A01FA52A-4D4D-4E28-A8FD-094B70E9565C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,10 @@ Global
 		{7223DA49-C402-4B7F-AC1A-B4185E47044E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7223DA49-C402-4B7F-AC1A-B4185E47044E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7223DA49-C402-4B7F-AC1A-B4185E47044E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A01FA52A-4D4D-4E28-A8FD-094B70E9565C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A01FA52A-4D4D-4E28-A8FD-094B70E9565C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A01FA52A-4D4D-4E28-A8FD-094B70E9565C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A01FA52A-4D4D-4E28-A8FD-094B70E9565C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -168,6 +174,7 @@ Global
 		{BA621354-E031-4FE4-9542-7F41DB0C6FA5} = {EB4A5585-B06C-492D-B1C8-451FC1EEBAD2}
 		{8E2917E9-86E7-4C9D-BA9D-136DF3C226DC} = {EB4A5585-B06C-492D-B1C8-451FC1EEBAD2}
 		{7223DA49-C402-4B7F-AC1A-B4185E47044E} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
+		{A01FA52A-4D4D-4E28-A8FD-094B70E9565C} = {EB4A5585-B06C-492D-B1C8-451FC1EEBAD2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E929A830-61A1-48FF-9596-23961F1A08C4}

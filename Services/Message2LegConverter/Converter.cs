@@ -27,7 +27,7 @@ namespace Message2LegConverter
 
         #region Public Constructors
 
-        public Converter(IConfiguration config, ILogger logger)
+        public Converter(IConfiguration config, ILogger<Converter> logger)
         {
             this.logger = logger;
 
