@@ -5,11 +5,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.330701" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="6.0.6" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="budul.ConverterExtensions" Version="1.6.2" />
 		<PackageReference Include="budul.EnumerableExtensions" Version="1.25.0" />
 		<PackageReference Include="budul.StringExtensions" Version="1.17.0" />

@@ -3,6 +3,7 @@ using Common.EventsArgs;
 using Common.Extensions;
 using Common.Interfaces;
 using EBuEf2IVUTestBase;
+using Message2LegConverter;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -67,6 +68,8 @@ namespace EBuEf2IVUVehicleTests
             services.AddSingleton(stateHandlerMock.Object);
 
             services.AddSingleton((new Mock<IMessageReceiver>()).Object);
+            services.AddSingleton((new Mock<IMessage2LegConverter>()).Object);
+
             services.AddSingleton((new Mock<IRealtimeSender>()).Object);
             services.AddSingleton((new Mock<IRealtimeSenderIS>()).Object);
         }

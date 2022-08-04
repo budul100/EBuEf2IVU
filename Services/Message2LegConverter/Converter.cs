@@ -1,9 +1,9 @@
 ﻿using Common.Enums;
 using Common.Models;
 using ConverterExtensions;
-using EBuEf2IVUVehicle.Extensions;
 using EBuEf2IVUVehicle.Settings;
 using EnumerableExtensions;
+using Message2LegConverter.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RegexExtensions;
@@ -11,24 +11,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EBuEf2IVUVehicle
+namespace Message2LegConverter
 {
-    internal class Message2TrainLeg
+    public class Converter
+        : IMessage2LegConverter
     {
         #region Private Fields
 
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
-        private readonly DateTime ivuSessionDate;
         private readonly ILogger logger;
+
+        private DateTime ivuSessionDate;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Message2TrainLeg(IConfiguration config, ILogger logger, DateTime ivuSessionDate)
+        public Converter(IConfiguration config, ILogger logger)
         {
             this.logger = logger;
-            this.ivuSessionDate = ivuSessionDate.Date;
 
             infrastructureMappings = config.GetInfrastructureMappings();
         }
@@ -73,6 +74,11 @@ namespace EBuEf2IVUVehicle
                 return GetTrainLeg(
                     message: message);
             }
+        }
+
+        public void Initialize(DateTime ivuSessionDate)
+        {
+            this.ivuSessionDate = ivuSessionDate.Date;
         }
 
         #endregion Public Methods

@@ -4,6 +4,7 @@ using Common.Interfaces;
 using Common.Models;
 using EBuEf2IVUBase;
 using EBuEf2IVUVehicle.Settings;
+using Message2LegConverter;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -20,7 +21,7 @@ namespace EBuEf2IVUVehicle
 
         private const string MessageTypePositions = "Echtzeit-Positionen";
 
-        private readonly Message2TrainLeg converter;
+        private readonly IMessage2LegConverter messageConverter;
         private readonly IMessageReceiver positionsReceiver;
         private readonly IRealtimeSender realtimeSender;
         private readonly IRealtimeSenderIS realtimeSenderIS;
@@ -35,25 +36,20 @@ namespace EBuEf2IVUVehicle
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
-            IDatabaseConnector databaseConnector, IRealtimeSender realtimeSender, IRealtimeSenderIS realtimeSenderIS,
-            ILogger<Worker> logger)
-            : base(
-                  config: config, sessionStateHandler: sessionStateHandler,
+            IDatabaseConnector databaseConnector, IMessage2LegConverter messageConverter, IRealtimeSender realtimeSender,
+            IRealtimeSenderIS realtimeSenderIS, ILogger<Worker> logger)
+            : base(config: config, sessionStateHandler: sessionStateHandler,
                   databaseConnector: databaseConnector, logger: logger,
                   assembly: Assembly.GetExecutingAssembly())
         {
             this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
 
             this.positionsReceiver = positionsReceiver;
+            this.messageConverter = messageConverter;
             this.positionsReceiver.MessageReceivedEvent += OnMessageReceivedAsync;
 
             this.realtimeSenderIS = realtimeSenderIS;
             this.realtimeSender = realtimeSender;
-
-            converter = new Message2TrainLeg(
-                config: config,
-                logger: logger,
-                ivuSessionDate: ivuSessionDate);
         }
 
         #endregion Public Constructors
@@ -128,6 +124,7 @@ namespace EBuEf2IVUVehicle
             else if (stateType == StateType.IsRunning
                 && !isSessionInitialized)
             {
+                InitializeMessageConverter();
                 await InitializeSessionAsync();
 
                 isSessionInitialized = true;
@@ -138,6 +135,12 @@ namespace EBuEf2IVUVehicle
                     initalAllocationsSent = true;
                 }
             }
+        }
+
+        private void InitializeMessageConverter()
+        {
+            messageConverter.Initialize(
+                ivuSessionDate: ivuSessionDate);
         }
 
         private void InitializePositionReceiver()
@@ -212,7 +215,7 @@ namespace EBuEf2IVUVehicle
                 }
                 else
                 {
-                    var trainLeg = converter.Convert(message);
+                    var trainLeg = messageConverter.Convert(message);
 
                     if (trainLeg != default)
                     {

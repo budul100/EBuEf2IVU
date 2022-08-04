@@ -32,10 +32,10 @@ namespace EBuEf2IVUPath
         {
             services.AddHostedService<Worker>();
 
-            services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
 
+            services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
             services.AddSingleton<ITrainPathSender, TrainPathSender.Sender>();
         }
 

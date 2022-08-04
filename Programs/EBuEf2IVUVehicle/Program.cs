@@ -3,6 +3,7 @@ using Common.Extensions;
 using Common.Interfaces;
 using EBuEf2IVUBase.Extensions;
 using EBuEf2IVUBase.Settings;
+using Message2LegConverter;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -32,10 +33,11 @@ namespace EBuEf2IVUVehicle
         {
             services.AddHostedService<Worker>();
 
-            services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
-            services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
+            services.AddSingleton<IStateHandler, StateHandler.Handler>();
 
+            services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
+            services.AddTransient<IMessage2LegConverter, Message2LegConverter.Converter>();
             services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();
             services.AddSingleton<IRealtimeSenderIS, RealtimeSenderIS.Sender>();
         }

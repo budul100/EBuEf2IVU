@@ -32,10 +32,10 @@ namespace EBuEf2IVUCrew
         {
             services.AddHostedService<Worker>();
 
-            services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
 
+            services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
             services.AddSingleton<ICrewChecker, CrewChecker.Checker>();
         }
 

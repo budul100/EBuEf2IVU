@@ -132,7 +132,7 @@ namespace MessageReceiver
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var result = await udpClient.ReceiveAsync(cancellationToken);
+                var result = await udpClient.ReceiveAsync();
                 SendMessageReceived(result);
             }
         }

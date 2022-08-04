@@ -36,6 +36,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Commons\Commons.csproj" />
 		<ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
+		<ProjectReference Include="..\..\Services\Message2LegConverter\Message2LegConverter.csproj" />
 		<ProjectReference Include="..\..\Services\MessageReceiver\MessageReceiver.csproj" />
 		<ProjectReference Include="..\..\Services\RealtimeSender\RealtimeSender.csproj" />
 		<ProjectReference Include="..\..\Services\RealtimeSenderIS\RealtimeSenderIS.csproj" />

@@ -21,7 +21,7 @@ namespace TrainPathSender
     {
         #region Private Fields
 
-        private readonly ConcurrentQueue<importTrainPaths> importsQueue = new();
+        private readonly ConcurrentQueue<importTrainPaths> importsQueue = new ConcurrentQueue<importTrainPaths>();
         private readonly ILogger<Sender> logger;
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;

@@ -20,7 +20,7 @@ namespace RealtimeSender
         #region Private Fields
 
         private readonly ILogger logger;
-        private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new();
+        private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new ConcurrentQueue<RealTimeInfoTO>();
 
         private Factory<RealTimeInformationImportFacadeChannel> channelFactory;
         private Message2RealtimeInfo converter;

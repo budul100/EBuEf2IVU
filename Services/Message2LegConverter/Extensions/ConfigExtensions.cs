@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
-namespace EBuEf2IVUVehicle.Extensions
+namespace Message2LegConverter.Extensions
 {
     internal static class ConfigExtensions
     {
