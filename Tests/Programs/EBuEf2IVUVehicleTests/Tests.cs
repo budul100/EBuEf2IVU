@@ -94,7 +94,7 @@ namespace EBuEf2IVUVehicleTests
             const string messageContent = "{\"zugnummer\":\"13\",\"decoder\":null,\"simulationszeit\":\"1970-01-01 01:00:00\",\"betriebsstelle\":\"BGS\",\"signaltyp\":\"ESig\",\"start_gleis\":\"1\",\"ziel_gleis\":\"2\",\"modus\":\"istzeit\"}";
             messageReceiverMock.Raise(m => m.MessageReceivedEvent += null, new MessageReceivedArgs(messageContent));
 
-            Thread.Sleep(20000);
+            Thread.Sleep(10000);
         }
 
         #endregion Public Methods

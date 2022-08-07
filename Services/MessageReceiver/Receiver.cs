@@ -49,14 +49,9 @@ namespace MessageReceiver
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            if (receiverTask == default)
-            {
-                receiverTask = retryPolicy.ExecuteAsync(
-                    action: (t) => RunReceiverAsync(t),
-                    cancellationToken: cancellationToken);
-            }
-
-            return receiverTask;
+            return receiverTask ??= retryPolicy.ExecuteAsync(
+                action: (t) => RunReceiverAsync(t),
+                cancellationToken: cancellationToken);
         }
 
         public void Initialize(string host, int port, int retryTime, string messageType)
