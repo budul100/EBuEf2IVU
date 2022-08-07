@@ -65,7 +65,12 @@ namespace EBuEf2IVUVehicleTests
         [Test]
         public void SendMessageForDifferentDate()
         {
-            var testDate = DateTime.Today.AddDays(-1);
+            //For testing the import on a local application server, the settings must be adjusted:
+            //
+            //<Division>[Set correct division]</Division>
+            //<Host>[Set hostname of app server]</Host>
+
+            var testDate = new DateTime(2022, 8, 4);
 
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 ivuDatum: testDate);
@@ -86,10 +91,10 @@ namespace EBuEf2IVUVehicleTests
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
 
-            const string messageContent = "{\"zugnummer\":\"14\",\"decoder\":null,\"simulationszeit\":\"1970-01-01 01:00:00\",\"betriebsstelle\":\"BGS\",\"signaltyp\":\"ESig\",\"start_gleis\":\"1\",\"ziel_gleis\":\"2\",\"modus\":\"istzeit\"}";
+            const string messageContent = "{\"zugnummer\":\"13\",\"decoder\":null,\"simulationszeit\":\"1970-01-01 01:00:00\",\"betriebsstelle\":\"BGS\",\"signaltyp\":\"ESig\",\"start_gleis\":\"1\",\"ziel_gleis\":\"2\",\"modus\":\"istzeit\"}";
             messageReceiverMock.Raise(m => m.MessageReceivedEvent += null, new MessageReceivedArgs(messageContent));
 
-            Thread.Sleep(6000);
+            Thread.Sleep(20000);
         }
 
         #endregion Public Methods

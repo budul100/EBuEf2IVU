@@ -20,6 +20,8 @@ namespace RealTimeSenderTests
     public class Tests
         : TestsBase
     {
+        private const string SettingsPath = @"..\..\..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml";
+
         #region Public Methods
 
         [Test]
@@ -29,7 +31,7 @@ namespace RealTimeSenderTests
 
             var loggerMock = GetLoggerMock(() => hasSocketException = true);
 
-            var settingsPath = Path.GetFullPath(@"..\..\..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml");
+            var settingsPath = Path.GetFullPath(SettingsPath);
 
             var host = Host
                 .CreateDefaultBuilder()

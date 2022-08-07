@@ -45,9 +45,9 @@ namespace CommonTests
             var query = databaseConnector.GetEBuEfSessionAsync();
             query.Wait();
 
-            Assert.That(query.Result.IVUDatum == query.Result.IVUDatum.Date, Is.True);
-            Assert.That(query.Result.SessionStart.TimeOfDay == new TimeSpan(10, 0, 0), Is.True);
-            Assert.That(query.Result.Wochentag == DayOfWeek.Friday, Is.True);
+            Assert.True(query.Result.IVUDatum == query.Result.IVUDatum.Date);
+            Assert.True(query.Result.SessionStart.TimeOfDay == new TimeSpan(8, 0, 0));
+            Assert.True(query.Result.Wochentag == DayOfWeek.Sunday);
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace CommonTests
         }
 
         [Test]
-        public void GetSessionStartedAsync()
+        public void GetSessionStarted()
         {
             var connectorSettings = config
                 .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))

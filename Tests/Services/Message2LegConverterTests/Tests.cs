@@ -15,12 +15,18 @@ namespace Message2LegConverterTests
     public class Tests
         : TestsBase
     {
+        #region Private Fields
+
+        private const string SettingsPath = @"..\..\..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml";
+
+        #endregion Private Fields
+
         #region Public Methods
 
         [Test]
         public void ConvertMessage()
         {
-            var settingsPath = Path.GetFullPath(@"..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml");
+            var settingsPath = Path.GetFullPath(SettingsPath);
 
             var host = Host
                 .CreateDefaultBuilder()
