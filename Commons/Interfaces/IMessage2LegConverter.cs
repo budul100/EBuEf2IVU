@@ -1,7 +1,7 @@
 ﻿using Common.Models;
 using System;
 
-namespace Message2LegConverter
+namespace Common.Interfaces
 {
     public interface IMessage2LegConverter
     {
@@ -9,7 +9,7 @@ namespace Message2LegConverter
 
         TrainLeg Convert(RealTimeMessage message);
 
-        void Initialize(DateTime sessionDate);
+        void Initialize(DateTime? ivuDatum);
 
         #endregion Public Methods
     }

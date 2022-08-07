@@ -33,7 +33,7 @@ namespace RealtimeSenderIS.Converters
 
         #region Public Methods
 
-        public RealTimeInfoTO Get(VehicleAllocation allocation, DateTime sessionStart)
+        public RealTimeInfoTO Convert(VehicleAllocation allocation, DateTime sessionStart)
         {
             var result = GetRealtimeInfo(
                 eventCode: RealtimeInfoConstants.EventCodeAllocation,
@@ -47,7 +47,7 @@ namespace RealtimeSenderIS.Converters
             return result;
         }
 
-        public RealTimeInfoTO Get(TrainLeg leg)
+        public RealTimeInfoTO Convert(TrainLeg leg)
         {
             var result = GetRealtimeInfo(
                 eventCode: leg.GetEventcode(),

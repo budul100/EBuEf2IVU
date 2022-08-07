@@ -26,7 +26,7 @@ namespace EBuEf2IVUBase
         protected readonly IStateHandler sessionStateHandler;
 
         protected EBuEfSession ebuefSession;
-        protected DateTime sessionDate = DateTime.Today;
+        protected DateTime ivuDatum = DateTime.Today;
         protected DateTime sessionStart = DateTime.Now;
 
         #endregion Protected Fields
@@ -69,6 +69,8 @@ namespace EBuEf2IVUBase
             return sessionCancellationTokenSource.Token;
         }
 
+        protected abstract Task HandleSessionStateAsync(StateType stateType);
+
         protected async Task InitializeConnectionAsync(CancellationToken cancellationToken)
         {
             logger.LogInformation(
@@ -97,7 +99,7 @@ namespace EBuEf2IVUBase
             await sessionStateHandler.ExecuteAsync(cancellationToken);
         }
 
-        protected async Task InitializeSessionAsync()
+        protected virtual async Task InitializeSessionAsync()
         {
             if (databaseConnector == default)
             {
@@ -109,13 +111,13 @@ namespace EBuEf2IVUBase
 
             if (ebuefSession != default)
             {
-                sessionDate = ebuefSession.IVUDatum;
-                sessionStart = sessionDate
+                ivuDatum = ebuefSession.IVUDatum;
+                sessionStart = ivuDatum
                     .Add(ebuefSession.SessionStart.TimeOfDay);
 
                 logger.LogDebug(
                     "Die IVU-Sitzung läuft am {sessionDate} um {sessionTime}.",
-                    sessionDate.ToString("yyyy-MM-dd"),
+                    ivuDatum.ToString("yyyy-MM-dd"),
                     sessionStart.ToString("HH:mm"));
             }
         }
@@ -124,12 +126,14 @@ namespace EBuEf2IVUBase
 
         #region Private Methods
 
-        private void OnSessionChanged(object sender, StateChangedArgs e)
+        private async void OnSessionChanged(object sender, StateChangedArgs e)
         {
             if (e.StateType == StateType.IsEnded)
             {
                 sessionCancellationTokenSource?.Cancel();
             }
+
+            await HandleSessionStateAsync(e.StateType);
         }
 
         #endregion Private Methods

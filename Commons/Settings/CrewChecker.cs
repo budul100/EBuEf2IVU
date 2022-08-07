@@ -1,4 +1,4 @@
-﻿namespace EBuEf2IVUCrew.Settings
+﻿namespace Common.Settings
 {
     public class CrewChecker
     {

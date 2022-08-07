@@ -20,12 +20,8 @@ namespace TrainPathSender.Converters
         private readonly string infrastructureManager;
         private readonly IEnumerable<string> locationShortnames;
         private readonly string orderingTransportationCompany;
-        private readonly DateTime sessionDate;
-        private readonly string sessionKey;
         private readonly string stoppingReasonPass;
         private readonly string stoppingReasonStop;
-        private readonly TimetableVersion timetableVersion;
-        private readonly TrainPathKeyTimetableVersion timetableVersionKey;
         private readonly string trainPathStateCancelled;
         private readonly string trainPathStateRun;
 
@@ -33,13 +29,10 @@ namespace TrainPathSender.Converters
 
         #region Public Constructors
 
-        public TrainRun2ImportPaths(DateTime sessionDate, string sessionKey, string infrastructureManager,
-            string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
-            string trainPathStateRun, string trainPathStateCancelled, string importProfile,
-            IEnumerable<string> locationShortnames)
+        public TrainRun2ImportPaths(string infrastructureManager, string orderingTransportationCompany,
+            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
+            string trainPathStateCancelled, string importProfile, IEnumerable<string> locationShortnames)
         {
-            this.sessionDate = sessionDate;
-            this.sessionKey = sessionKey;
             this.infrastructureManager = infrastructureManager;
             this.orderingTransportationCompany = orderingTransportationCompany;
             this.stoppingReasonStop = stoppingReasonStop;
@@ -48,23 +41,25 @@ namespace TrainPathSender.Converters
             this.trainPathStateCancelled = trainPathStateCancelled;
             this.importProfile = importProfile;
             this.locationShortnames = locationShortnames;
-
-            timetableVersion = GetTimetableVersion();
-            timetableVersionKey = GetTimetableVersionKey();
         }
 
         #endregion Public Constructors
 
         #region Public Methods
 
-        public importTrainPaths Get(IEnumerable<TrainRun> trainRuns)
+        public importTrainPaths Convert(IEnumerable<TrainRun> trainRuns)
         {
             var result = default(importTrainPaths);
 
             if (trainRuns.AnyItem())
             {
                 var stopPoints = GetNetworkPointKeys(trainRuns).ToArray();
-                var trainPaths = GetTrainPaths(trainRuns).ToArray();
+
+                var timetableVersion = GetTimetableVersion(trainRuns);
+
+                var trainPaths = GetTrainPaths(
+                    trainRuns: trainRuns,
+                    timetableVersion: timetableVersion).ToArray();
 
                 var request = new TrainPathImportRequest
                 {
@@ -116,13 +111,15 @@ namespace TrainPathSender.Converters
             yield return result;
         }
 
-        private TimetableVersion GetTimetableVersion()
+        private TimetableVersion GetTimetableVersion(IEnumerable<TrainRun> trainRuns)
         {
+            var relevant = trainRuns.First();
+
             var validity = new DateInterval
             {
-                begin = sessionDate,
+                begin = relevant.IVUDatum,
                 bitmask = SingleDayBitmask,
-                end = sessionDate
+                end = relevant.IVUDatum
             };
 
             var result = new TimetableVersion
@@ -133,7 +130,7 @@ namespace TrainPathSender.Converters
             return result;
         }
 
-        private TrainPathKeyTimetableVersion GetTimetableVersionKey()
+        private TrainPathKeyTimetableVersion GetTimetableVersionKey(TimetableVersion timetableVersion)
         {
             var result = new TrainPathKeyTimetableVersion
             {
@@ -143,10 +140,11 @@ namespace TrainPathSender.Converters
             return result;
         }
 
-        private TrainPathKey GetTrainPathKey(IEnumerable<TrainRun> trainRuns)
+        private TrainPathKey GetTrainPathKey(IEnumerable<TrainRun> trainRuns,
+            TrainPathKeyTimetableVersion timetableVersionKey)
         {
             var relevant = trainRuns.First();
-            var trainPathId = $"{relevant.ZugId}_{sessionKey}";
+            var trainPathId = $"{relevant.ZugId}_{relevant.SessionKey}";
 
             var result = new TrainPathKey
             {
@@ -158,15 +156,23 @@ namespace TrainPathSender.Converters
             return result;
         }
 
-        private IEnumerable<TrainPath> GetTrainPaths(IEnumerable<TrainRun> trainRuns)
+        private IEnumerable<TrainPath> GetTrainPaths(IEnumerable<TrainRun> trainRuns,
+            TimetableVersion timetableVersion)
         {
+            var timetableVersionKey = GetTimetableVersionKey(timetableVersion);
+
             var trainGroups = trainRuns
                 .GroupBy(m => m.Zugnummer).ToArray();
 
             foreach (var trainGroup in trainGroups)
             {
-                var trainPathKey = GetTrainPathKey(trainGroup);
-                var trainPathVariants = GetTrainPathVariants(trainGroup).ToArray();
+                var trainPathKey = GetTrainPathKey(
+                    trainRuns: trainGroup,
+                    timetableVersionKey: timetableVersionKey);
+
+                var trainPathVariants = GetTrainPathVariants(
+                    trainRuns: trainGroup,
+                    timetableVersion: timetableVersion).ToArray();
 
                 var result = new TrainPath
                 {
@@ -190,7 +196,7 @@ namespace TrainPathSender.Converters
             foreach (var relevant in relevants)
             {
                 var arrivalSpecified = relevant.Ankunft.HasValue
-                    && relevant != relevants.First();
+                    && relevant != relevants[0];
 
                 var departureSpecified = relevant.Abfahrt.HasValue
                     && relevant != relevants.Last();
@@ -229,7 +235,8 @@ namespace TrainPathSender.Converters
             }
         }
 
-        private IEnumerable<TrainPathVariant> GetTrainPathVariants(IEnumerable<TrainRun> trainRuns)
+        private IEnumerable<TrainPathVariant> GetTrainPathVariants(IEnumerable<TrainRun> trainRuns,
+            TimetableVersion timetableVersion)
         {
             foreach (var trainRun in trainRuns)
             {

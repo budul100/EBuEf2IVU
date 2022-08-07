@@ -38,7 +38,9 @@ namespace EBuEf2IVUTestBase
             result
                 .Setup(m => m.GetTrainRunsDispoAsync(
                     It.IsAny<TimeSpan>(),
-                    It.IsAny<TimeSpan>()))
+                    It.IsAny<TimeSpan>(),
+                    It.IsAny<DateTime>(),
+                    It.IsAny<string>()))
                 .Returns(Task.FromResult((IEnumerable<TrainRun>)trainRunsMock));
 
             return result;

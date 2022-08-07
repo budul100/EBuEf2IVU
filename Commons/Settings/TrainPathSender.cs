@@ -1,4 +1,4 @@
-﻿namespace EBuEf2IVUPath.Settings
+﻿namespace Common.Settings
 {
     public class TrainPathSender
     {

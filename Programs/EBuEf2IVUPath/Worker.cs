@@ -21,6 +21,7 @@ namespace EBuEf2IVUPath
 
         private const string MessageTypePaths = "Zugtrassen";
 
+        private readonly IMessage2TrainRunConverter messageConverter;
         private readonly IMessageReceiver trainPathReceiver;
         private readonly ITrainPathSender trainPathSender;
 
@@ -32,16 +33,15 @@ namespace EBuEf2IVUPath
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
-            IMessageReceiver trainPathReceiver, ITrainPathSender trainPathSender, ILogger<Worker> logger)
-            : base(config: config, sessionStateHandler: sessionStateHandler,
-                  databaseConnector: databaseConnector, logger: logger,
-                  assembly: Assembly.GetExecutingAssembly())
+            IMessageReceiver messageReceiver, IMessage2TrainRunConverter messageConverter, ITrainPathSender trainPathSender,
+            ILogger<Worker> logger)
+            : base(config: config, sessionStateHandler: sessionStateHandler, databaseConnector: databaseConnector,
+                  logger: logger, assembly: Assembly.GetExecutingAssembly())
         {
-            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
-
-            this.trainPathReceiver = trainPathReceiver;
+            this.trainPathReceiver = messageReceiver;
             this.trainPathReceiver.MessageReceivedEvent += OnMessageReceived;
 
+            this.messageConverter = messageConverter;
             this.trainPathSender = trainPathSender;
         }
 
@@ -94,14 +94,45 @@ namespace EBuEf2IVUPath
             }
         }
 
+        protected override async Task HandleSessionStateAsync(StateType stateType)
+        {
+            if (stateType == StateType.IsEnded
+                || stateType == StateType.IsPaused)
+            {
+                isSessionInitialized = false;
+            }
+            else if ((stateType == StateType.InPreparation || stateType == StateType.IsRunning)
+                && !isSessionInitialized)
+            {
+                await InitializeSessionAsync();
+
+                isSessionInitialized = true;
+
+                if (!initalPathsSent)
+                {
+                    await SendInitialPathesAsync();
+                    initalPathsSent = true;
+                }
+            }
+        }
+
+        protected override async Task InitializeSessionAsync()
+        {
+            await base.InitializeSessionAsync();
+
+            messageConverter.Initialize(
+                ivuDatum: ebuefSession?.IVUDatum,
+                sessionKey: ebuefSession?.SessionKey);
+        }
+
         #endregion Protected Methods
 
         #region Private Methods
 
-        private async Task<IEnumerable<string>> GetLocationShortnamesAsync(Settings.TrainPathSender senderSettings)
+        private async Task<IEnumerable<string>> GetLocationShortnamesAsync(Common.Settings.TrainPathSender senderSettings)
         {
             var locationTypes = senderSettings.LocationTypes?.Split(
-                separator: Settings.TrainPathSender.SettingsSeparator,
+                separator: Common.Settings.TrainPathSender.SettingsSeparator,
                 options: StringSplitOptions.RemoveEmptyEntries);
 
             var result = await databaseConnector.GetLocationShortnamesAsync(locationTypes);
@@ -116,35 +147,14 @@ namespace EBuEf2IVUPath
             return result;
         }
 
-        private async Task HandleSessionStateAsync(StateType stateType)
-        {
-            if (stateType == StateType.IsEnded
-                || stateType == StateType.IsPaused)
-            {
-                isSessionInitialized = false;
-            }
-            else if ((stateType == StateType.InPreparation || stateType == StateType.IsRunning)
-                && !isSessionInitialized)
-            {
-                await InitializeSessionAsync();
-                isSessionInitialized = true;
-
-                if (!initalPathsSent)
-                {
-                    await SendInitialPathesAsync();
-                    initalPathsSent = true;
-                }
-            }
-        }
-
         private void InitializePathReceiver()
         {
             logger.LogInformation(
                 "Der Nachrichten-Empfänger von EBuEf2IVUPath wird gestartet.");
 
             var receiverSettings = config
-                .GetSection(nameof(Settings.TrainPathReceiver))
-                .Get<Settings.TrainPathReceiver>();
+                .GetSection(nameof(Common.Settings.TrainPathReceiver))
+                .Get<Common.Settings.TrainPathReceiver>();
 
             trainPathReceiver.Initialize(
                 host: receiverSettings.Host,
@@ -159,11 +169,11 @@ namespace EBuEf2IVUPath
                 "Der Trassen-Sender von EBuEf2IVUPath wird gestartet.");
 
             var senderSettings = config
-                .GetSection(nameof(Settings.TrainPathSender))
-                .Get<Settings.TrainPathSender>();
+                .GetSection(nameof(Common.Settings.TrainPathSender))
+                .Get<Common.Settings.TrainPathSender>();
 
             var ignoreTrainTypes = senderSettings.IgnoreTrainTypes?.Split(
-                separator: Settings.TrainPathSender.SettingsSeparator,
+                separator: Common.Settings.TrainPathSender.SettingsSeparator,
                 options: StringSplitOptions.RemoveEmptyEntries);
 
             var locationShortnames = await GetLocationShortnamesAsync(senderSettings);
@@ -176,8 +186,6 @@ namespace EBuEf2IVUPath
                 password: senderSettings.Password,
                 isHttps: senderSettings.IsHttps,
                 retryTime: senderSettings.RetryTime,
-                sessionKey: ebuefSession?.SessionKey,
-                sessionDate: sessionDate,
                 infrastructureManager: senderSettings.InfrastructureManager,
                 orderingTransportationCompany: senderSettings.OrderingTransportationCompany,
                 stoppingReasonStop: senderSettings.StoppingReasonStop,
@@ -185,7 +193,6 @@ namespace EBuEf2IVUPath
                 trainPathStateRun: senderSettings.TrainPathStateRun,
                 trainPathStateCancelled: senderSettings.TrainPathStateCancelled,
                 importProfile: senderSettings.ImportProfile,
-                preferPrognosis: senderSettings.PreferPrognosis,
                 ignoreTrainTypes: ignoreTrainTypes,
                 locationShortnames: locationShortnames);
         }
@@ -199,10 +206,11 @@ namespace EBuEf2IVUPath
             try
             {
                 var messages = JsonConvert.DeserializeObject<TrainPathMessage[]>(e.Content);
+                var trainRuns = messageConverter.Convert(messages);
 
-                if (messages.AnyItem())
+                if (trainRuns.AnyItem())
                 {
-                    trainPathSender.Add(messages);
+                    trainPathSender.Add(trainRuns);
                 }
                 else
                 {
@@ -226,11 +234,6 @@ namespace EBuEf2IVUPath
             }
         }
 
-        private async void OnSessionChangedAsync(object sender, Common.EventsArgs.StateChangedArgs e)
-        {
-            await HandleSessionStateAsync(e.StateType);
-        }
-
         private async Task SendInitialPathesAsync()
         {
             logger.LogInformation(
@@ -245,12 +248,14 @@ namespace EBuEf2IVUPath
             else
             {
                 var senderSettings = config
-                    .GetSection(nameof(Settings.TrainPathSender))
-                    .Get<Settings.TrainPathSender>();
+                    .GetSection(nameof(Common.Settings.TrainPathSender))
+                    .Get<Common.Settings.TrainPathSender>();
 
                 var trainRuns = await databaseConnector.GetTrainRunsPlanAsync(
                     timetableId: ebuefSession.FahrplanId,
                     weekday: ebuefSession.Wochentag,
+                    ivuDatum: ebuefSession.IVUDatum,
+                    sessionKey: ebuefSession.SessionKey,
                     preferPrognosis: senderSettings.PreferPrognosis);
 
                 if (trainRuns.AnyItem())

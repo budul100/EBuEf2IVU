@@ -3,7 +3,6 @@ using Common.EventsArgs;
 using Common.Extensions;
 using Common.Interfaces;
 using EBuEf2IVUTestBase;
-using Message2LegConverter;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

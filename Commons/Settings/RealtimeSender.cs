@@ -1,4 +1,4 @@
-﻿namespace EBuEf2IVUVehicle.Settings
+﻿namespace Common.Settings
 {
     public class RealtimeSender
     {

@@ -1,34 +1,40 @@
-﻿using Common.Models;
+﻿using Common.Interfaces;
+using Common.Models;
 using EnumerableExtensions;
+using Message2TrainRunConverter.Extensions;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TrainPathSender.Extensions;
 
-namespace TrainPathSender.Converters
+namespace Message2TrainRunConverter
 {
-    internal class Message2TrainRun
+    public class Converter
+        : IMessage2TrainRunConverter
     {
         #region Private Fields
 
         private readonly Func<TrainPathMessage, DateTime?> abfahrtGetter;
         private readonly Func<TrainPathMessage, DateTime?> ankunftGetter;
 
+        private DateTime ivuDatum;
+        private string sessionKey;
+
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Message2TrainRun(bool preferPrognosis)
+        public Converter(IConfiguration config)
         {
-            abfahrtGetter = GetAbfahrtGetter(preferPrognosis);
-            ankunftGetter = GetAnkunftGetter(preferPrognosis);
+            abfahrtGetter = config.GetAbfahrtGetter();
+            ankunftGetter = config.GetAnkunftGetter();
         }
 
         #endregion Public Constructors
 
         #region Public Methods
 
-        public IEnumerable<TrainRun> Get(IEnumerable<TrainPathMessage> messages)
+        public IEnumerable<TrainRun> Convert(IEnumerable<TrainPathMessage> messages)
         {
             if (messages.AnyItem())
             {
@@ -47,27 +53,15 @@ namespace TrainPathSender.Converters
             }
         }
 
+        public void Initialize(DateTime? ivuDatum, string sessionKey)
+        {
+            this.ivuDatum = ivuDatum?.Date ?? DateTime.Today;
+            this.sessionKey = sessionKey;
+        }
+
         #endregion Public Methods
 
         #region Private Methods
-
-        private static Func<TrainPathMessage, DateTime?> GetAbfahrtGetter(bool preferPrognosis)
-        {
-            var result = preferPrognosis
-                ? (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtPrognose ?? m.AbfahrtSoll ?? m.AbfahrtPlan)
-                : (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtSoll ?? m.AbfahrtPlan);
-
-            return result;
-        }
-
-        private static Func<TrainPathMessage, DateTime?> GetAnkunftGetter(bool preferPrognosis)
-        {
-            var result = preferPrognosis
-                ? (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftPrognose ?? m.AnkunftSoll ?? m.AnkunftPlan)
-                : (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftSoll ?? m.AnkunftPlan);
-
-            return result;
-        }
 
         private IEnumerable<TrainPosition> GetPositions(IEnumerable<TrainPathMessage> messages)
         {
@@ -106,7 +100,9 @@ namespace TrainPathSender.Converters
             var result = new TrainRun
             {
                 Abfahrt = positions[0].Abfahrt?.TimeOfDay,
+                IVUDatum = ivuDatum,
                 Positions = positions,
+                SessionKey = sessionKey,
                 Zuggattung = relevantMessage.Zuggattung,
                 ZugId = relevantMessage.ZugId,
                 Zugnummer = relevantMessage.Zugnummer,

@@ -1,4 +1,5 @@
 ﻿using Common.Enums;
+using Common.Interfaces;
 using Common.Models;
 using ConverterExtensions;
 using EBuEf2IVUVehicle.Settings;
@@ -21,7 +22,7 @@ namespace Message2LegConverter
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
         private readonly ILogger logger;
 
-        private DateTime sessionDate;
+        private DateTime ivuDatum;
 
         #endregion Private Fields
 
@@ -73,9 +74,9 @@ namespace Message2LegConverter
             return result;
         }
 
-        public void Initialize(DateTime sessionDate)
+        public void Initialize(DateTime? ivuDatum)
         {
-            this.sessionDate = sessionDate.Date;
+            this.ivuDatum = ivuDatum?.Date ?? DateTime.Today;
         }
 
         #endregion Public Methods
@@ -108,7 +109,7 @@ namespace Message2LegConverter
                 ? message.SimulationsZeit.Value.Add(ivuShift).TimeOfDay
                 : message.SimulationsZeit.Value.TimeOfDay;
 
-            var ivuZeitpunkt = sessionDate.Add(ivuZeit);
+            var ivuZeitpunkt = ivuDatum.Add(ivuZeit);
 
             var fahrzeuge = message.Decoder.AsEnumerable();
 

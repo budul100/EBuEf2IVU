@@ -20,7 +20,11 @@ namespace RealTimeSenderTests
     public class Tests
         : TestsBase
     {
+        #region Private Fields
+
         private const string SettingsPath = @"..\..\..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml";
+
+        #endregion Private Fields
 
         #region Public Methods
 
@@ -41,8 +45,8 @@ namespace RealTimeSenderTests
                 .Build();
 
             var senderSettings = host.Services.GetService<IConfiguration>()
-                .GetSection(nameof(EBuEf2IVUVehicle.Settings.RealtimeSender))
-                .Get<EBuEf2IVUVehicle.Settings.RealtimeSender>();
+                .GetSection(nameof(Common.Settings.RealtimeSender))
+                .Get<Common.Settings.RealtimeSender>();
 
             var sender = host.Services.GetService<IRealtimeSender>();
 

@@ -18,22 +18,6 @@ namespace TrainPathSender.Extensions
             return result;
         }
 
-        public static TrainPosition GetPositionWithoutTraffic(this TrainPathMessage message)
-        {
-            var result = new TrainPosition
-            {
-                Abfahrt = message.AbfahrtPlan,
-                Ankunft = message.AnkunftPlan,
-                Bemerkungen = message.Bemerkungen,
-                Betriebsstelle = message.Betriebsstelle,
-                Gleis = message.GleisSoll?.ToString(),
-                VerkehrNicht = true,
-                IstDurchfahrt = message.IstDurchfahrt,
-            };
-
-            return result;
-        }
-
         public static TrainPathStopStopPoint GetStopPoint(this TrainPosition position)
         {
             var result = new TrainPathStopStopPoint

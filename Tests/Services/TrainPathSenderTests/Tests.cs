@@ -16,8 +16,6 @@ namespace TrainPathSenderTests
     {
         #region Private Fields
 
-        private const string SessionKey = "TestSessionKey";
-
         private IConfigurationRoot config;
         private NullLoggerFactory loggerFactory;
         private Sender sender;
@@ -52,11 +50,11 @@ namespace TrainPathSenderTests
             var logger = loggerFactory.CreateLogger<Sender>();
 
             var senderSettings = config
-                .GetSection(nameof(EBuEf2IVUPath.Settings.TrainPathSender))
-                .Get<EBuEf2IVUPath.Settings.TrainPathSender>();
+                .GetSection(nameof(Common.Settings.TrainPathSender))
+                .Get<Common.Settings.TrainPathSender>();
 
             var ignoreTrainTypes = senderSettings.IgnoreTrainTypes?.Split(
-                separator: EBuEf2IVUPath.Settings.TrainPathSender.SettingsSeparator,
+                separator: Common.Settings.TrainPathSender.SettingsSeparator,
                 options: StringSplitOptions.RemoveEmptyEntries);
 
             sender = new Sender(logger);
@@ -69,8 +67,6 @@ namespace TrainPathSenderTests
                 password: senderSettings.Password,
                 isHttps: senderSettings.IsHttps,
                 retryTime: senderSettings.RetryTime,
-                sessionKey: SessionKey,
-                sessionDate: DateTime.Today,
                 infrastructureManager: senderSettings.InfrastructureManager,
                 orderingTransportationCompany: senderSettings.OrderingTransportationCompany,
                 stoppingReasonStop: senderSettings.StoppingReasonStop,
@@ -78,7 +74,6 @@ namespace TrainPathSenderTests
                 trainPathStateRun: senderSettings.TrainPathStateRun,
                 trainPathStateCancelled: senderSettings.TrainPathStateCancelled,
                 importProfile: senderSettings.ImportProfile,
-                preferPrognosis: senderSettings.PreferPrognosis,
                 ignoreTrainTypes: ignoreTrainTypes,
                 locationShortnames: default);
         }
@@ -103,6 +98,8 @@ namespace TrainPathSenderTests
             var trainRuns = databaseConnector.GetTrainRunsPlanAsync(
                 timetableId: query.Result.FahrplanId,
                 weekday: query.Result.Wochentag,
+                ivuDatum: query.Result.IVUDatum,
+                sessionKey: query.Result.SessionKey,
                 preferPrognosis: false).Result;
 
             sender.Add(trainRuns);

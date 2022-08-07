@@ -1,6 +1,6 @@
-﻿namespace EBuEf2IVUPath.Settings
+﻿namespace Common.Settings
 {
-    internal class TrainPathReceiver
+    public class TrainPathReceiver
     {
         #region Public Properties
 

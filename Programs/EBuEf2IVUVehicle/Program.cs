@@ -3,7 +3,6 @@ using Common.Extensions;
 using Common.Interfaces;
 using EBuEf2IVUBase.Extensions;
 using EBuEf2IVUBase.Settings;
-using Message2LegConverter;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;

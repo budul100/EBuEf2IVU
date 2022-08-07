@@ -36,6 +36,8 @@ namespace EBuEf2IVUPath
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
 
             services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
+            services.AddSingleton<IMessage2TrainRunConverter, Message2TrainRunConverter.Converter>();
+
             services.AddSingleton<ITrainPathSender, TrainPathSender.Sender>();
         }
 

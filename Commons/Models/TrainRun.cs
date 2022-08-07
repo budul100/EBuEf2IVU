@@ -11,7 +11,11 @@ namespace Common.Models
 
         public string Bemerkungen { get; set; }
 
+        public DateTime IVUDatum { get; set; }
+
         public IEnumerable<TrainPosition> Positions { get; set; }
+
+        public string SessionKey { get; set; }
 
         public string Zuggattung { get; set; }
 

@@ -15,7 +15,7 @@ namespace DatabaseConnector.Models
         public int Id { get; set; }
 
         [Column("sim_ivutag")]
-        public DateTime? IvuDate { get; set; }
+        public DateTime? IvuDatum { get; set; }
 
         [Column("name")]
         public string Name { get; set; }

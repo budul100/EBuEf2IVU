@@ -2,9 +2,8 @@ using Common.Enums;
 using Common.EventsArgs;
 using Common.Interfaces;
 using Common.Models;
+using Common.Settings;
 using EBuEf2IVUBase;
-using EBuEf2IVUVehicle.Settings;
-using Message2LegConverter;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -35,19 +34,16 @@ namespace EBuEf2IVUVehicle
 
         #region Public Constructors
 
-        public Worker(IConfiguration config, IStateHandler sessionStateHandler, IMessageReceiver positionsReceiver,
-            IDatabaseConnector databaseConnector, IMessage2LegConverter messageConverter, IRealtimeSender realtimeSender,
+        public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
+            IMessageReceiver positionsReceiver, IMessage2LegConverter messageConverter, IRealtimeSender realtimeSender,
             IRealtimeSenderIS realtimeSenderIS, ILogger<Worker> logger)
-            : base(config: config, sessionStateHandler: sessionStateHandler,
-                  databaseConnector: databaseConnector, logger: logger,
-                  assembly: Assembly.GetExecutingAssembly())
+            : base(config: config, sessionStateHandler: sessionStateHandler, databaseConnector: databaseConnector,
+                  logger: logger, assembly: Assembly.GetExecutingAssembly())
         {
-            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
-
             this.positionsReceiver = positionsReceiver;
-            this.messageConverter = messageConverter;
             this.positionsReceiver.MessageReceivedEvent += OnMessageReceivedAsync;
 
+            this.messageConverter = messageConverter;
             this.realtimeSenderIS = realtimeSenderIS;
             this.realtimeSender = realtimeSender;
         }
@@ -110,11 +106,7 @@ namespace EBuEf2IVUVehicle
             }
         }
 
-        #endregion Protected Methods
-
-        #region Private Methods
-
-        private async Task HandleSessionStateAsync(StateType stateType)
+        protected override async Task HandleSessionStateAsync(StateType stateType)
         {
             if (stateType == StateType.IsEnded
                 || stateType == StateType.IsPaused)
@@ -125,7 +117,6 @@ namespace EBuEf2IVUVehicle
                 && !isSessionInitialized)
             {
                 await InitializeSessionAsync();
-                InitializeMessageConverter();
 
                 isSessionInitialized = true;
 
@@ -137,11 +128,17 @@ namespace EBuEf2IVUVehicle
             }
         }
 
-        private void InitializeMessageConverter()
+        protected override async Task InitializeSessionAsync()
         {
+            await base.InitializeSessionAsync();
+
             messageConverter.Initialize(
-                sessionDate: sessionDate);
+                ivuDatum: ebuefSession.IVUDatum);
         }
+
+        #endregion Protected Methods
+
+        #region Private Methods
 
         private void InitializePositionReceiver()
         {
@@ -165,8 +162,8 @@ namespace EBuEf2IVUVehicle
                 "Der Ist-Daten-Sender von EBuEf2IVUVehicle wird gestartet.");
 
             var settings = config
-                .GetSection(nameof(Settings.RealtimeSender))
-                .Get<Settings.RealtimeSender>();
+                .GetSection(nameof(Common.Settings.RealtimeSender))
+                .Get<Common.Settings.RealtimeSender>();
 
             ignorePrognosis = settings.IgnorePrognosis;
             useInterfaceServer = settings.UseInterfaceServer;
@@ -249,11 +246,6 @@ namespace EBuEf2IVUVehicle
                     "Die Nachricht kann nicht in eine Echtzeitmeldung umgeformt werden: {message}",
                     serializationException.Message);
             }
-        }
-
-        private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
-        {
-            await HandleSessionStateAsync(e.StateType);
         }
 
         private async Task SendInitialAllocationsAsync()

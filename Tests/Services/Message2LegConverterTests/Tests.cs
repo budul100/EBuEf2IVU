@@ -1,4 +1,5 @@
 ﻿using Common.Extensions;
+using Common.Interfaces;
 using Common.Models;
 using EBuEf2IVUTestBase;
 using Message2LegConverter;

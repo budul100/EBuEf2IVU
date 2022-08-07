@@ -25,11 +25,10 @@ namespace TrainPathSender
         private readonly ILogger<Sender> logger;
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
+        private TrainRun2ImportPaths converter;
         private IEnumerable<string> ignoreTrainTypes;
-        private Message2TrainRun messageConverter;
         private AsyncRetryPolicy retryPolicy;
         private Task senderTask;
-        private TrainRun2ImportPaths trainRunConverter;
 
         #endregion Private Fields
 
@@ -44,17 +43,6 @@ namespace TrainPathSender
 
         #region Public Methods
 
-        public void Add(IEnumerable<TrainPathMessage> messages)
-        {
-            if (messages.AnyItem())
-            {
-                var trainRuns = messageConverter
-                    .Get(messages).ToArray();
-
-                Add(trainRuns);
-            }
-        }
-
         public void Add(IEnumerable<TrainRun> trainRuns)
         {
             var filtereds = trainRuns
@@ -62,7 +50,7 @@ namespace TrainPathSender
 
             if (filtereds.AnyItem())
             {
-                var imports = trainRunConverter.Get(filtereds);
+                var imports = converter.Convert(filtereds);
 
                 if (imports != default)
                 {
@@ -86,18 +74,13 @@ namespace TrainPathSender
         }
 
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
-            int retryTime, string sessionKey, DateTime sessionDate, string infrastructureManager,
-            string orderingTransportationCompany, string stoppingReasonStop, string stoppingReasonPass,
-            string trainPathStateRun, string trainPathStateCancelled, string importProfile, bool preferPrognosis,
+            int retryTime, string infrastructureManager, string orderingTransportationCompany, string stoppingReasonStop,
+            string stoppingReasonPass, string trainPathStateRun, string trainPathStateCancelled, string importProfile,
             IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames)
         {
             this.ignoreTrainTypes = ignoreTrainTypes;
 
-            messageConverter = new Message2TrainRun(preferPrognosis);
-
-            trainRunConverter = new TrainRun2ImportPaths(
-                sessionDate: sessionDate,
-                sessionKey: sessionKey,
+            converter = new TrainRun2ImportPaths(
                 infrastructureManager: infrastructureManager,
                 orderingTransportationCompany: orderingTransportationCompany,
                 stoppingReasonStop: stoppingReasonStop,

@@ -16,6 +16,12 @@ namespace EBuEf2IVUPathTests
     public class Tests
         : TestsBase
     {
+        #region Private Fields
+
+        private const string SettingsPath = @"..\..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml";
+
+        #endregion Private Fields
+
         #region Public Methods
 
         [Test]
@@ -23,20 +29,21 @@ namespace EBuEf2IVUPathTests
         {
             var wasCalled = false;
 
-            var cancellationTokenSource = new CancellationTokenSource();
-
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 sessionCallback: () => wasCalled = true);
             var stateHandlerMock = GetStateHandlerMock();
+            var messageReceiverMock = new Mock<IMessageReceiver>();
 
-            var settingsPath = Path.GetFullPath(@"..\..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
+            var settingsPath = Path.GetFullPath(SettingsPath);
 
             var host = Host
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock))
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, messageReceiverMock))
                 .Build();
+
+            var cancellationTokenSource = new CancellationTokenSource();
 
             host.StartAsync(cancellationTokenSource.Token);
             Assert.False(wasCalled);
@@ -58,7 +65,7 @@ namespace EBuEf2IVUPathTests
         #region Private Methods
 
         private static void ConfigureServices(IServiceCollection services, Mock<IDatabaseConnector> databaseConnectorMock,
-            Mock<IStateHandler> stateHandlerMock)
+            Mock<IStateHandler> stateHandlerMock, Mock<IMessageReceiver> messageReceiverMock)
         {
             services.AddHostedService<EBuEf2IVUPath.Worker>();
 
@@ -66,8 +73,10 @@ namespace EBuEf2IVUPathTests
             services.AddSingleton(databaseConnectorMock.Object);
             services.AddSingleton(stateHandlerMock.Object);
 
-            services.AddSingleton(new Mock<IMessageReceiver>().Object);
-            services.AddSingleton(new Mock<ITrainPathSender>().Object);
+            services.AddSingleton(messageReceiverMock.Object);
+            services.AddSingleton<IMessage2TrainRunConverter, Message2TrainRunConverter.Converter>();
+
+            services.AddSingleton<ITrainPathSender, TrainPathSender.Sender>();
         }
 
         #endregion Private Methods

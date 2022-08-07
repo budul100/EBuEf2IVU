@@ -1,5 +1,4 @@
 using Common.Enums;
-using Common.EventsArgs;
 using Common.Extensions;
 using Common.Interfaces;
 using EBuEf2IVUBase;
@@ -36,8 +35,6 @@ namespace EBuEf2IVUCrew
                   databaseConnector: databaseConnector, logger: logger,
                   assembly: Assembly.GetExecutingAssembly())
         {
-            this.sessionStateHandler.SessionChangedEvent += OnSessionChangedAsync;
-
             this.crewChecker = crewChecker;
         }
 
@@ -90,51 +87,7 @@ namespace EBuEf2IVUCrew
             }
         }
 
-        #endregion Protected Methods
-
-        #region Private Methods
-
-        private async Task CheckCrewsAsync(CancellationToken sessionCancellationToken)
-        {
-            var minTime = ebuefSession.GetSimTime()
-                .Add(queryDurationPast).TimeOfDay;
-            var maxTime = ebuefSession.GetSimTime()
-                .Add(queryDurationFuture).TimeOfDay;
-
-            var trainRuns = await databaseConnector.GetTrainRunsDispoAsync(
-                minTime: minTime,
-                maxTime: maxTime);
-
-            logger.LogDebug(
-                "In der EBuEf-DB wurden {trainsCount} Züge für den Zeitraum zwischen {minTime} und {maxTime} gefunden.",
-                trainRuns.Count(),
-                minTime.ToString(@"hh\:mm"),
-                maxTime.ToString(@"hh\:mm"));
-
-            if (trainRuns.Any()
-                && !sessionCancellationToken.IsCancellationRequested)
-            {
-                var tripNumbers = trainRuns
-                    .Select(t => t.Zugnummer.ToString()).ToArray();
-                var crewingElements = await crewChecker.GetCrewingElementsAsync(
-                    tripNumbers: tripNumbers,
-                    date: sessionDate,
-                    cancellationToken: sessionCancellationToken);
-
-                logger.LogDebug(
-                    "In der IVU.rail wurden {crewingCount} Besatzungseinträge zu den Zügen gefunden: {crewingElements}",
-                    crewingElements.Count(),
-                    crewingElements.Merge());
-
-                if (crewingElements.Any()
-                    && !sessionCancellationToken.IsCancellationRequested)
-                {
-                    await databaseConnector.SetCrewingsAsync(crewingElements);
-                }
-            }
-        }
-
-        private async Task HandleSessionStateAsync(StateType stateType)
+        protected override async Task HandleSessionStateAsync(StateType stateType)
         {
             if (stateType == StateType.IsEnded
                 || stateType == StateType.IsPaused)
@@ -157,14 +110,60 @@ namespace EBuEf2IVUCrew
             }
         }
 
+        #endregion Protected Methods
+
+        #region Private Methods
+
+        private async Task CheckCrewsAsync(CancellationToken sessionCancellationToken)
+        {
+            var minTime = ebuefSession.GetSimTime()
+                .Add(queryDurationPast).TimeOfDay;
+            var maxTime = ebuefSession.GetSimTime()
+                .Add(queryDurationFuture).TimeOfDay;
+
+            var trainRuns = await databaseConnector.GetTrainRunsDispoAsync(
+                minTime: minTime,
+                maxTime: maxTime,
+                ivuDatum: ebuefSession.IVUDatum,
+                sessionKey: ebuefSession.SessionKey);
+
+            logger.LogDebug(
+                "In der EBuEf-DB wurden {trainsCount} Züge für den Zeitraum zwischen {minTime} und {maxTime} gefunden.",
+                trainRuns.Count(),
+                minTime.ToString(@"hh\:mm"),
+                maxTime.ToString(@"hh\:mm"));
+
+            if (trainRuns.Any()
+                && !sessionCancellationToken.IsCancellationRequested)
+            {
+                var tripNumbers = trainRuns
+                    .Select(t => t.Zugnummer.ToString()).ToArray();
+                var crewingElements = await crewChecker.GetCrewingElementsAsync(
+                    tripNumbers: tripNumbers,
+                    date: ivuDatum,
+                    cancellationToken: sessionCancellationToken);
+
+                logger.LogDebug(
+                    "In der IVU.rail wurden {crewingCount} Besatzungseinträge zu den Zügen gefunden: {crewingElements}",
+                    crewingElements.Count(),
+                    crewingElements.Merge());
+
+                if (crewingElements.Any()
+                    && !sessionCancellationToken.IsCancellationRequested)
+                {
+                    await databaseConnector.SetCrewingsAsync(crewingElements);
+                }
+            }
+        }
+
         private void InitializeCrewChecker()
         {
             logger.LogInformation(
                 "IVU-Connector für EBuEf2IVUCrew wird gestartet.");
 
             var serviceSettings = config
-                .GetSection(nameof(Settings.CrewChecker))
-                .Get<Settings.CrewChecker>();
+                .GetSection(nameof(Common.Settings.CrewChecker))
+                .Get<Common.Settings.CrewChecker>();
 
             serviceInterval = new TimeSpan(
                 hours: 0,
@@ -191,11 +190,6 @@ namespace EBuEf2IVUCrew
                 division: serviceSettings.Division,
                 planningLevel: serviceSettings.PlanningLevel,
                 retryTime: serviceSettings.RetryTime);
-        }
-
-        private async void OnSessionChangedAsync(object sender, StateChangedArgs e)
-        {
-            await HandleSessionStateAsync(e.StateType);
         }
 
         #endregion Private Methods

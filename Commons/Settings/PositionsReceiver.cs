@@ -1,6 +1,6 @@
-﻿namespace EBuEf2IVUVehicle.Settings
+﻿namespace Common.Settings
 {
-    internal class PositionsReceiver
+    public class PositionsReceiver
     {
         #region Public Properties
 

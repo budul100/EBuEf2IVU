@@ -44,7 +44,7 @@ namespace RealtimeSender
         {
             foreach (var allocation in trainAllocations)
             {
-                var message = converter.Get(
+                var message = converter.Convert(
                     allocation: allocation,
                     sessionStart: sessionStart);
 
@@ -59,7 +59,7 @@ namespace RealtimeSender
         {
             if (trainLeg != default)
             {
-                var message = converter.Get(trainLeg);
+                var message = converter.Convert(trainLeg);
 
                 if (message != default)
                 {
