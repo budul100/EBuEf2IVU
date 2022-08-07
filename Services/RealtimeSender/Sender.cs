@@ -25,7 +25,7 @@ namespace RealtimeSender
         private Factory<RealTimeInformationImportFacadeChannel> channelFactory;
         private Message2RealtimeInfo converter;
         private AsyncRetryPolicy retryPolicy;
-        private Task workerTask;
+        private Task senderTask;
 
         #endregion Private Fields
 
@@ -70,16 +70,16 @@ namespace RealtimeSender
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            cancellationToken.Register(() => messagesQueue.Clear());
-
-            if (workerTask == default)
+            if (senderTask == default)
             {
-                workerTask = retryPolicy?.ExecuteAsync(
+                cancellationToken.Register(() => messagesQueue.Clear());
+
+                senderTask = retryPolicy?.ExecuteAsync(
                     action: (token) => RunSenderAsync(token),
                     cancellationToken: cancellationToken);
             }
 
-            return workerTask;
+            return senderTask;
         }
 
         public void Initialize(string host, int port, string path, string username, string password,

@@ -28,6 +28,7 @@ namespace TrainPathSender
         private IEnumerable<string> ignoreTrainTypes;
         private Message2TrainRun messageConverter;
         private AsyncRetryPolicy retryPolicy;
+        private Task senderTask;
         private TrainRun2ImportPaths trainRunConverter;
 
         #endregion Private Fields
@@ -72,13 +73,16 @@ namespace TrainPathSender
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            cancellationToken.Register(() => importsQueue.Clear());
+            if (senderTask == default)
+            {
+                cancellationToken.Register(() => importsQueue.Clear());
 
-            var result = retryPolicy.ExecuteAsync(
-                action: (token) => RunSenderAsync(token),
-                cancellationToken: cancellationToken);
+                senderTask = retryPolicy?.ExecuteAsync(
+                    action: (token) => RunSenderAsync(token),
+                    cancellationToken: cancellationToken);
+            }
 
-            return result;
+            return senderTask;
         }
 
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
