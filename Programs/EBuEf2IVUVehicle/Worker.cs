@@ -140,7 +140,7 @@ namespace EBuEf2IVUVehicle
         private void InitializeMessageConverter()
         {
             messageConverter.Initialize(
-                ivuSessionDate: ivuSessionDate);
+                ivuSessionDate: sessionDate);
         }
 
         private void InitializePositionReceiver()
@@ -176,7 +176,6 @@ namespace EBuEf2IVUVehicle
                 realtimeSenderIS.Initialize(
                     endpoint: settings.Endpoint,
                     division: settings.Division,
-                    sessionStart: ebuefSessionStart,
                     retryTime: settings.RetryTime);
             }
             else
@@ -189,7 +188,6 @@ namespace EBuEf2IVUVehicle
                     password: settings.Password,
                     isHttps: settings.IsHttps,
                     division: settings.Division,
-                    sessionStart: ebuefSessionStart,
                     retryTime: settings.RetryTime);
             }
         }
@@ -267,11 +265,15 @@ namespace EBuEf2IVUVehicle
 
             if (useInterfaceServer)
             {
-                realtimeSenderIS.Add(allocations);
+                realtimeSenderIS.Add(
+                    trainAllocations: allocations,
+                    sessionStart: sessionStart);
             }
             else
             {
-                realtimeSender.Add(allocations);
+                realtimeSender.Add(
+                    trainAllocations: allocations,
+                    sessionStart: sessionStart);
             }
         }
 

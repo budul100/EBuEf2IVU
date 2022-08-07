@@ -10,13 +10,13 @@ namespace Common.Interfaces
     {
         #region Public Methods
 
-        void Add(IEnumerable<VehicleAllocation> trainAllocations);
+        void Add(IEnumerable<VehicleAllocation> trainAllocations, DateTime sessionStart);
 
         void Add(TrainLeg trainLeg);
 
         Task ExecuteAsync(CancellationToken cancellationToken);
 
-        void Initialize(string endpoint, string division, DateTime sessionStart, int retryTime);
+        void Initialize(string endpoint, string division, int retryTime);
 
         #endregion Public Methods
     }

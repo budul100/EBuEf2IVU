@@ -16,17 +16,15 @@ namespace RealtimeSenderIS.Converters
         private readonly string deviceID;
         private readonly string division;
         private readonly ILogger logger;
-        private readonly DateTime sessionStart;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public Message2RealtimeInfo(ILogger logger, string division, DateTime sessionStart)
+        public Message2RealtimeInfo(ILogger logger, string division)
         {
             this.logger = logger;
             this.division = division;
-            this.sessionStart = sessionStart;
 
             deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
         }
@@ -35,7 +33,7 @@ namespace RealtimeSenderIS.Converters
 
         #region Public Methods
 
-        public RealTimeInfoTO Get(VehicleAllocation allocation)
+        public RealTimeInfoTO Get(VehicleAllocation allocation, DateTime sessionStart)
         {
             var result = GetRealtimeInfo(
                 eventCode: RealtimeInfoConstants.EventCodeAllocation,

@@ -52,7 +52,6 @@ namespace RealTimeSenderTests
                 password: senderSettings.Password,
                 isHttps: senderSettings.IsHttps,
                 division: senderSettings.Division,
-                sessionStart: DateTime.Now,
                 retryTime: senderSettings.RetryTime);
 
             var trainLeg = new TrainLeg

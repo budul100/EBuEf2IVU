@@ -177,7 +177,7 @@ namespace EBuEf2IVUPath
                 isHttps: senderSettings.IsHttps,
                 retryTime: senderSettings.RetryTime,
                 sessionKey: ebuefSession?.SessionKey,
-                sessionDate: ivuSessionDate,
+                sessionDate: sessionDate,
                 infrastructureManager: senderSettings.InfrastructureManager,
                 orderingTransportationCompany: senderSettings.OrderingTransportationCompany,
                 stoppingReasonStop: senderSettings.StoppingReasonStop,

@@ -39,11 +39,13 @@ namespace RealtimeSenderIS
 
         #region Public Methods
 
-        public void Add(IEnumerable<VehicleAllocation> trainAllocations)
+        public void Add(IEnumerable<VehicleAllocation> trainAllocations, DateTime sessionStart)
         {
             foreach (var allocation in trainAllocations)
             {
-                var message = converter.Get(allocation);
+                var message = converter.Get(
+                    allocation: allocation,
+                    sessionStart: sessionStart);
 
                 if (message != default)
                 {
@@ -76,7 +78,7 @@ namespace RealtimeSenderIS
             return result;
         }
 
-        public void Initialize(string endpoint, string division, DateTime sessionStart, int retryTime)
+        public void Initialize(string endpoint, string division, int retryTime)
         {
             if (string.IsNullOrWhiteSpace(endpoint))
             {
@@ -94,8 +96,7 @@ namespace RealtimeSenderIS
 
             converter = new Message2RealtimeInfo(
                 logger: logger,
-                division: division,
-                sessionStart: sessionStart);
+                division: division);
 
             client = new RealTimeInformationImportFacadeClient();
             client.Endpoint.Address = new EndpointAddress(endpoint);

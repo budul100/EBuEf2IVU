@@ -39,11 +39,13 @@ namespace RealtimeSender
 
         #region Public Methods
 
-        public void Add(IEnumerable<VehicleAllocation> trainAllocations)
+        public void Add(IEnumerable<VehicleAllocation> trainAllocations, DateTime sessionStart)
         {
             foreach (var allocation in trainAllocations)
             {
-                var message = converter.Get(allocation);
+                var message = converter.Get(
+                    allocation: allocation,
+                    sessionStart: sessionStart);
 
                 if (message != default)
                 {
@@ -77,7 +79,7 @@ namespace RealtimeSender
         }
 
         public void Initialize(string host, int port, string path, string username, string password,
-            bool isHttps, string division, DateTime sessionStart, int retryTime)
+            bool isHttps, string division, int retryTime)
         {
             if (string.IsNullOrWhiteSpace(host))
             {
@@ -116,8 +118,7 @@ namespace RealtimeSender
 
             converter = new Message2RealtimeInfo(
                 logger: logger,
-                division: division,
-                sessionStart: sessionStart);
+                division: division);
 
             channelFactory = new Factory<RealTimeInformationImportFacadeChannel>(
                 host: host,

@@ -118,7 +118,7 @@ namespace EBuEf2IVUCrew
                     .Select(t => t.Zugnummer.ToString()).ToArray();
                 var crewingElements = await crewChecker.GetCrewingElementsAsync(
                     tripNumbers: tripNumbers,
-                    date: ivuSessionDate,
+                    date: sessionDate,
                     cancellationToken: sessionCancellationToken);
 
                 logger.LogDebug(

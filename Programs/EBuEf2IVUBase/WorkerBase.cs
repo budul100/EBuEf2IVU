@@ -26,8 +26,8 @@ namespace EBuEf2IVUBase
         protected readonly IStateHandler sessionStateHandler;
 
         protected EBuEfSession ebuefSession;
-        protected DateTime ebuefSessionStart = DateTime.Now;
-        protected DateTime ivuSessionDate = DateTime.Now;
+        protected DateTime sessionDate = DateTime.Today;
+        protected DateTime sessionStart = DateTime.Now;
 
         #endregion Protected Fields
 
@@ -109,14 +109,14 @@ namespace EBuEf2IVUBase
 
             if (ebuefSession != default)
             {
-                ivuSessionDate = ebuefSession.IVUDatum;
-                ebuefSessionStart = ivuSessionDate
+                sessionDate = ebuefSession.IVUDatum;
+                sessionStart = sessionDate
                     .Add(ebuefSession.SessionStart.TimeOfDay);
 
                 logger.LogDebug(
                     "Die IVU-Sitzung läuft am {sessionDate} um {sessionTime}.",
-                    ivuSessionDate.ToString("yyyy-MM-dd"),
-                    ebuefSessionStart.ToString("HH:mm"));
+                    sessionDate.ToString("yyyy-MM-dd"),
+                    sessionStart.ToString("HH:mm"));
             }
         }
 

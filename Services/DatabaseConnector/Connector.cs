@@ -218,13 +218,7 @@ namespace DatabaseConnector
             if (aufstellungen.Any())
             {
                 var aufstellungenGroups = aufstellungen
-                    .GroupBy(a => new
-                    {
-                        a.Feld.Betriebsstelle,
-                        a.Feld.Gleis,
-                        a.Decoder,
-                        a.Zugnummer
-                    }).ToArray();
+                    .GroupBy(a => (a.Feld.Betriebsstelle, a.Feld.Gleis, a.Decoder, a.Zugnummer)).ToArray();
 
                 logger.LogDebug(
                     "Es wurden {numberTrains} Züge in der Grundaufstellungen gefunden.",
@@ -232,21 +226,20 @@ namespace DatabaseConnector
 
                 foreach (var aufstellungenGroup in aufstellungenGroups)
                 {
-                    var relevantAufstellung = aufstellungenGroup.First();
-
-                    var fahrzeuge = relevantAufstellung.Decoder.ToString().AsEnumerable();
+                    var relevant = aufstellungenGroup.First();
+                    var fahrzeuge = relevant.Decoder.ToString().AsEnumerable();
 
                     var result = new VehicleAllocation
                     {
-                        Betriebsstelle = relevantAufstellung.Feld?.Betriebsstelle,
+                        Betriebsstelle = relevant.Feld?.Betriebsstelle,
                         Fahrzeuge = fahrzeuge,
-                        Gleis = relevantAufstellung.Feld?.Gleis.ToString(),
-                        Zugnummer = relevantAufstellung.Zugnummer?.ToString(),
+                        Gleis = relevant.Feld?.Gleis.ToString(),
+                        Zugnummer = relevant.Zugnummer?.ToString(),
                     };
 
                     logger.LogDebug(
                         "Zug in Grundaufstellung: {train}",
-                        relevantAufstellung);
+                        relevant);
 
                     yield return result;
                 }
