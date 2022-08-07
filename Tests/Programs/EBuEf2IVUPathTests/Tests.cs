@@ -26,7 +26,7 @@ namespace EBuEf2IVUPathTests
             var cancellationTokenSource = new CancellationTokenSource();
 
             var databaseConnectorMock = GetDatabaseConnectorMock(
-                getEbuefSession: () => wasCalled = true);
+                sessionCallback: () => wasCalled = true);
             var stateHandlerMock = GetStateHandlerMock();
 
             var settingsPath = Path.GetFullPath(@"..\..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
@@ -66,8 +66,8 @@ namespace EBuEf2IVUPathTests
             services.AddSingleton(databaseConnectorMock.Object);
             services.AddSingleton(stateHandlerMock.Object);
 
-            services.AddSingleton((new Mock<IMessageReceiver>()).Object);
-            services.AddSingleton((new Mock<ITrainPathSender>()).Object);
+            services.AddSingleton(new Mock<IMessageReceiver>().Object);
+            services.AddSingleton(new Mock<ITrainPathSender>().Object);
         }
 
         #endregion Private Methods

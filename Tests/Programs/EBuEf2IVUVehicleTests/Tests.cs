@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Threading;
 
@@ -17,6 +18,12 @@ namespace EBuEf2IVUVehicleTests
     public class Tests
         : TestsBase
     {
+        #region Private Fields
+
+        private const string SettingsPath = @"..\..\..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml";
+
+        #endregion Private Fields
+
         #region Public Methods
 
         [Test]
@@ -24,20 +31,21 @@ namespace EBuEf2IVUVehicleTests
         {
             var wasCalled = false;
 
-            var cancellationTokenSource = new CancellationTokenSource();
-
             var databaseConnectorMock = GetDatabaseConnectorMock(
-                getEbuefSession: () => wasCalled = true);
+                sessionCallback: () => wasCalled = true);
             var stateHandlerMock = GetStateHandlerMock();
+            var messageReceiverMock = new Mock<IMessageReceiver>();
 
-            var settingsPath = Path.GetFullPath(@"..\..\..\..\..\..\Programs\EBuEf2IVUVehicle\ebuef2ivuvehicle-settings.example.xml");
+            var settingsPath = Path.GetFullPath(SettingsPath);
 
             var host = Host
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock))
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, messageReceiverMock))
                 .Build();
+
+            var cancellationTokenSource = new CancellationTokenSource();
 
             host.StartAsync(cancellationTokenSource.Token);
             Assert.False(wasCalled);
@@ -54,12 +62,42 @@ namespace EBuEf2IVUVehicleTests
             Assert.True(wasCalled);
         }
 
+        [Test]
+        public void SendMessageForDifferentDate()
+        {
+            var testDate = DateTime.Today.AddDays(-1);
+
+            var databaseConnectorMock = GetDatabaseConnectorMock(
+                ivuDatum: testDate);
+            var stateHandlerMock = GetStateHandlerMock();
+            var messageReceiverMock = new Mock<IMessageReceiver>();
+
+            var settingsPath = Path.GetFullPath(SettingsPath);
+
+            var host = Host
+                .CreateDefaultBuilder()
+                .GetHostBuilder()
+                .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, messageReceiverMock))
+                .Build();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            host.StartAsync(cancellationTokenSource.Token);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
+
+            const string messageContent = "{\"zugnummer\":\"14\",\"decoder\":null,\"simulationszeit\":\"1970-01-01 01:00:00\",\"betriebsstelle\":\"BGS\",\"signaltyp\":\"ESig\",\"start_gleis\":\"1\",\"ziel_gleis\":\"2\",\"modus\":\"istzeit\"}";
+            messageReceiverMock.Raise(m => m.MessageReceivedEvent += null, new MessageReceivedArgs(messageContent));
+
+            Thread.Sleep(6000);
+        }
+
         #endregion Public Methods
 
         #region Private Methods
 
         private static void ConfigureServices(IServiceCollection services, Mock<IDatabaseConnector> databaseConnectorMock,
-            Mock<IStateHandler> stateHandlerMock)
+            Mock<IStateHandler> stateHandlerMock, Mock<IMessageReceiver> messageReceiverMock)
         {
             services.AddHostedService<EBuEf2IVUVehicle.Worker>();
 
@@ -67,11 +105,11 @@ namespace EBuEf2IVUVehicleTests
             services.AddSingleton(databaseConnectorMock.Object);
             services.AddSingleton(stateHandlerMock.Object);
 
-            services.AddSingleton((new Mock<IMessageReceiver>()).Object);
-            services.AddSingleton((new Mock<IMessage2LegConverter>()).Object);
+            services.AddSingleton(messageReceiverMock.Object);
+            services.AddSingleton<IMessage2LegConverter, Message2LegConverter.Converter>();
 
-            services.AddSingleton((new Mock<IRealtimeSender>()).Object);
-            services.AddSingleton((new Mock<IRealtimeSenderIS>()).Object);
+            services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();
+            services.AddSingleton<IRealtimeSenderIS, RealtimeSenderIS.Sender>();
         }
 
         #endregion Private Methods

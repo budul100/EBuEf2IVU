@@ -38,6 +38,7 @@ namespace EBuEf2IVUVehicle
 
             services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
             services.AddSingleton<IMessage2LegConverter, Message2LegConverter.Converter>();
+
             services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();
             services.AddSingleton<IRealtimeSenderIS, RealtimeSenderIS.Sender>();
         }

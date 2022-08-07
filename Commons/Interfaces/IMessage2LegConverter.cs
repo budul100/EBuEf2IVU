@@ -9,7 +9,7 @@ namespace Message2LegConverter
 
         TrainLeg Convert(RealTimeMessage message);
 
-        void Initialize(DateTime ivuSessionDate);
+        void Initialize(DateTime sessionDate);
 
         #endregion Public Methods
     }

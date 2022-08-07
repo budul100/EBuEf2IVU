@@ -25,6 +25,7 @@ namespace RealtimeSenderIS
         private RealTimeInformationImportFacadeClient client;
         private Message2RealtimeInfo converter;
         private AsyncRetryPolicy retryPolicy;
+        private Task workerTask;
 
         #endregion Private Fields
 
@@ -71,11 +72,14 @@ namespace RealtimeSenderIS
         {
             cancellationToken.Register(() => messagesQueue.Clear());
 
-            var result = retryPolicy?.ExecuteAsync(
-                action: (token) => RunSenderAsync(token),
-                cancellationToken: cancellationToken);
+            if (workerTask == default)
+            {
+                workerTask = retryPolicy?.ExecuteAsync(
+                    action: (token) => RunSenderAsync(token),
+                    cancellationToken: cancellationToken);
+            }
 
-            return result;
+            return workerTask;
         }
 
         public void Initialize(string endpoint, string division, int retryTime)

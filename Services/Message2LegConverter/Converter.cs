@@ -21,7 +21,7 @@ namespace Message2LegConverter
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
         private readonly ILogger logger;
 
-        private DateTime ivuSessionDate;
+        private DateTime sessionDate;
 
         #endregion Private Fields
 
@@ -73,9 +73,9 @@ namespace Message2LegConverter
             return result;
         }
 
-        public void Initialize(DateTime ivuSessionDate)
+        public void Initialize(DateTime sessionDate)
         {
-            this.ivuSessionDate = ivuSessionDate.Date;
+            this.sessionDate = sessionDate.Date;
         }
 
         #endregion Public Methods
@@ -100,30 +100,32 @@ namespace Message2LegConverter
                 ? message.SimulationsZeit.Value.Add(ebuefZeitNach).TimeOfDay
                 : default;
 
-            var ivuZeit = mapping != default
+            var ivuShift = mapping != default
                 ? TimeSpan.FromSeconds(mapping.IVUVerschiebungSekunden.ToInt())
                 : default;
 
-            var ivuZeitpunkt = mapping != default
-                ? message.SimulationsZeit.Value.Add(ivuZeit).TimeOfDay
+            var ivuZeit = mapping != default
+                ? message.SimulationsZeit.Value.Add(ivuShift).TimeOfDay
                 : message.SimulationsZeit.Value.TimeOfDay;
+
+            var ivuZeitpunkt = sessionDate.Add(ivuZeit);
 
             var fahrzeuge = message.Decoder.AsEnumerable();
 
             var result = new TrainLeg
             {
-                EBuEfBetriebsstelleNach = mapping.EBuEfNachBetriebsstelle,
-                EBuEfBetriebsstelleVon = mapping.EBuEfVonBetriebsstelle,
+                EBuEfBetriebsstelleNach = mapping?.EBuEfNachBetriebsstelle,
+                EBuEfBetriebsstelleVon = mapping?.EBuEfVonBetriebsstelle,
                 EBuEfGleisNach = message.EndGleis,
                 EBuEfGleisVon = message.StartGleis,
                 EBuEfZeitpunktNach = ebuefZeitpunktNach,
                 EBuEfZeitpunktVon = ebuefZeitpunktVon,
                 Fahrzeuge = fahrzeuge,
                 IstPrognose = message.Modus == MessageType.Prognose,
-                IVUGleis = mapping.IVUGleis,
-                IVULegTyp = mapping.IVUTrainPositionType,
-                IVUNetzpunkt = mapping.IVUNetzpunkt,
-                IVUZeitpunkt = ivuSessionDate.Add(ivuZeitpunkt),
+                IVUGleis = mapping?.IVUGleis ?? message.ZielGleis,
+                IVULegTyp = mapping?.IVUTrainPositionType ?? LegType.Abfahrt,
+                IVUNetzpunkt = mapping?.IVUNetzpunkt ?? message.Betriebsstelle,
+                IVUZeitpunkt = ivuZeitpunkt,
                 Zugnummer = message.Zugnummer,
             };
 

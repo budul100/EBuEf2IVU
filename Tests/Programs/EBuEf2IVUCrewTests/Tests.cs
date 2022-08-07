@@ -27,8 +27,6 @@ namespace EBuEf2IVUCrewTests
         {
             var wasCalled = false;
 
-            var cancellationTokenSource = new CancellationTokenSource();
-
             var databaseConnectorMock = GetDatabaseConnectorMock();
             var stateHandlerMock = GetStateHandlerMock(
                 sessionStatusType: StateType.IsRunning);
@@ -44,6 +42,7 @@ namespace EBuEf2IVUCrewTests
                 .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, crewCheckerMock))
                 .Build();
 
+            var cancellationTokenSource = new CancellationTokenSource();
             host.StartAsync(cancellationTokenSource.Token);
             Assert.True(wasCalled);
         }
@@ -56,7 +55,7 @@ namespace EBuEf2IVUCrewTests
             var cancellationTokenSource = new CancellationTokenSource();
 
             var databaseConnectorMock = GetDatabaseConnectorMock(
-                getEbuefSession: () => wasCalled = true);
+                sessionCallback: () => wasCalled = true);
             var stateHandlerMock = GetStateHandlerMock();
             var crewCheckerMock = GetCrewCheckerMock();
 

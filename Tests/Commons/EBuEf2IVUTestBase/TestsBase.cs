@@ -12,11 +12,12 @@ namespace EBuEf2IVUTestBase
     {
         #region Protected Methods
 
-        protected static Mock<IDatabaseConnector> GetDatabaseConnectorMock(Action getEbuefSession = default)
+        protected static Mock<IDatabaseConnector> GetDatabaseConnectorMock(Action sessionCallback = default,
+            DateTime? ivuDatum = default)
         {
             var session = new EBuEfSession
             {
-                IVUDatum = DateTime.Today,
+                IVUDatum = ivuDatum ?? DateTime.Today,
                 SessionStart = DateTime.Now,
                 Status = StateType.IsRunning,
             };
@@ -31,7 +32,7 @@ namespace EBuEf2IVUTestBase
 
             result
                 .Setup(m => m.GetEBuEfSessionAsync())
-                .Callback(() => getEbuefSession?.Invoke())
+                .Callback(() => sessionCallback?.Invoke())
                 .Returns(Task.FromResult(session));
 
             result

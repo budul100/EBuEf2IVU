@@ -124,8 +124,8 @@ namespace EBuEf2IVUVehicle
             else if (stateType == StateType.IsRunning
                 && !isSessionInitialized)
             {
-                InitializeMessageConverter();
                 await InitializeSessionAsync();
+                InitializeMessageConverter();
 
                 isSessionInitialized = true;
 
@@ -140,7 +140,7 @@ namespace EBuEf2IVUVehicle
         private void InitializeMessageConverter()
         {
             messageConverter.Initialize(
-                ivuSessionDate: sessionDate);
+                sessionDate: sessionDate);
         }
 
         private void InitializePositionReceiver()
