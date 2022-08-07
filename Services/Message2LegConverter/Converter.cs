@@ -64,16 +64,13 @@ namespace Message2LegConverter
                         mapping.IVUTrainPositionType,
                         message);
                 }
+            }
 
-                return GetTrainLeg(
-                    message: message,
-                    mapping: mapping);
-            }
-            else
-            {
-                return GetTrainLeg(
-                    message: message);
-            }
+            var result = GetTrainLeg(
+                message: message,
+                mapping: mapping);
+
+            return result;
         }
 
         public void Initialize(DateTime ivuSessionDate)
@@ -85,37 +82,33 @@ namespace Message2LegConverter
 
         #region Private Methods
 
-        private TrainLeg GetTrainLeg(RealTimeMessage message)
-        {
-            var ivuZeitpunkt = message.SimulationsZeit.Value.TimeOfDay;
-            var fahrzeuge = message?.Decoder.AsEnumerable();
-
-            var result = new TrainLeg
-            {
-                Fahrzeuge = fahrzeuge,
-                IstPrognose = message.Modus == MessageType.Prognose,
-                IVUGleis = message.ZielGleis,
-                IVULegTyp = LegType.Ankunft,
-                IVUNetzpunkt = message.Betriebsstelle,
-                IVUZeitpunkt = ivuSessionDate.Add(ivuZeitpunkt),
-                Zugnummer = message.Zugnummer,
-            };
-
-            return result;
-        }
-
         private TrainLeg GetTrainLeg(RealTimeMessage message, InfrastructureMapping mapping)
         {
-            var ebuefZeitVon = TimeSpan.FromSeconds(mapping.EBuEfVonVerschiebungSekunden.ToInt());
-            var ebuefZeitpunktVon = message.SimulationsZeit.Value.Add(ebuefZeitVon).TimeOfDay;
+            var ebuefZeitVon = mapping != default
+                ? TimeSpan.FromSeconds(mapping.EBuEfVonVerschiebungSekunden.ToInt())
+                : default;
 
-            var ebuefZeitNach = TimeSpan.FromSeconds(mapping.EBuEfNachVerschiebungSekunden.ToInt());
-            var ebuefZeitpunktNach = message.SimulationsZeit.Value.Add(ebuefZeitNach).TimeOfDay;
+            var ebuefZeitpunktVon = mapping != default
+                ? message.SimulationsZeit.Value.Add(ebuefZeitVon).TimeOfDay
+                : default;
 
-            var ivuZeit = TimeSpan.FromSeconds(mapping.IVUVerschiebungSekunden.ToInt());
-            var ivuZeitpunkt = message.SimulationsZeit.Value.Add(ivuZeit).TimeOfDay;
+            var ebuefZeitNach = mapping != default
+                ? TimeSpan.FromSeconds(mapping.EBuEfNachVerschiebungSekunden.ToInt())
+                : default;
 
-            var fahrzeuge = message?.Decoder.AsEnumerable();
+            var ebuefZeitpunktNach = mapping != default
+                ? message.SimulationsZeit.Value.Add(ebuefZeitNach).TimeOfDay
+                : default;
+
+            var ivuZeit = mapping != default
+                ? TimeSpan.FromSeconds(mapping.IVUVerschiebungSekunden.ToInt())
+                : default;
+
+            var ivuZeitpunkt = mapping != default
+                ? message.SimulationsZeit.Value.Add(ivuZeit).TimeOfDay
+                : message.SimulationsZeit.Value.TimeOfDay;
+
+            var fahrzeuge = message.Decoder.AsEnumerable();
 
             var result = new TrainLeg
             {
