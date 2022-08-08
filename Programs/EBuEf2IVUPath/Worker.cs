@@ -58,9 +58,9 @@ namespace EBuEf2IVUPath
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
-
                 _ = HandleSessionStateAsync(sessionStateHandler.StateType);
+
+                var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
@@ -69,9 +69,16 @@ namespace EBuEf2IVUPath
                         if (isSessionInitialized
                             && sessionStateHandler.StateType != StateType.IsPaused)
                         {
+                            var receiverTask = trainPathReceiver.ExecuteAsync(sessionCancellationToken);
+
+                            var senderTask = trainPathSender.ExecuteAsync(
+                                ivuDatum: ebuefSession.IVUDatum,
+                                sessionKey: ebuefSession.SessionKey,
+                                cancellationToken: sessionCancellationToken);
+
                             await Task.WhenAny(
-                                trainPathReceiver.ExecuteAsync(sessionCancellationToken),
-                                trainPathSender.ExecuteAsync(sessionCancellationToken));
+                                receiverTask,
+                                senderTask);
                         }
                         else
                         {
@@ -114,15 +121,6 @@ namespace EBuEf2IVUPath
                     initalPathsSent = true;
                 }
             }
-        }
-
-        protected override async Task InitializeSessionAsync()
-        {
-            await base.InitializeSessionAsync();
-
-            messageConverter.Initialize(
-                ivuDatum: ebuefSession?.IVUDatum,
-                sessionKey: ebuefSession?.SessionKey);
         }
 
         #endregion Protected Methods
@@ -254,8 +252,6 @@ namespace EBuEf2IVUPath
                 var trainRuns = await databaseConnector.GetTrainRunsPlanAsync(
                     timetableId: ebuefSession.FahrplanId,
                     weekday: ebuefSession.Wochentag,
-                    ivuDatum: ebuefSession.IVUDatum,
-                    sessionKey: ebuefSession.SessionKey,
                     preferPrognosis: senderSettings.PreferPrognosis);
 
                 if (trainRuns.AnyItem())

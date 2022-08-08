@@ -34,7 +34,7 @@ namespace Common.Extensions
 
         public static DateTime GetSimTime(this EBuEfSession ebuefSession)
         {
-            var sessionShift = -ebuefSession.Verschiebung;
+            var sessionShift = ebuefSession.Verschiebung;
 
             var result = sessionShift == default
                 ? DateTime.Now

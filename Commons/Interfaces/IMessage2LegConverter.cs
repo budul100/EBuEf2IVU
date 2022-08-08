@@ -1,5 +1,4 @@
 ﻿using Common.Models;
-using System;
 
 namespace Common.Interfaces
 {
@@ -8,8 +7,6 @@ namespace Common.Interfaces
         #region Public Methods
 
         TrainLeg Convert(RealTimeMessage message);
-
-        void Initialize(DateTime? ivuDatum);
 
         #endregion Public Methods
     }

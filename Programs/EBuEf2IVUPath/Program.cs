@@ -61,8 +61,8 @@ namespace EBuEf2IVUPath
             var result = Host
                 .CreateDefaultBuilder(args)
                 .GetHostBuilder()
-                .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices((_, services) => ConfigureServices(services))
+                .ConfigureAppConfiguration(config => config.ConfigureAppConfiguration(settingsPath))
+                .ConfigureServices(services => ConfigureServices(services))
                 .UseSerilog((hostingContext, loggerConfiguration) => hostingContext.GetSerilogConfiguration(loggerConfiguration));
 
             return result;

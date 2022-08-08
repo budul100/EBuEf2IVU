@@ -112,8 +112,7 @@ namespace EBuEf2IVUBase
             if (ebuefSession != default)
             {
                 ivuDatum = ebuefSession.IVUDatum;
-                sessionStart = ivuDatum
-                    .Add(ebuefSession.SessionStart.TimeOfDay);
+                sessionStart = ivuDatum.Add(ebuefSession.SessionStart);
 
                 logger.LogDebug(
                     "Die IVU-Sitzung läuft am {sessionDate} um {sessionTime}.",

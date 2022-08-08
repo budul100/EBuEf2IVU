@@ -12,6 +12,7 @@ using TrainPathSender;
 namespace TrainPathSenderTests
 {
     // Database must be activated for tests!
+
     public class Tests
     {
         #region Private Fields
@@ -98,13 +99,16 @@ namespace TrainPathSenderTests
             var trainRuns = databaseConnector.GetTrainRunsPlanAsync(
                 timetableId: query.Result.FahrplanId,
                 weekday: query.Result.Wochentag,
-                ivuDatum: query.Result.IVUDatum,
-                sessionKey: query.Result.SessionKey,
                 preferPrognosis: false).Result;
 
             sender.Add(trainRuns);
 
-            sender.ExecuteAsync(new CancellationToken());
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            sender.ExecuteAsync(
+                ivuDatum: query.Result.IVUDatum,
+                sessionKey: query.Result.SessionKey,
+                cancellationToken: cancellationTokenSource.Token);
         }
 
         #endregion Public Methods

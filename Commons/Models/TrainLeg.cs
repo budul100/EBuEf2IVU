@@ -30,7 +30,7 @@ namespace Common.Models
 
         public string IVUNetzpunkt { get; set; }
 
-        public DateTime IVUZeitpunkt { get; set; }
+        public TimeSpan IVUZeit { get; set; }
 
         public string Zugnummer { get; set; }
 
@@ -43,18 +43,18 @@ namespace Common.Models
             if (string.IsNullOrWhiteSpace(EBuEfBetriebsstelleVon))
             {
                 return $@"Zug: {Zugnummer} | EBuEf nach: {EBuEfBetriebsstelleNach}/{EBuEfGleisNach} um {EBuEfZeitpunktNach:hh\:mm} | " +
-                    $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeitpunkt:HH\:mm} ({IVULegTyp})";
+                    $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeit:hh\:mm} ({IVULegTyp})";
             }
 
             if (string.IsNullOrWhiteSpace(EBuEfBetriebsstelleNach))
             {
                 return $@"Zug: {Zugnummer} | EBuEf von: {EBuEfBetriebsstelleVon}/{EBuEfGleisVon} um {EBuEfZeitpunktVon:hh\:mm} | " +
-                    $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeitpunkt:HH\:mm} ({IVULegTyp})";
+                    $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeit:hh\:mm} ({IVULegTyp})";
             }
 
             return $@"Zug: {Zugnummer} | EBuEf von: {EBuEfBetriebsstelleVon}/{EBuEfGleisVon} um {EBuEfZeitpunktVon:hh\:mm} | " +
                 $@"EBuEf nach: {EBuEfBetriebsstelleNach}/{EBuEfGleisNach} um {EBuEfZeitpunktNach:hh\:mm} | " +
-                $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeitpunkt:HH\:mm} ({IVULegTyp})";
+                $@"IVU: {IVUNetzpunkt}/{IVUGleis} um {IVUZeit:hh\:mm} ({IVULegTyp})";
         }
 
         #endregion Public Methods

@@ -18,7 +18,7 @@ namespace EBuEf2IVUTestBase
             var session = new EBuEfSession
             {
                 IVUDatum = ivuDatum ?? DateTime.Today,
-                SessionStart = DateTime.Now,
+                SessionStart = DateTime.Now.TimeOfDay,
                 Status = StateType.IsRunning,
             };
 
@@ -38,9 +38,7 @@ namespace EBuEf2IVUTestBase
             result
                 .Setup(m => m.GetTrainRunsDispoAsync(
                     It.IsAny<TimeSpan>(),
-                    It.IsAny<TimeSpan>(),
-                    It.IsAny<DateTime>(),
-                    It.IsAny<string>()))
+                    It.IsAny<TimeSpan>()))
                 .Returns(Task.FromResult((IEnumerable<TrainRun>)trainRunsMock));
 
             return result;

@@ -49,9 +49,16 @@ namespace MessageReceiver
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            return receiverTask ??= retryPolicy.ExecuteAsync(
-                action: (t) => RunReceiverAsync(t),
-                cancellationToken: cancellationToken);
+            if (receiverTask == default)
+            {
+                cancellationToken.Register(() => StopTask());
+
+                receiverTask = retryPolicy.ExecuteAsync(
+                    action: (t) => RunReceiverAsync(t),
+                    cancellationToken: cancellationToken);
+            }
+
+            return receiverTask;
         }
 
         public void Initialize(string host, int port, int retryTime, string messageType)
@@ -154,6 +161,11 @@ namespace MessageReceiver
                         e: new MessageReceivedArgs(content));
                 }
             }
+        }
+
+        private void StopTask()
+        {
+            receiverTask = default;
         }
 
         #endregion Private Methods

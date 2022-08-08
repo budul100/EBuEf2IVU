@@ -22,8 +22,6 @@ namespace Message2LegConverter
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
         private readonly ILogger logger;
 
-        private DateTime ivuDatum;
-
         #endregion Private Fields
 
         #region Public Constructors
@@ -74,11 +72,6 @@ namespace Message2LegConverter
             return result;
         }
 
-        public void Initialize(DateTime? ivuDatum)
-        {
-            this.ivuDatum = ivuDatum?.Date ?? DateTime.Today;
-        }
-
         #endregion Public Methods
 
         #region Private Methods
@@ -109,8 +102,6 @@ namespace Message2LegConverter
                 ? message.SimulationsZeit.Value.Add(ivuShift).TimeOfDay
                 : message.SimulationsZeit.Value.TimeOfDay;
 
-            var ivuZeitpunkt = ivuDatum.Add(ivuZeit);
-
             var fahrzeuge = message.Decoder.AsEnumerable();
 
             var result = new TrainLeg
@@ -126,7 +117,7 @@ namespace Message2LegConverter
                 IVUGleis = mapping?.IVUGleis ?? message.ZielGleis,
                 IVULegTyp = mapping?.IVUTrainPositionType ?? LegType.Abfahrt,
                 IVUNetzpunkt = mapping?.IVUNetzpunkt ?? message.Betriebsstelle,
-                IVUZeitpunkt = ivuZeitpunkt,
+                IVUZeit = ivuZeit,
                 Zugnummer = message.Zugnummer,
             };
 

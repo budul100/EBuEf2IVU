@@ -61,9 +61,11 @@ namespace EBuEf2IVUVehicle
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
+                _ = HandleSessionStateAsync(sessionStateHandler.StateType);
+
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                _ = HandleSessionStateAsync(sessionStateHandler.StateType);
+                var receiverTask = positionsReceiver.ExecuteAsync(sessionCancellationToken);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
@@ -72,18 +74,19 @@ namespace EBuEf2IVUVehicle
                         if (isSessionInitialized
                             && sessionStateHandler.StateType != StateType.IsPaused)
                         {
-                            if (useInterfaceServer)
-                            {
-                                await Task.WhenAny(
-                                    positionsReceiver.ExecuteAsync(sessionCancellationToken),
-                                    realtimeSenderIS.ExecuteAsync(sessionCancellationToken));
-                            }
-                            else
-                            {
-                                await Task.WhenAny(
-                                    positionsReceiver.ExecuteAsync(sessionCancellationToken),
-                                    realtimeSender.ExecuteAsync(sessionCancellationToken));
-                            }
+                            var senderTask = useInterfaceServer
+                                ? realtimeSenderIS.ExecuteAsync(
+                                    ivuDatum: ebuefSession.IVUDatum,
+                                    sessionStart: ebuefSession.SessionStart,
+                                    cancellationToken: sessionCancellationToken)
+                                : realtimeSender.ExecuteAsync(
+                                    ivuDatum: ebuefSession.IVUDatum,
+                                    sessionStart: ebuefSession.SessionStart,
+                                    cancellationToken: sessionCancellationToken);
+
+                            await Task.WhenAny(
+                                receiverTask,
+                                senderTask);
                         }
                         else
                         {
@@ -126,14 +129,6 @@ namespace EBuEf2IVUVehicle
                     initalAllocationsSent = true;
                 }
             }
-        }
-
-        protected override async Task InitializeSessionAsync()
-        {
-            await base.InitializeSessionAsync();
-
-            messageConverter.Initialize(
-                ivuDatum: ebuefSession.IVUDatum);
         }
 
         #endregion Protected Methods
@@ -257,15 +252,11 @@ namespace EBuEf2IVUVehicle
 
             if (useInterfaceServer)
             {
-                realtimeSenderIS.Add(
-                    trainAllocations: allocations,
-                    sessionStart: sessionStart);
+                realtimeSenderIS.Add(allocations);
             }
             else
             {
-                realtimeSender.Add(
-                    trainAllocations: allocations,
-                    sessionStart: sessionStart);
+                realtimeSender.Add(allocations);
             }
         }
 

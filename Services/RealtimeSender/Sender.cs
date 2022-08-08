@@ -40,13 +40,12 @@ namespace RealtimeSender
 
         #region Public Methods
 
-        public void Add(IEnumerable<VehicleAllocation> trainAllocations, DateTime sessionStart)
+        public void Add(IEnumerable<VehicleAllocation> trainAllocations)
         {
             foreach (var allocation in trainAllocations)
             {
                 var message = converter.Convert(
-                    allocation: allocation,
-                    sessionStart: sessionStart);
+                    allocation: allocation);
 
                 if (message != default)
                 {
@@ -59,7 +58,8 @@ namespace RealtimeSender
         {
             if (trainLeg != default)
             {
-                var message = converter.Convert(trainLeg);
+                var message = converter.Convert(
+                    leg: trainLeg);
 
                 if (message != default)
                 {
@@ -68,11 +68,15 @@ namespace RealtimeSender
             }
         }
 
-        public Task ExecuteAsync(CancellationToken cancellationToken)
+        public Task ExecuteAsync(DateTime ivuDatum, TimeSpan sessionStart, CancellationToken cancellationToken)
         {
             if (senderTask == default)
             {
-                cancellationToken.Register(() => messagesQueue.Clear());
+                converter.Initialize(
+                    ivuDatum: ivuDatum,
+                    sessionStart: sessionStart);
+
+                cancellationToken.Register(() => StopTask());
 
                 senderTask = retryPolicy?.ExecuteAsync(
                     action: (token) => RunSenderAsync(token),
@@ -200,6 +204,13 @@ namespace RealtimeSender
                     messagesQueue.TryDequeue(out _);
                 }
             }
+        }
+
+        private void StopTask()
+        {
+            senderTask = default;
+
+            messagesQueue.Clear();
         }
 
         #endregion Private Methods

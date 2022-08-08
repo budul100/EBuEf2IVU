@@ -67,7 +67,8 @@ namespace DatabaseConnector.Extensions
             return result;
         }
 
-        public static IEnumerable<TrainPosition> GetTrainPositions<T>(this IEnumerable<Halt<T>> halte, bool preferPrognosis)
+        public static IEnumerable<TrainPosition> GetTrainPositions<T>(this IEnumerable<Halt<T>> halte,
+            bool preferPrognosis)
             where T : Zug
         {
             if (halte.AnyItem())
@@ -90,8 +91,8 @@ namespace DatabaseConnector.Extensions
             }
         }
 
-        public static IEnumerable<TrainRun> GetTrainRuns<T>(this IEnumerable<Halt<T>> halte, DateTime ivuDatum,
-            string sessionKey, bool preferPrognosis)
+        public static IEnumerable<TrainRun> GetTrainRuns<T>(this IEnumerable<Halt<T>> halte,
+            bool preferPrognosis)
             where T : Zug
         {
             if (halte.AnyItem())
@@ -114,9 +115,7 @@ namespace DatabaseConnector.Extensions
                     {
                         Abfahrt = relevant.GetAbfahrt(),
                         Bemerkungen = relevant.Zug.Bemerkungen,
-                        IVUDatum = ivuDatum,
                         Positions = positions,
-                        SessionKey = sessionKey,
                         Zuggattung = relevant.Zug.Zuggattung.Kurzname,
                         ZugId = relevant.ZugID,
                         Zugnummer = relevant.Zug.Zugnummer,

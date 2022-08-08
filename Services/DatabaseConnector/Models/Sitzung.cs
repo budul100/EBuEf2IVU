@@ -20,6 +20,9 @@ namespace DatabaseConnector.Models
         [Column("name")]
         public string Name { get; set; }
 
+        [Column("real_startzeit")]
+        public int RealStartzeit { get; set; }
+
         [Column("sessionkey")]
         public string SessionKey { get; set; }
 

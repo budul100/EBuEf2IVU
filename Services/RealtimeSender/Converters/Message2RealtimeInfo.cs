@@ -17,6 +17,9 @@ namespace RealtimeSender.Converters
         private readonly string division;
         private readonly ILogger logger;
 
+        private DateTime ivuDatum;
+        private TimeSpan sessionStart;
+
         #endregion Private Fields
 
         #region Public Constructors
@@ -33,13 +36,15 @@ namespace RealtimeSender.Converters
 
         #region Public Methods
 
-        public RealTimeInfoTO Convert(VehicleAllocation allocation, DateTime sessionStart)
+        public RealTimeInfoTO Convert(VehicleAllocation allocation)
         {
+            var ivuTimestamp = ivuDatum.Add(sessionStart);
+
             var result = GetRealtimeInfo(
                 eventCode: RealtimeInfoConstants.EventCodeAllocation,
                 classifier: RealtimeInfoConstants.ClassifierActual,
                 tripNumber: allocation.Zugnummer,
-                timeStamp: sessionStart,
+                timeStamp: ivuTimestamp,
                 stopArea: allocation.Betriebsstelle,
                 track: allocation.Gleis,
                 vehicles: allocation.Fahrzeuge);
@@ -49,16 +54,24 @@ namespace RealtimeSender.Converters
 
         public RealTimeInfoTO Convert(TrainLeg leg)
         {
+            var ivuTimestamp = ivuDatum.Add(leg.IVUZeit);
+
             var result = GetRealtimeInfo(
                 eventCode: leg.GetEventcode(),
                 classifier: leg.GetClassifier(),
                 tripNumber: leg.Zugnummer,
-                timeStamp: leg.IVUZeitpunkt,
+                timeStamp: ivuTimestamp,
                 stopArea: leg.IVUNetzpunkt,
                 track: leg.IVUGleis,
                 vehicles: leg.Fahrzeuge);
 
             return result;
+        }
+
+        public void Initialize(DateTime ivuDatum, TimeSpan sessionStart)
+        {
+            this.ivuDatum = ivuDatum;
+            this.sessionStart = sessionStart;
         }
 
         #endregion Public Methods

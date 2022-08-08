@@ -63,7 +63,6 @@ namespace RealTimeSenderTests
             var trainLeg = new TrainLeg
             {
                 IVUNetzpunkt = "ABC",
-                IVUZeitpunkt = DateTime.Now,
                 IVUGleis = "9",
                 IVULegTyp = Common.Enums.LegType.Abfahrt,
                 Zugnummer = "123"
@@ -73,8 +72,10 @@ namespace RealTimeSenderTests
 
             var cancellationTokenSource = new CancellationTokenSource();
 
-            Task.WhenAny(
-                _ = sender.ExecuteAsync(cancellationTokenSource.Token));
+            _ = sender.ExecuteAsync(
+                ivuDatum: DateTime.Today,
+                sessionStart: DateTime.Now.TimeOfDay,
+                cancellationToken: cancellationTokenSource.Token);
 
             Thread.Sleep(6000);
 

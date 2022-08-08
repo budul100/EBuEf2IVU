@@ -17,9 +17,6 @@ namespace Message2TrainRunConverter
         private readonly Func<TrainPathMessage, DateTime?> abfahrtGetter;
         private readonly Func<TrainPathMessage, DateTime?> ankunftGetter;
 
-        private DateTime ivuDatum;
-        private string sessionKey;
-
         #endregion Private Fields
 
         #region Public Constructors
@@ -51,12 +48,6 @@ namespace Message2TrainRunConverter
                     }
                 }
             }
-        }
-
-        public void Initialize(DateTime? ivuDatum, string sessionKey)
-        {
-            this.ivuDatum = ivuDatum?.Date ?? DateTime.Today;
-            this.sessionKey = sessionKey;
         }
 
         #endregion Public Methods
@@ -100,9 +91,7 @@ namespace Message2TrainRunConverter
             var result = new TrainRun
             {
                 Abfahrt = positions[0].Abfahrt?.TimeOfDay,
-                IVUDatum = ivuDatum,
                 Positions = positions,
-                SessionKey = sessionKey,
                 Zuggattung = relevantMessage.Zuggattung,
                 ZugId = relevantMessage.ZugId,
                 Zugnummer = relevantMessage.Zugnummer,

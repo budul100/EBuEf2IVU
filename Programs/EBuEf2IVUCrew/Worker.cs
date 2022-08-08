@@ -50,9 +50,9 @@ namespace EBuEf2IVUCrew
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
-
                 _ = HandleSessionStateAsync(sessionStateHandler.StateType);
+
+                var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
@@ -123,9 +123,7 @@ namespace EBuEf2IVUCrew
 
             var trainRuns = await databaseConnector.GetTrainRunsDispoAsync(
                 minTime: minTime,
-                maxTime: maxTime,
-                ivuDatum: ebuefSession.IVUDatum,
-                sessionKey: ebuefSession.SessionKey);
+                maxTime: maxTime);
 
             logger.LogDebug(
                 "In der EBuEf-DB wurden {trainsCount} Züge für den Zeitraum zwischen {minTime} und {maxTime} gefunden.",

@@ -86,14 +86,11 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsDispoAsync(int trainId, DateTime ivuDatum, string sessionKey,
-            bool preferPrognosis = false)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsDispoAsync(int trainId, bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (queryCancellationToken) => QueryTrainRunsDispoAsync(
                     trainId: trainId,
-                    ivuDatum: ivuDatum,
-                    sessionKey: sessionKey,
                     preferPrognosis: preferPrognosis,
                     queryCancellationToken: queryCancellationToken),
                 cancellationToken: cancellationToken);
@@ -101,30 +98,24 @@ namespace DatabaseConnector
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsDispoAsync(TimeSpan minTime, TimeSpan maxTime, DateTime ivuDatum,
-            string sessionKey)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsDispoAsync(TimeSpan minTime, TimeSpan maxTime)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (queryCancellationToken) => QueryTrainRunsDispoAsync(
                     minTime: minTime,
                     maxTime: maxTime,
-                    ivuDatum: ivuDatum,
-                    sessionKey: sessionKey,
                     queryCancellationToken: queryCancellationToken),
                 cancellationToken: cancellationToken);
 
             return result;
         }
 
-        public Task<IEnumerable<TrainRun>> GetTrainRunsPlanAsync(int timetableId, DayOfWeek weekday, DateTime ivuDatum,
-            string sessionKey, bool preferPrognosis = false)
+        public Task<IEnumerable<TrainRun>> GetTrainRunsPlanAsync(int timetableId, DayOfWeek weekday, bool preferPrognosis = false)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: (queryCancellationToken) => QueryTrainRunsPlanAsync(
                     timetableId: timetableId,
                     weekday: weekday,
-                    ivuDatum: ivuDatum,
-                    sessionKey: sessionKey,
                     preferPrognosis: preferPrognosis,
                     queryCancellationToken: queryCancellationToken),
                 cancellationToken: cancellationToken);
@@ -314,15 +305,21 @@ namespace DatabaseConnector
                     var timeshift = new TimeSpan(
                         hours: 0,
                         minutes: 0,
-                        seconds: sitzung.Verschiebung * -1);
+                        seconds: sitzung.Verschiebung);
+
+                    var realStart = sitzung.RealStartzeit
+                        .ToDateTime().ToLocalTime().TimeOfDay;
+                    var sessionStart = sitzung.SimStartzeit
+                        .ToDateTime().ToLocalTime().TimeOfDay;
 
                     result = new EBuEfSession
                     {
                         FahrplanId = sitzung.FahrplanId,
                         IVUDatum = sitzung.IvuDatum ?? DateTime.Today,
                         Name = sitzung.Name,
+                        RealStart = realStart,
                         SessionKey = sitzung.SessionKey,
-                        SessionStart = sitzung.SimStartzeit.ToDateTime().ToLocalTime(),
+                        SessionStart = sessionStart,
                         Status = (StateType)sitzung.Status,
                         Verschiebung = timeshift,
                         Wochentag = sitzung.SimWochentag.GetWochentag(),
@@ -378,7 +375,7 @@ namespace DatabaseConnector
         }
 
         private async Task<IEnumerable<TrainRun>> QueryTrainRunsDispoAsync(TimeSpan minTime, TimeSpan maxTime,
-            DateTime ivuDatum, string sessionKey, CancellationToken queryCancellationToken)
+            CancellationToken queryCancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
 
@@ -397,16 +394,14 @@ namespace DatabaseConnector
                     .ToArrayAsync(queryCancellationToken);
 
                 result = halte.GetTrainRuns(
-                    ivuDatum: ivuDatum,
-                    sessionKey: sessionKey,
                     preferPrognosis: false).ToArray();
             }
 
             return result;
         }
 
-        private async Task<IEnumerable<TrainRun>> QueryTrainRunsDispoAsync(int trainId, DateTime ivuDatum,
-            string sessionKey, bool preferPrognosis, CancellationToken queryCancellationToken)
+        private async Task<IEnumerable<TrainRun>> QueryTrainRunsDispoAsync(int trainId, bool preferPrognosis,
+            CancellationToken queryCancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
 
@@ -424,8 +419,6 @@ namespace DatabaseConnector
                     .ToArrayAsync(queryCancellationToken);
 
                 result = halte.GetTrainRuns(
-                    ivuDatum: ivuDatum,
-                    sessionKey: sessionKey,
                     preferPrognosis: preferPrognosis).ToArray();
             }
 
@@ -433,7 +426,7 @@ namespace DatabaseConnector
         }
 
         private async Task<IEnumerable<TrainRun>> QueryTrainRunsPlanAsync(int timetableId, DayOfWeek weekday,
-            DateTime ivuDatum, string sessionKey, bool preferPrognosis, CancellationToken queryCancellationToken)
+            bool preferPrognosis, CancellationToken queryCancellationToken)
         {
             var result = Enumerable.Empty<TrainRun>();
 
@@ -458,8 +451,6 @@ namespace DatabaseConnector
                     .Where(h => h.Zug.Bitmask[weekdayId] == QueryExtensions.PositiveBit).ToArray();
 
                 result = currentHalte.GetTrainRuns(
-                    ivuDatum: ivuDatum,
-                    sessionKey: sessionKey,
                     preferPrognosis: preferPrognosis).ToArray();
             }
 

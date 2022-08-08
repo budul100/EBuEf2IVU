@@ -59,11 +59,15 @@ namespace TrainPathSender
             }
         }
 
-        public Task ExecuteAsync(CancellationToken cancellationToken)
+        public Task ExecuteAsync(DateTime ivuDatum, string sessionKey, CancellationToken cancellationToken)
         {
             if (senderTask == default)
             {
-                cancellationToken.Register(() => importsQueue.Clear());
+                converter.Initialize(
+                    ivuDatum: ivuDatum,
+                    sessionKey: sessionKey);
+
+                cancellationToken.Register(() => StopTask());
 
                 senderTask = retryPolicy?.ExecuteAsync(
                     action: (token) => RunSenderAsync(token),
@@ -158,6 +162,13 @@ namespace TrainPathSender
                     importsQueue.TryDequeue(out _);
                 }
             }
+        }
+
+        private void StopTask()
+        {
+            senderTask = default;
+
+            importsQueue.Clear();
         }
 
         #endregion Private Methods
