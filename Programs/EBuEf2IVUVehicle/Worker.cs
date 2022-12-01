@@ -218,7 +218,10 @@ namespace EBuEf2IVUVehicle
                             realtimeSender.Add(trainLeg);
                         }
 
-                        await databaseConnector.AddRealtimeAsync(trainLeg);
+                        if (!trainLeg.IstPrognose)
+                        {
+                            await databaseConnector.AddRealtimeAsync(trainLeg);
+                        }
                     }
                     else
                     {
