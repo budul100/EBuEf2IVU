@@ -26,6 +26,7 @@ namespace DatabaseConnector
         #region Private Fields
 
         private const int IdSunday = 6;
+        private const int SessionIdDefault = 0;
 
         private readonly ILogger logger;
 
@@ -293,9 +294,10 @@ namespace DatabaseConnector
                 using var context = new SitzungContext(connectionString);
 
                 var sitzung = await context.Sitzungen
-                    .Where(s => s.Status == Convert.ToByte(StateType.InPreparation)
+                    .Where(s => s.Id != SessionIdDefault
+                        && (s.Status == Convert.ToByte(StateType.InPreparation)
                         || s.Status == Convert.ToByte(StateType.IsRunning)
-                        || s.Status == Convert.ToByte(StateType.IsPaused))
+                        || s.Status == Convert.ToByte(StateType.IsPaused)))
                     .OrderByDescending(s => s.Status == Convert.ToByte(StateType.IsRunning))
                     .ThenByDescending(s => s.Status == Convert.ToByte(StateType.IsPaused))
                     .FirstOrDefaultAsync(queryCancellationToken);
@@ -530,51 +532,54 @@ namespace DatabaseConnector
 
         private async Task SaveTrainPositionAsync(TrainLeg leg, bool istVon, CancellationToken queryCancellationToken)
         {
-            var betriebsstelle = istVon
-                ? leg.EBuEfBetriebsstelleVon
-                : leg.EBuEfBetriebsstelleNach;
-
-            if (!string.IsNullOrWhiteSpace(betriebsstelle))
+            if (!leg.IstPrognose)
             {
-                logger.LogDebug(
-                    "Suche in der EBuEf-DB nach dem letzten Halt von Zug {train} in {location}.",
-                    leg.Zugnummer,
-                    betriebsstelle);
+                var betriebsstelle = istVon
+                    ? leg.EBuEfBetriebsstelleVon
+                    : leg.EBuEfBetriebsstelleNach;
 
-                using var context = new HaltDispoContext(connectionString);
-
-                var halt = context.Halte
-                    .Where(h => h.Betriebsstelle == betriebsstelle)
-                    .Include(h => h.Zug)
-                    .FirstOrDefault(h => h.Zug.Zugnummer.ToString() == leg.Zugnummer);
-
-                if (halt != null)
+                if (!string.IsNullOrWhiteSpace(betriebsstelle))
                 {
                     logger.LogDebug(
-                        "Schreibe {positionType}-Position in Session-Fahrplan.",
-                        istVon.GetName());
+                        "Suche in der EBuEf-DB nach dem letzten Halt von Zug {train} in {location}.",
+                        leg.Zugnummer,
+                        betriebsstelle);
 
-                    halt.GleisIst = leg.GetEBuEfGleis(istVon);
+                    using var context = new HaltDispoContext(connectionString);
 
-                    if (istVon)
+                    var halt = context.Halte
+                        .Where(h => h.Betriebsstelle == betriebsstelle)
+                        .Include(h => h.Zug)
+                        .FirstOrDefault(h => h.Zug.Zugnummer.ToString() == leg.Zugnummer);
+
+                    if (halt != null)
                     {
-                        halt.AbfahrtIst = leg.EBuEfZeitpunktVon;
+                        logger.LogDebug(
+                            "Schreibe {positionType}-Position in Session-Fahrplan.",
+                            istVon.GetName());
+
+                        halt.GleisIst = leg.GetEBuEfGleis(istVon);
+
+                        if (istVon)
+                        {
+                            halt.AbfahrtIst = leg.EBuEfZeitpunktVon;
+                        }
+                        else
+                        {
+                            halt.AnkunftIst = leg.EBuEfZeitpunktNach;
+                        }
+
+                        await context.SaveChangesAsync(queryCancellationToken);
+
+                        logger.LogDebug(
+                            "Das Update des Halts wurde gespeichert.");
                     }
                     else
                     {
-                        halt.AnkunftIst = leg.EBuEfZeitpunktNach;
+                        logger.LogDebug(
+                            "In Session-Fahrplan wurde {positionType}-Position nicht gefunden.",
+                            istVon.GetName());
                     }
-
-                    await context.SaveChangesAsync(queryCancellationToken);
-
-                    logger.LogDebug(
-                        "Das Update des Halts wurde gespeichert.");
-                }
-                else
-                {
-                    logger.LogDebug(
-                        "In Session-Fahrplan wurde {positionType}-Position nicht gefunden.",
-                        istVon.GetName());
                 }
             }
         }
