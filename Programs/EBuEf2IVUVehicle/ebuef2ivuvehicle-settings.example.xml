@@ -34,16 +34,16 @@
 		<Division>EBUEF</Division>
 		<Host>ivu.ebuef</Host>
 		<IgnorePrognosis>false</IgnorePrognosis>
+		<DateMin>2000-01-01</DateMin>
 		<RetryTime>30</RetryTime>
-		<Port>20000</Port>
+		<!--<Port>20000</Port>
 		<Path>intf.realtime.standardimport.impl/RealtimeImportWebFacadeBean</Path>
 		<IsHttps>false</IsHttps>
 		<Username>ivu</Username>
-		<Password>ivu$admin</Password>
-		<!--
-			<UseInterfaceServer>true</UseInterfaceServer>
-			<Endpoint>http://ivu.ebuef:8080</Endpoint>
-		-->
+		<Password>ivu$admin</Password>-->
+
+		<UseInterfaceServer>true</UseInterfaceServer>
+		<Endpoint>http://ivu.ebuef:8080</Endpoint>
 	</RealtimeSender>
 	<InfrastructureMappings>
 		<InfrastructureMapping name="XAB_A">

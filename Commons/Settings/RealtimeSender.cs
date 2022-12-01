@@ -1,8 +1,12 @@
-﻿namespace Common.Settings
+﻿using System;
+
+namespace Common.Settings
 {
     public class RealtimeSender
     {
         #region Public Properties
+
+        public DateTime? DateMin { get; set; }
 
         public string Division { get; set; }
 

@@ -19,6 +19,7 @@ namespace Message2LegConverter
     {
         #region Private Fields
 
+        private readonly DateTime? dateMin;
         private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
         private readonly ILogger logger;
 
@@ -31,6 +32,7 @@ namespace Message2LegConverter
             this.logger = logger;
 
             infrastructureMappings = config.GetInfrastructureMappings();
+            dateMin = config.GetDateMin();
         }
 
         #endregion Public Constructors
@@ -39,35 +41,46 @@ namespace Message2LegConverter
 
         public TrainLeg Convert(RealTimeMessage message)
         {
-            var mapping = default(InfrastructureMapping);
+            var result = default(TrainLeg);
 
             if (message.SimulationsZeit.HasValue)
             {
-                mapping = infrastructureMappings
-                    .Where(m => m?.MessageBetriebsstelle.IsMatch(message.Betriebsstelle) == true
-                        && m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
-                        && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
-                    .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
-                    .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis)).FirstOrDefault();
-            }
+                if (!dateMin.HasValue || message.SimulationsZeit.Value >= dateMin.Value)
+                {
+                    var mapping = infrastructureMappings
+                        .Where(m => m?.MessageBetriebsstelle.IsMatch(message.Betriebsstelle) == true
+                            && m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
+                            && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
+                        .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
+                        .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis)).FirstOrDefault();
 
-            if (mapping != default)
-            {
-                if ((message.SignalTyp == SignalType.ESig && mapping.IVUTrainPositionType != LegType.Ankunft)
-                    || (message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != LegType.Abfahrt)
-                    || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != LegType.Durchfahrt))
+                    if (mapping != default)
+                    {
+                        if ((message.SignalTyp == SignalType.ESig && mapping.IVUTrainPositionType != LegType.Ankunft)
+                            || (message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != LegType.Abfahrt)
+                            || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != LegType.Durchfahrt))
+                        {
+                            logger.LogWarning(
+                                "Der IVUTrainPositionType des Mappings {mappingType} entspricht nicht " +
+                                "dem SignalTyp der eingegangenen Nachricht: {message}",
+                                mapping.IVUTrainPositionType,
+                                message);
+                        }
+                    }
+
+                    result = GetTrainLeg(
+                        message: message,
+                        mapping: mapping);
+                }
+                else if (dateMin.HasValue)
                 {
                     logger.LogWarning(
-                        "Der IVUTrainPositionType des Mappings {mappingType} entspricht nicht " +
-                        "dem SignalTyp der eingegangenen Nachricht: {message}",
-                        mapping.IVUTrainPositionType,
+                        "Die Simulationszeit der eingegangenen Nachricht liegt vor dem frühesten " +
+                        "erlaubten Datum {dateMin}: {message]",
+                        dateMin.Value,
                         message);
                 }
             }
-
-            var result = GetTrainLeg(
-                message: message,
-                mapping: mapping);
 
             return result;
         }
