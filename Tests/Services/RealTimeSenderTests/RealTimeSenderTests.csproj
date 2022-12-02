@@ -23,4 +23,10 @@
 	  <ProjectReference Include="..\..\Commons\EBuEf2IVUTestBase\EBuEf2IVUTestBase.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="ebuef2ivuvehicle-settings.example.xml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>
