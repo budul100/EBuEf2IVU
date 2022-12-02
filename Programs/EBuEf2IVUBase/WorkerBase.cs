@@ -43,10 +43,13 @@ namespace EBuEf2IVUBase
             IDatabaseConnector databaseConnector, ILogger logger, Assembly assembly)
         {
             var assemblyInfo = assembly.GetName();
+
+            var version = $"{assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}.{assemblyInfo.Version.Build}";
+
             logger.LogInformation(
                 "{name} (Version {version}) wird gestartet.",
                 assemblyInfo.Name,
-                $"{assemblyInfo.Version.Major}.{assemblyInfo.Version.Minor}");
+                version);
 
             this.config = config;
             this.logger = logger;
