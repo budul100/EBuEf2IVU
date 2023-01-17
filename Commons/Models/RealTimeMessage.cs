@@ -14,9 +14,6 @@ namespace Common.Models
         [JsonProperty("decoder")]
         public string Decoder { get; set; }
 
-        [JsonProperty("end_gleis")]
-        public string EndGleis { get; set; }
-
         [JsonProperty("modus")]
         public MessageType? Modus { get; set; }
 

@@ -50,9 +50,9 @@ namespace Message2LegConverter
                     var mapping = infrastructureMappings
                         .Where(m => m?.MessageBetriebsstelle.IsMatch(message.Betriebsstelle) == true
                             && m.MessageStartGleis.IsMatchOrEmptyPatternOrEmptyValue(message.StartGleis)
-                            && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.EndGleis))
+                            && m.MessageEndGleis.IsMatchOrEmptyPatternOrEmptyValue(message.ZielGleis))
                         .OrderByDescending(m => m.MessageStartGleis.IsMatch(message.StartGleis))
-                        .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.EndGleis)).FirstOrDefault();
+                        .ThenByDescending(m => m.MessageEndGleis.IsMatch(message.ZielGleis)).FirstOrDefault();
 
                     if (mapping != default)
                     {
@@ -121,7 +121,7 @@ namespace Message2LegConverter
             {
                 EBuEfBetriebsstelleNach = mapping?.EBuEfNachBetriebsstelle,
                 EBuEfBetriebsstelleVon = mapping?.EBuEfVonBetriebsstelle,
-                EBuEfGleisNach = message.EndGleis,
+                EBuEfGleisNach = message.ZielGleis,
                 EBuEfGleisVon = message.StartGleis,
                 EBuEfZeitpunktNach = ebuefZeitpunktNach,
                 EBuEfZeitpunktVon = ebuefZeitpunktVon,
