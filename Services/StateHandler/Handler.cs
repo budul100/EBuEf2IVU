@@ -116,39 +116,32 @@ namespace StateHandler
             }
         }
 
-        private void SetSessionStatus(StateType newSessionStatus)
+        private void SetSessionStatus(StateType stateType)
         {
-            if (newSessionStatus != StateType)
+            StateType = stateType;
+
+            switch (StateType)
             {
-                StateType = newSessionStatus;
+                case StateType.InPreparation:
+                    logger?.LogInformation("Die Session wird vorbereitet.");
+                    break;
 
-                switch (StateType)
-                {
-                    case StateType.InPreparation:
-                        logger?.LogInformation("Die Session wird vorbereitet.");
-                        break;
+                case StateType.IsRunning:
+                    logger?.LogInformation("Die Session wurde gestartet.");
+                    break;
 
-                    case StateType.IsRunning:
-                        logger?.LogInformation("Die Session wurde gestartet.");
-                        break;
+                case StateType.IsEnded:
+                    logger?.LogInformation("Die Session wurde beendet.");
+                    break;
 
-                    case StateType.IsEnded:
-                        logger?.LogInformation("Die Session wurde beendet.");
-                        break;
-
-                    case StateType.IsPaused:
-                        logger?.LogInformation("Die Session wird pausiert.");
-                        break;
-                }
-
-                SessionChangedEvent?.Invoke(
-                    sender: this,
-                    e: new StateChangedArgs(StateType));
+                case StateType.IsPaused:
+                    logger?.LogInformation("Die Session wird pausiert.");
+                    break;
             }
-            else
-            {
-                logger?.LogDebug("Der Status der Session hat sich nicht geändert.");
-            }
+
+            SessionChangedEvent?.Invoke(
+                sender: this,
+                e: new StateChangedArgs(StateType));
         }
 
         private async Task SetSessionStatusInitally()

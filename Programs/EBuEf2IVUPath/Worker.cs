@@ -26,7 +26,7 @@ namespace EBuEf2IVUPath
         private readonly ITrainPathSender trainPathSender;
 
         private bool initalPathsSent;
-        private bool isSessionInitialized;
+        private bool isSessionRunning;
 
         #endregion Private Fields
 
@@ -66,7 +66,7 @@ namespace EBuEf2IVUPath
                 {
                     try
                     {
-                        if (isSessionInitialized
+                        if (isSessionRunning
                             && sessionStateHandler.StateType != StateType.IsPaused)
                         {
                             var receiverTask = trainPathReceiver.ExecuteAsync(sessionCancellationToken);
@@ -93,8 +93,8 @@ namespace EBuEf2IVUPath
                     { }
                 }
 
+                isSessionRunning = false;
                 initalPathsSent = false;
-                isSessionInitialized = false;
 
                 logger.LogInformation(
                     "EBuEf2IVUPath wird gestoppt.");
@@ -103,19 +103,21 @@ namespace EBuEf2IVUPath
 
         protected override async Task HandleSessionStateAsync(StateType stateType)
         {
-            if (stateType == StateType.IsEnded
-                || stateType == StateType.IsPaused)
+            if (stateType == StateType.IsEnded || stateType == StateType.IsPaused)
             {
-                isSessionInitialized = false;
+                isSessionRunning = false;
+
+                if (stateType == StateType.IsEnded)
+                {
+                    initalPathsSent = false;
+                }
             }
-            else if ((stateType == StateType.InPreparation || stateType == StateType.IsRunning)
-                && !isSessionInitialized)
+            else if (stateType == StateType.InPreparation || stateType == StateType.IsRunning)
             {
                 await InitializeSessionAsync();
+                isSessionRunning = stateType == StateType.IsRunning;
 
-                isSessionInitialized = true;
-
-                if (!initalPathsSent)
+                if (stateType == StateType.InPreparation || !initalPathsSent)
                 {
                     await SendInitialPathesAsync();
                     initalPathsSent = true;

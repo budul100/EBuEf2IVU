@@ -27,7 +27,7 @@ namespace EBuEf2IVUVehicle
 
         private bool ignorePrognosis;
         private bool initalAllocationsSent;
-        private bool isSessionInitialized;
+        private bool isSessionRunning;
         private bool useInterfaceServer;
 
         #endregion Private Fields
@@ -71,7 +71,7 @@ namespace EBuEf2IVUVehicle
                 {
                     try
                     {
-                        if (isSessionInitialized
+                        if (isSessionRunning
                             && sessionStateHandler.StateType != StateType.IsPaused)
                         {
                             var senderTask = useInterfaceServer
@@ -101,8 +101,8 @@ namespace EBuEf2IVUVehicle
                     { }
                 }
 
+                isSessionRunning = false;
                 initalAllocationsSent = false;
-                isSessionInitialized = false;
 
                 logger.LogInformation(
                     "EBuEf2IVUVehicle wird gestoppt.");
@@ -111,17 +111,19 @@ namespace EBuEf2IVUVehicle
 
         protected override async Task HandleSessionStateAsync(StateType stateType)
         {
-            if (stateType == StateType.IsEnded
-                || stateType == StateType.IsPaused)
+            if (stateType == StateType.IsEnded || stateType == StateType.IsPaused)
             {
-                isSessionInitialized = false;
+                isSessionRunning = false;
+
+                if (stateType == StateType.IsEnded)
+                {
+                    initalAllocationsSent = false;
+                }
             }
-            else if (stateType == StateType.IsRunning
-                && !isSessionInitialized)
+            else if (stateType == StateType.IsRunning)
             {
                 await InitializeSessionAsync();
-
-                isSessionInitialized = true;
+                isSessionRunning = stateType == StateType.IsRunning;
 
                 if (!initalAllocationsSent)
                 {

@@ -13,7 +13,7 @@ namespace EBuEf2IVUTestBase
         #region Protected Methods
 
         protected static Mock<IDatabaseConnector> GetDatabaseConnectorMock(Action sessionCallback = default,
-            DateTime? ivuDatum = default)
+            Action trainRunsPlanCallback = default, DateTime? ivuDatum = default)
         {
             var session = new EBuEfSession
             {
@@ -22,7 +22,7 @@ namespace EBuEf2IVUTestBase
                 Status = StateType.IsRunning,
             };
 
-            var trainRunsMock = new List<TrainRun> { Mock.Of<TrainRun>() };
+            var trainRunsMock = new List<TrainRun>();
 
             var result = new Mock<IDatabaseConnector>();
 
@@ -34,6 +34,14 @@ namespace EBuEf2IVUTestBase
                 .Setup(m => m.GetEBuEfSessionAsync())
                 .Callback(() => sessionCallback?.Invoke())
                 .Returns(Task.FromResult(session));
+
+            result
+                .Setup(m => m.GetTrainRunsPlanAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<DayOfWeek>(),
+                    It.IsAny<bool>()))
+                .Callback(() => trainRunsPlanCallback?.Invoke())
+                .Returns(Task.FromResult((IEnumerable<TrainRun>)trainRunsMock));
 
             result
                 .Setup(m => m.GetTrainRunsDispoAsync(

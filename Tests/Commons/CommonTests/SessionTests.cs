@@ -1,3 +1,4 @@
+using Common.EventsArgs;
 using Common.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -74,6 +75,43 @@ namespace CommonTests
             Task.WaitAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
             Assert.False(wasCalled);
+        }
+
+        [Test]
+        public void GetSessionPreparationTwice()
+        {
+            var connectorSettings = config
+                .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
+                .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
+
+            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var loggerMock = new Mock<ILogger<StateHandler.Handler>>();
+            var databaseConnectorMock = new Mock<IDatabaseConnector>();
+
+            var sessionStateHandler = new StateHandler.Handler(
+                logger: loggerMock.Object,
+                databaseConnector: databaseConnectorMock.Object,
+                stateReceiver: messageReceiverMock.Object);
+
+            sessionStateHandler.Initialize(
+                host: default,
+                port: default,
+                retryTime: 30,
+                sessionStartPattern: "ZN SET DISPATCH",
+                sessionStatusPattern: "SESSION NEW STATUS $");
+
+            var eventsSend = 0;
+            sessionStateHandler.SessionChangedEvent += (o, e) =>
+            {
+                if (e.StateType == Common.Enums.StateType.InPreparation) eventsSend++;
+            };
+
+            Task.WhenAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
+
+            messageReceiverMock.Raise(r => r.MessageReceivedEvent += null, new MessageReceivedArgs("SESSION NEW STATUS 1"));
+            messageReceiverMock.Raise(r => r.MessageReceivedEvent += null, new MessageReceivedArgs("SESSION NEW STATUS 1"));
+
+            Assert.True(eventsSend == 2);
         }
 
         [Test]

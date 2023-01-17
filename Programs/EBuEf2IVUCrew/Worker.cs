@@ -20,7 +20,7 @@ namespace EBuEf2IVUCrew
 
         private readonly ICrewChecker crewChecker;
 
-        private bool isSessionInitialized;
+        private bool isSessionRunning;
         private TimeSpan queryDurationFuture;
         private TimeSpan queryDurationPast;
         private TimeSpan serviceInterval;
@@ -58,7 +58,7 @@ namespace EBuEf2IVUCrew
                 {
                     try
                     {
-                        if (isSessionInitialized
+                        if (isSessionRunning
                             && sessionStateHandler.StateType != StateType.IsPaused)
                         {
                             await CheckCrewsAsync(sessionCancellationToken);
@@ -80,7 +80,7 @@ namespace EBuEf2IVUCrew
                     { }
                 }
 
-                isSessionInitialized = false;
+                isSessionRunning = false;
 
                 logger.LogInformation(
                     "EBuEf2IVUCrew wird gestoppt.");
@@ -89,15 +89,14 @@ namespace EBuEf2IVUCrew
 
         protected override async Task HandleSessionStateAsync(StateType stateType)
         {
-            if (stateType == StateType.IsEnded
-                || stateType == StateType.IsPaused)
+            if (stateType == StateType.IsEnded || stateType == StateType.IsPaused)
             {
-                isSessionInitialized = false;
+                isSessionRunning = false;
             }
-            else if (stateType == StateType.IsRunning
-                && !isSessionInitialized)
+            else if (stateType == StateType.IsRunning)
             {
                 await InitializeSessionAsync();
+                isSessionRunning = stateType == StateType.IsRunning;
 
                 logger.LogDebug(
                     "Die EBuEf-DB wird für den Crew-Check alle {interval} Sekunden " +
@@ -105,8 +104,6 @@ namespace EBuEf2IVUCrew
                     serviceInterval.TotalSeconds,
                     queryDurationPast.ToString(@"hh\:mm"),
                     queryDurationFuture.ToString(@"hh\:mm"));
-
-                isSessionInitialized = true;
             }
         }
 

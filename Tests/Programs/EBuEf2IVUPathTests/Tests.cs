@@ -60,6 +60,52 @@ namespace EBuEf2IVUPathTests
             Assert.True(wasCalled);
         }
 
+        [Test]
+        public void InitializeSessionTwice()
+        {
+            var eventCount = 0;
+
+            var databaseConnectorMock = GetDatabaseConnectorMock(
+                trainRunsPlanCallback: () => eventCount++);
+            var stateHandlerMock = GetStateHandlerMock();
+            var messageReceiverMock = new Mock<IMessageReceiver>();
+
+            var settingsPath = Path.GetFullPath(SettingsPath);
+
+            var host = Host
+                .CreateDefaultBuilder()
+                .GetHostBuilder()
+                .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, messageReceiverMock))
+                .Build();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            host.StartAsync(cancellationTokenSource.Token);
+            Assert.True(eventCount == 0);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.InPreparation));
+            Assert.True(eventCount == 1);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.InPreparation));
+            Assert.True(eventCount == 2);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
+            Assert.True(eventCount == 2);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsPaused));
+            Assert.True(eventCount == 2);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
+            Assert.True(eventCount == 2);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsEnded));
+            Assert.True(eventCount == 2);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
+            Assert.True(eventCount == 3);
+        }
+
         #endregion Public Methods
 
         #region Private Methods
