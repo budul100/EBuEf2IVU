@@ -2,6 +2,7 @@ using Common.Enums;
 using Common.EventsArgs;
 using Common.Extensions;
 using Common.Interfaces;
+using Common.Models;
 using EBuEf2IVUTestBase;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,6 +33,7 @@ namespace EBuEf2IVUVehicleTests
 
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 sessionCallback: () => wasCalled = true);
+
             var stateHandlerMock = GetStateHandlerMock();
             var messageReceiverMock = new Mock<IMessageReceiver>();
 
@@ -41,7 +43,7 @@ namespace EBuEf2IVUVehicleTests
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, messageReceiverMock))
+                .ConfigureServices(services => ConfigureServices(services, messageReceiverMock.Object, databaseConnectorMock, stateHandlerMock))
                 .Build();
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -82,7 +84,7 @@ namespace EBuEf2IVUVehicleTests
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, messageReceiverMock))
+                .ConfigureServices(services => ConfigureServices(services, messageReceiverMock.Object, databaseConnectorMock, stateHandlerMock))
                 .Build();
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -93,27 +95,62 @@ namespace EBuEf2IVUVehicleTests
             const string messageContent = "{\"zugnummer\":\"13\",\"decoder\":null,\"simulationszeit\":\"1970-01-01 01:00:00\",\"betriebsstelle\":\"BGS\",\"signaltyp\":\"ESig\",\"start_gleis\":\"1\",\"ziel_gleis\":\"2\",\"modus\":\"istzeit\"}";
             messageReceiverMock.Raise(m => m.MessageReceivedEvent += null, new MessageReceivedArgs(messageContent));
 
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
+        }
+
+        [Test]
+        public void UpdateRealtimeInDatabase()
+        {
+            var legReceived = default(TrainLeg);
+
+            var databaseConnectorMock = GetDatabaseConnectorMock(
+                addRealtimeCallback: l => legReceived = l);
+
+            var stateHandlerMock = GetStateHandlerMock();
+            var messageReceiverMock = new Mock<IMessageReceiver>();
+
+            var settingsPath = Path.GetFullPath(SettingsPath);
+
+            var host = Host
+                .CreateDefaultBuilder()
+                .GetHostBuilder()
+                .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
+                .ConfigureServices(services => ConfigureServices(services, messageReceiverMock.Object, databaseConnectorMock, stateHandlerMock))
+                .Build();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            host.StartAsync(cancellationTokenSource.Token);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
+
+            const string messageContent = "{\"zugnummer\":\"13\",\"decoder\":null,\"simulationszeit\":\"1970-01-01 01:00:00\",\"betriebsstelle\":\"BGS\",\"signaltyp\":\"ESig\",\"start_gleis\":\"1\",\"ziel_gleis\":\"2\",\"modus\":\"istzeit\"}";
+            messageReceiverMock.Raise(m => m.MessageReceivedEvent += null, new MessageReceivedArgs(messageContent));
+
+            Thread.Sleep(1000);
+
+            Assert.True(legReceived.EBuEfGleisVon == "1");
+            Assert.True(legReceived.EBuEfGleisNach == "2");
+
+            Assert.True(legReceived.IVUGleis == "2");
         }
 
         #endregion Public Methods
 
         #region Private Methods
 
-        private static void ConfigureServices(IServiceCollection services, Mock<IDatabaseConnector> databaseConnectorMock,
-            Mock<IStateHandler> stateHandlerMock, Mock<IMessageReceiver> messageReceiverMock)
+        private static void ConfigureServices(IServiceCollection services, IMessageReceiver messageReceiver,
+            Mock<IDatabaseConnector> databaseConnectorMock, Mock<IStateHandler> stateHandlerMock)
         {
             services.AddHostedService<EBuEf2IVUVehicle.Worker>();
 
             services.AddTransient<Mock<ILogger>>();
             services.AddSingleton(databaseConnectorMock.Object);
             services.AddSingleton(stateHandlerMock.Object);
-
-            services.AddSingleton(messageReceiverMock.Object);
+            services.AddSingleton(messageReceiver);
             services.AddSingleton<IMessage2LegConverter, Message2LegConverter.Converter>();
 
-            services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();
             services.AddSingleton<IRealtimeSenderIS, RealtimeSenderIS.Sender>();
+            services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();
         }
 
         #endregion Private Methods

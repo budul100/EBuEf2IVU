@@ -11,9 +11,7 @@ using NUnit.Framework;
 using RealtimeSender;
 using System;
 using System.IO;
-using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace RealTimeSenderTests
 {
@@ -33,7 +31,7 @@ namespace RealTimeSenderTests
         {
             var hasSocketException = false;
 
-            var loggerMock = GetLoggerMock(() => hasSocketException = true);
+            var loggerMock = GetLoggerMock<Sender>(() => hasSocketException = true);
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -77,7 +75,7 @@ namespace RealTimeSenderTests
                 sessionStart: DateTime.Now.TimeOfDay,
                 cancellationToken: cancellationTokenSource.Token);
 
-            Thread.Sleep(6000);
+            Thread.Sleep(5000);
 
             Assert.True(hasSocketException);
         }
@@ -90,22 +88,6 @@ namespace RealTimeSenderTests
         {
             services.AddSingleton(loggerMock.Object);
             services.AddSingleton<IRealtimeSender, Sender>();
-        }
-
-        private static Mock<ILogger<Sender>> GetLoggerMock(Action errorCallback)
-        {
-            var result = new Mock<ILogger<Sender>>();
-
-            result
-                .Setup(x => x.Log(
-                    It.Is<LogLevel>(l => l == LogLevel.Error),
-                    It.IsAny<EventId>(),
-                    It.IsAny<It.IsAnyType>(),
-                    It.IsAny<SocketException>(),
-                    (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
-                .Callback(() => errorCallback?.Invoke());
-
-            return result;
         }
 
         #endregion Private Methods

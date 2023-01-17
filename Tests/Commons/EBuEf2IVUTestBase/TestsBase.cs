@@ -1,9 +1,11 @@
 ﻿using Common.Enums;
 using Common.Interfaces;
 using Common.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace EBuEf2IVUTestBase
@@ -12,8 +14,9 @@ namespace EBuEf2IVUTestBase
     {
         #region Protected Methods
 
-        protected static Mock<IDatabaseConnector> GetDatabaseConnectorMock(Action sessionCallback = default,
-            Action trainRunsPlanCallback = default, DateTime? ivuDatum = default)
+        protected static Mock<IDatabaseConnector> GetDatabaseConnectorMock(bool sendTrainRuns = false,
+            Action sessionCallback = default, Action trainRunsPlanCallback = default,
+            Action<TrainLeg> addRealtimeCallback = default, DateTime? ivuDatum = default)
         {
             var session = new EBuEfSession
             {
@@ -23,6 +26,11 @@ namespace EBuEf2IVUTestBase
             };
 
             var trainRunsMock = new List<TrainRun>();
+
+            if (sendTrainRuns)
+            {
+                trainRunsMock.Add((new Mock<TrainRun>()).Object);
+            }
 
             var result = new Mock<IDatabaseConnector>();
 
@@ -48,6 +56,27 @@ namespace EBuEf2IVUTestBase
                     It.IsAny<TimeSpan>(),
                     It.IsAny<TimeSpan>()))
                 .Returns(Task.FromResult((IEnumerable<TrainRun>)trainRunsMock));
+
+            result
+                .Setup(m => m.AddRealtimeAsync(
+                    It.IsAny<TrainLeg>()))
+                .Callback<TrainLeg>(l => addRealtimeCallback?.Invoke(l));
+
+            return result;
+        }
+
+        protected static Mock<ILogger<T>> GetLoggerMock<T>(Action errorCallback = default)
+        {
+            var result = new Mock<ILogger<T>>();
+
+            result
+                .Setup(x => x.Log(
+                    It.Is<LogLevel>(l => l == LogLevel.Error),
+                    It.IsAny<EventId>(),
+                    It.IsAny<It.IsAnyType>(),
+                    It.IsAny<SocketException>(),
+                    (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
+                .Callback(() => errorCallback?.Invoke());
 
             return result;
         }
