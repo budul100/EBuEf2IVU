@@ -194,7 +194,8 @@ namespace EBuEf2IVUPath
                 trainPathStateCancelled: senderSettings.TrainPathStateCancelled,
                 importProfile: senderSettings.ImportProfile,
                 ignoreTrainTypes: ignoreTrainTypes,
-                locationShortnames: locationShortnames);
+                locationShortnames: locationShortnames,
+                logRequests: senderSettings.LogRequests);
         }
 
         private void OnMessageReceived(object sender, Common.EventsArgs.MessageReceivedArgs e)

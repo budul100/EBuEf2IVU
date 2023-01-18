@@ -17,6 +17,8 @@ namespace TrainPathSenderTests
     {
         #region Private Fields
 
+        private const string SettingsPath = @"..\..\..\ebuef2ivupath-settings.example.xml";
+
         private IConfigurationRoot config;
         private NullLoggerFactory loggerFactory;
         private Sender sender;
@@ -37,11 +39,9 @@ namespace TrainPathSenderTests
         [SetUp]
         public void Init()
         {
-            var path = Path.GetFullPath(@"..\..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml");
-
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddXmlFile(
-                path: path,
+                path: Path.GetFullPath(SettingsPath),
                 optional: false,
                 reloadOnChange: false);
 
@@ -76,7 +76,8 @@ namespace TrainPathSenderTests
                 trainPathStateCancelled: senderSettings.TrainPathStateCancelled,
                 importProfile: senderSettings.ImportProfile,
                 ignoreTrainTypes: ignoreTrainTypes,
-                locationShortnames: default);
+                locationShortnames: default,
+                logRequests: senderSettings.LogRequests);
         }
 
         [Test]
@@ -101,9 +102,9 @@ namespace TrainPathSenderTests
                 weekday: query.Result.Wochentag,
                 preferPrognosis: false).Result;
 
-            sender.Add(trainRuns);
-
             var cancellationTokenSource = new CancellationTokenSource();
+
+            sender.Add(trainRuns);
 
             sender.ExecuteAsync(
                 ivuDatum: query.Result.IVUDatum,

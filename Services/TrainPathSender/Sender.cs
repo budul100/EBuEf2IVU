@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TrainPathImportService;
 using TrainPathSender.Converters;
+using TrainPathSender.Extensions;
 
 namespace TrainPathSender
 {
@@ -21,12 +22,13 @@ namespace TrainPathSender
     {
         #region Private Fields
 
-        private readonly ConcurrentQueue<importTrainPaths> importsQueue = new ConcurrentQueue<importTrainPaths>();
+        private readonly ConcurrentQueue<IEnumerable<TrainRun>> importsQueue = new ConcurrentQueue<IEnumerable<TrainRun>>();
         private readonly ILogger<Sender> logger;
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
         private TrainRun2ImportPaths converter;
         private IEnumerable<string> ignoreTrainTypes;
+        private bool logRequests;
         private AsyncRetryPolicy retryPolicy;
         private Task senderTask;
 
@@ -46,16 +48,12 @@ namespace TrainPathSender
         public void Add(IEnumerable<TrainRun> trainRuns)
         {
             var filtereds = trainRuns
-                .Where(r => !ignoreTrainTypes.AnyItem() || !ignoreTrainTypes.Contains(r.Zuggattung)).ToArray();
+                .Where(r => r != default
+                    && (!ignoreTrainTypes.AnyItem() || !ignoreTrainTypes.Contains(r.Zuggattung))).ToArray();
 
             if (filtereds.AnyItem())
             {
-                var imports = converter.Convert(filtereds);
-
-                if (imports != default)
-                {
-                    importsQueue.Enqueue(imports);
-                }
+                importsQueue.Enqueue(filtereds);
             }
         }
 
@@ -80,9 +78,10 @@ namespace TrainPathSender
         public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
             int retryTime, string infrastructureManager, string orderingTransportationCompany, string stoppingReasonStop,
             string stoppingReasonPass, string trainPathStateRun, string trainPathStateCancelled, string importProfile,
-            IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames)
+            IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames, bool logRequests)
         {
             this.ignoreTrainTypes = ignoreTrainTypes;
+            this.logRequests = logRequests;
 
             converter = new TrainRun2ImportPaths(
                 infrastructureManager: infrastructureManager,
@@ -140,16 +139,29 @@ namespace TrainPathSender
             {
                 if (!importsQueue.IsEmpty)
                 {
-                    importsQueue.TryPeek(out importTrainPaths currentImport);
+                    importsQueue.TryPeek(out IEnumerable<TrainRun> currentImport);
 
-                    if (currentImport != default)
+                    var currentPaths = converter.Convert(currentImport);
+
+                    if (currentPaths != default)
                     {
-                        logger.LogDebug(
-                            "Es werden {Trassenzahl} Trassen an IVU.rail gesendet.",
-                            currentImport.trainPathImportRequest.trainPaths.Length);
+                        if (logRequests)
+                        {
+                            var trainPaths = currentPaths.trainPathImportRequest.trainPaths.Serialize();
+
+                            logger.LogDebug(
+                                "Es werden die folgenden Trassen an IVU.rail gesendet: {trainPaths}",
+                                trainPaths);
+                        }
+                        else
+                        {
+                            logger.LogDebug(
+                                "Es werden {Trassenzahl} Trassen an IVU.rail gesendet.",
+                                currentPaths.trainPathImportRequest.trainPaths.Length);
+                        }
 
                         using var channel = channelFactory.Get();
-                        var response = await channel.importTrainPathsAsync(currentImport);
+                        var response = await channel.importTrainPathsAsync(currentPaths);
 
                         if (response.trainPathImportResponse != default)
                         {

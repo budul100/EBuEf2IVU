@@ -21,6 +21,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="ebuef2ivupath-settings.example.xml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="TrainPathMessages.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

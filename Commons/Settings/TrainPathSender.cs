@@ -22,6 +22,8 @@
 
         public string LocationTypes { get; set; }
 
+        public bool LogRequests { get; set; }
+
         public string OrderingTransportationCompany { get; set; }
 
         public string Password { get; set; }

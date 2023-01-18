@@ -17,7 +17,7 @@ namespace Common.Interfaces
         void Initialize(string host, int port, string path, string username, string password, bool isHttps,
             int retryTime, string infrastructureManager, string orderingTransportationCompany, string stoppingReasonStop,
             string stoppingReasonPass, string trainPathStateRun, string trainPathStateCancelled, string importProfile,
-            IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames);
+            IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames, bool logRequests);
 
         #endregion Public Methods
     }
