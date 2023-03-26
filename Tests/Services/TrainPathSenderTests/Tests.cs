@@ -17,7 +17,7 @@ namespace TrainPathSenderTests
     {
         #region Private Fields
 
-        private const string SettingsPath = @"..\..\..\ebuef2ivupath-settings.example.xml";
+        private const string SettingsPath = @"..\..\..\TrainPathSenderTests.example.xml";
 
         private IConfigurationRoot config;
         private NullLoggerFactory loggerFactory;

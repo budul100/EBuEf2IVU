@@ -20,7 +20,7 @@ namespace RealTimeSenderTests
     {
         #region Private Fields
 
-        private const string SettingsPath = @"..\..\..\ebuef2ivuvehicle-settings.example.xml";
+        private const string SettingsPath = @"..\..\..\RealTimeSenderTests.example.xml";
 
         #endregion Private Fields
 

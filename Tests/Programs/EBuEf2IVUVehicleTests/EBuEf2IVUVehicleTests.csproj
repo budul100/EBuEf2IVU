@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="ebuef2ivuvehicle-settings.example.xml">
+	  <None Update="EBuEf2IVUVehicleTests.example.xml">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

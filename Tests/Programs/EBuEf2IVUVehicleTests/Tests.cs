@@ -20,7 +20,7 @@ namespace EBuEf2IVUVehicleTests
     {
         #region Private Fields
 
-        private const string SettingsPath = @"..\..\..\ebuef2ivuvehicle-settings.example.xml";
+        private const string SettingsPath = @"..\..\..\EBuEf2IVUVehicleTests.example.xml";
 
         #endregion Private Fields
 
