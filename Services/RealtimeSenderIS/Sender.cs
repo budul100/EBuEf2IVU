@@ -124,7 +124,7 @@ namespace RealtimeSenderIS
 
         private void OnRetry(Exception exception, TimeSpan reconnection)
         {
-            while (exception.InnerException != null) exception = exception.InnerException;
+            while (exception.InnerException != default) exception = exception.InnerException;
 
             logger.LogError(
                 exception,

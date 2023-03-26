@@ -97,7 +97,7 @@ namespace MessageReceiver
             }
             else
             {
-                while (exception.InnerException != null) exception = exception.InnerException;
+                while (exception.InnerException != default) exception = exception.InnerException;
 
                 if (exception.GetType() != typeof(OperationCanceledException))
                 {

@@ -42,7 +42,7 @@ namespace Message2TrainRunConverter
                 {
                     var result = GetTrainRun(trainGroup);
 
-                    if (result.Positions.Count() > 1)
+                    if (result != default)
                     {
                         yield return result;
                     }
@@ -58,44 +58,41 @@ namespace Message2TrainRunConverter
         {
             foreach (var message in messages)
             {
-                var result = message.AnkunftSoll == default && message.AbfahrtSoll == default
-                    ? message.GetPositionWithoutTraffic()
-                    : GetPositionWithTraffic(message);
+                if (message.AnkunftSoll == default
+                    && message.AbfahrtSoll == default)
+                {
+                    yield return message.GetPositionWithoutTraffic();
+                }
+                else
+                {
+                    var result = message.GetPositionWithTraffic(
+                        abfahrtGetter: abfahrtGetter,
+                        ankunftGetter: ankunftGetter);
 
-                yield return result;
+                    yield return result;
+                }
             }
-        }
-
-        private TrainPosition GetPositionWithTraffic(TrainPathMessage message)
-        {
-            var result = new TrainPosition
-            {
-                Abfahrt = abfahrtGetter.Invoke(message),
-                Ankunft = ankunftGetter.Invoke(message),
-                Bemerkungen = message.Bemerkungen,
-                Betriebsstelle = message.Betriebsstelle,
-                Gleis = message.GleisSoll?.ToString(),
-                VerkehrNicht = false,
-                IstDurchfahrt = message.IstDurchfahrt,
-            };
-
-            return result;
         }
 
         private TrainRun GetTrainRun(IEnumerable<TrainPathMessage> messages)
         {
+            var result = default(TrainRun);
+
             var positions = GetPositions(messages).ToArray();
 
-            var relevantMessage = messages.First();
-
-            var result = new TrainRun
+            if (positions.Length > 1)
             {
-                Abfahrt = positions[0].Abfahrt?.TimeOfDay,
-                Positions = positions,
-                Zuggattung = relevantMessage.Zuggattung,
-                ZugId = relevantMessage.ZugId,
-                Zugnummer = relevantMessage.Zugnummer,
-            };
+                var relevantMessage = messages.First();
+
+                result = new TrainRun
+                {
+                    Abfahrt = positions[0].Abfahrt?.TimeOfDay,
+                    Positions = positions,
+                    Zuggattung = relevantMessage.Zuggattung,
+                    ZugId = relevantMessage.ZugId,
+                    Zugnummer = relevantMessage.Zugnummer,
+                };
+            }
 
             return result;
         }

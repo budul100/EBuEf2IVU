@@ -2,6 +2,7 @@
 using Common.Models;
 using CredentialChannelFactory;
 using CrewChecker.Extensions;
+using EnumerableExtensions;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
@@ -115,28 +116,37 @@ namespace CrewChecker
 
         private async Task<IEnumerable<CrewingElement>> GetCrewsForTrips(IEnumerable<string> tripNumbers, DateTime date)
         {
-            var assignments = default(IEnumerable<tripAssignment>);
+            var result = default(IEnumerable<CrewingElement>);
 
-            var request = GetRequest(
-                tripNumbers: tripNumbers,
-                date: date);
+            var relevants = tripNumbers.IfAny()
+                .Where(t => !string.IsNullOrWhiteSpace(t)).ToArray();
 
-            using (var channel = channelFactory.Get())
+            if (relevants.AnyItem())
             {
+                var request = GetRequest(
+                    tripNumbers: relevants,
+                    date: date);
+
+                using var channel = channelFactory.Get();
+
                 var response = await channel.exportCrewAssignmentsForTripsAsync(request);
 
-                if (response.exportCrewAssignmentsResponse.error != default)
+                if (response != default)
                 {
-                    throw new ApplicationException(
-                        $"Error response received at crew on trip request:{response.exportCrewAssignmentsResponse.error.description}");
-                }
+                    if (response.exportCrewAssignmentsResponse.error != default)
+                    {
+                        throw new ApplicationException(
+                            $"Error response received at crew on trip request:{response.exportCrewAssignmentsResponse.error.description}");
+                    }
 
-                assignments = response.exportCrewAssignmentsResponse.tripAssignment.ToArray();
+                    var assignments = response.exportCrewAssignmentsResponse.tripAssignment?.ToArray();
+
+                    result = assignments.GetCrewingElements().ToArray();
+                }
             }
 
-            var result = assignments.GetCrewingElements().ToArray();
-
-            return result;
+            return result
+                ?? Enumerable.Empty<CrewingElement>();
         }
 
         private exportCrewAssignmentsForTrips GetRequest(IEnumerable<string> tripNumbers, DateTime date)
@@ -158,7 +168,7 @@ namespace CrewChecker
 
         private void OnRetry(Exception exception, TimeSpan reconnection)
         {
-            while (exception.InnerException != null) exception = exception.InnerException;
+            while (exception.InnerException != default) exception = exception.InnerException;
 
             logger.LogError(
                 exception,

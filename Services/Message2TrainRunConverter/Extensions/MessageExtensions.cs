@@ -1,4 +1,5 @@
 ﻿using Common.Models;
+using System;
 
 namespace Message2TrainRunConverter.Extensions
 {
@@ -16,6 +17,23 @@ namespace Message2TrainRunConverter.Extensions
                 Betriebsstelle = message.Betriebsstelle,
                 Gleis = message.GleisSoll?.ToString(),
                 VerkehrNicht = true,
+                IstDurchfahrt = message.IstDurchfahrt,
+            };
+
+            return result;
+        }
+
+        public static TrainPosition GetPositionWithTraffic(this TrainPathMessage message,
+            Func<TrainPathMessage, DateTime?> abfahrtGetter, Func<TrainPathMessage, DateTime?> ankunftGetter)
+        {
+            var result = new TrainPosition
+            {
+                Abfahrt = abfahrtGetter.Invoke(message),
+                Ankunft = ankunftGetter.Invoke(message),
+                Bemerkungen = message.Bemerkungen,
+                Betriebsstelle = message.Betriebsstelle,
+                Gleis = message.GleisSoll?.ToString(),
+                VerkehrNicht = false,
                 IstDurchfahrt = message.IstDurchfahrt,
             };
 

@@ -11,27 +11,24 @@ namespace CrewChecker.Extensions
 
         public static IEnumerable<CrewingElement> GetCrewingElements(this IEnumerable<tripAssignment> tripAssignments)
         {
-            if (tripAssignments.AnyItem())
+            var relevants = tripAssignments.IfAny()
+                .Where(a => a?.employeeOrigin != default
+                    && a?.employeeDestination != default).ToArray();
+
+            foreach (var relevant in relevants)
             {
-                var employeeAssignments = tripAssignments
-                    .Where(a => a.employeeOrigin != default
-                        && a.employeeDestination != default).ToArray();
-
-                foreach (var employeeAssignment in employeeAssignments)
+                var result = new CrewingElement
                 {
-                    var result = new CrewingElement
-                    {
-                        BetriebsstelleVon = employeeAssignment.employeeOrigin,
-                        BetriebsstelleNach = employeeAssignment.employeeDestination,
-                        DienstKurzname = employeeAssignment.duty,
-                        PersonalNachname = employeeAssignment.surname,
-                        PersonalNummer = employeeAssignment.personnelNumber,
-                        Zugnummer = employeeAssignment.trip,
-                        ZugnummerVorgaenger = employeeAssignment.previousTripNumber,
-                    };
+                    BetriebsstelleVon = relevant.employeeOrigin,
+                    BetriebsstelleNach = relevant.employeeDestination,
+                    DienstKurzname = relevant.duty,
+                    PersonalNachname = relevant.surname,
+                    PersonalNummer = relevant.personnelNumber,
+                    Zugnummer = relevant.trip,
+                    ZugnummerVorgaenger = relevant.previousTripNumber,
+                };
 
-                    yield return result;
-                }
+                yield return result;
             }
         }
 
