@@ -57,6 +57,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Message2LegConverter", "Ser
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Message2TrainRunConverter", "Services\Message2TrainRunConverter\Message2TrainRunConverter.csproj", "{59E9EC19-E624-4518-9ACD-B3723D493193}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Additionals", "Additionals", "{032BE8ED-2172-4A71-B280-2309E66AAB54}"
+	ProjectSection(SolutionItems) = preProject
+		Create_Linux-x64.bat = Create_Linux-x64.bat
+		Create_Docker.sh = Create_Docker.sh
+		Create_Linux-x64.sh = Create_Linux-x64.sh
+		docker-compose.yml = docker-compose.yml
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

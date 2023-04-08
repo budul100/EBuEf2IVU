@@ -15,7 +15,7 @@
 		</WriteTo>
 	</Serilog>
 	<EBuEfDBConnector>
-		<ConnectionString>SERVER=db.ebuef;PORT=3306;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
+		<ConnectionString>SERVER=host.docker.internal;PORT=3306;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
 		<RetryTime>30</RetryTime>
 	</EBuEfDBConnector>
 	<StatusReceiver>
@@ -26,17 +26,17 @@
 		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
 	</StatusReceiver>
 	<CrewChecker>
-		<Host>ivu.ebuef</Host>
+		<Host>host.docker.internal</Host>
 		<Port>20000</Port>
 		<Path>intf.crewontrip.impl/CrewOnTripWebFacadeBean</Path>
 		<IsHttps>false</IsHttps>
-		<Username>crewontrip</Username>
-		<Password>crewontrip</Password>
+		<Username>ivu</Username>
+		<Password>ivu$admin</Password>
 		<RetryTime>30</RetryTime>
 		<AbfrageIntervalSek>60</AbfrageIntervalSek>
 		<AbfrageVergangenheitMin>15</AbfrageVergangenheitMin>
-		<AbfrageZukunftMin>60</AbfrageZukunftMin>
-		<Division>EBUEF</Division>
-		<PlanningLevel>ACTUAL</PlanningLevel>
+		<AbfrageZukunftMin>480</AbfrageZukunftMin>
+		<Division>LD</Division>
+		<PlanningLevel>DISPATCH</PlanningLevel>
 	</CrewChecker>
 </Configuration>
