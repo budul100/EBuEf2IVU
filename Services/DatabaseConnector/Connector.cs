@@ -149,6 +149,10 @@ namespace DatabaseConnector
             this.connectionString = connectionString;
             this.cancellationToken = cancellationToken;
 
+            logger.LogDebug(
+                "Die Datenbank wird wie folgt aufgerufen: {connectionString}",
+                connectionString);
+
             retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
