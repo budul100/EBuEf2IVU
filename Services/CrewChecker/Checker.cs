@@ -101,6 +101,10 @@ namespace CrewChecker
                 isHttps: isHttps,
                 notIgnoreCertificateErrors: true);
 
+            logger.LogDebug(
+                "Die Crew-on-trip-Anfragen werden gesendet an: {uri}",
+                channelFactory.Uri.AbsoluteUri);
+
             retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
@@ -136,7 +140,7 @@ namespace CrewChecker
                     if (response.exportCrewAssignmentsResponse.error != default)
                     {
                         throw new ApplicationException(
-                            $"Error response received at crew on trip request:{response.exportCrewAssignmentsResponse.error.description}");
+                            $"Die Crew-on-trip-Anfrage hat eine Fehlermeldung erhalten: {response.exportCrewAssignmentsResponse.error.description}");
                     }
 
                     var assignments = response.exportCrewAssignmentsResponse.tripAssignment?.ToArray();
