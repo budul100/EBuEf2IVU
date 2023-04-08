@@ -131,7 +131,7 @@ namespace CrewChecker
 
                 var response = await channel.exportCrewAssignmentsForTripsAsync(request);
 
-                if (response != default)
+                if (response?.exportCrewAssignmentsResponse != default)
                 {
                     if (response.exportCrewAssignmentsResponse.error != default)
                     {
