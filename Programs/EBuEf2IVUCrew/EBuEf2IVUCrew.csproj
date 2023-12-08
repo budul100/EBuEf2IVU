@@ -5,7 +5,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<RuntimeIdentifiers>win10-x64;linux-arm;linux-x64</RuntimeIdentifiers>
 		<StartupObject>EBuEf2IVUCrew.Program</StartupObject>
-		<AssemblyVersion>1.4.0</AssemblyVersion>
+		<AssemblyVersion>1.4.1</AssemblyVersion>
 		<FileVersion>$(AssemblyVersion)</FileVersion>
 		<Version>$(AssemblyVersion)</Version>
 	</PropertyGroup>
