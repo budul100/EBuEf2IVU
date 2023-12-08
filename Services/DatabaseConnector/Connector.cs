@@ -276,7 +276,7 @@ namespace DatabaseConnector
                 logger.LogDebug(
                     "Suche in der EBuEf-DB nach dem Status der aktuellen Fahrplan-Session.");
 
-                using var context = new SitzungContext(connectionString);
+                await using var context = new SitzungContext(connectionString);
 
                 result = await context.Sitzungen
                     .Where(s => s.Status == Convert.ToByte(StateType.IsRunning))
@@ -295,7 +295,7 @@ namespace DatabaseConnector
                 logger.LogDebug(
                     "Suche in der EBuEf-DB nach der aktuellen Fahrplan-Session.");
 
-                using var context = new SitzungContext(connectionString);
+                await using var context = new SitzungContext(connectionString);
 
                 var sitzung = await context.Sitzungen
                     .Where(s => s.Id != SessionIdDefault
@@ -348,12 +348,12 @@ namespace DatabaseConnector
         private async Task<IEnumerable<string>> QueryLocationShortnames(IEnumerable<string> locationTypes,
             CancellationToken queryCancellationToken)
         {
-            using var context = new BetriebsstelleContext(connectionString);
+            await using var context = new FahrplanpunktContext(connectionString);
 
-            var betriebsstellen = await context.Betriebsstellen
+            var fahrplanpunkte = await context.Fahrplanpunkte
                 .ToArrayAsync(queryCancellationToken);
 
-            var result = betriebsstellen?
+            var result = fahrplanpunkte?
                 .Where(b => !locationTypes.AnyItem() || locationTypes.Contains(b.Art))
                 .Select(b => b.Kurzname).ToArray();
 
@@ -366,7 +366,7 @@ namespace DatabaseConnector
 
             if (!zugnummer.IsEmpty())
             {
-                using var context = new ZugDispoContext(connectionString);
+                await using var context = new ZugDispoContext(connectionString);
 
                 var trainNumber = zugnummer.ToInt();
 
@@ -390,7 +390,7 @@ namespace DatabaseConnector
                 logger.LogDebug(
                     "Suche nach aktuellen Fahrplaneinträgen.");
 
-                using var context = new HaltDispoContext(connectionString);
+                await using var context = new HaltDispoContext(connectionString);
 
                 var halte = await context.Halte
                     .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
@@ -417,7 +417,7 @@ namespace DatabaseConnector
                     "Suche nach Zug-ID {trainId}.",
                     trainId);
 
-                using var context = new HaltDispoContext(connectionString);
+                await using var context = new HaltDispoContext(connectionString);
 
                 var halte = await context.Halte
                     .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
@@ -441,7 +441,7 @@ namespace DatabaseConnector
                 logger.LogDebug(
                     "Suche nach allen Zügen.");
 
-                using var context = new HaltPlanContext(connectionString);
+                await using var context = new HaltPlanContext(connectionString);
 
                 var weekdayId = weekday != DayOfWeek.Sunday
                     ? ((int)weekday) - 1
@@ -469,7 +469,7 @@ namespace DatabaseConnector
 
             if (!zuggattung.IsEmpty())
             {
-                using var context = new ZugGattungContext(connectionString);
+                await using var context = new ZugGattungContext(connectionString);
 
                 result = await context.Zuggattungen.FirstOrDefaultAsync(
                     predicate: g => g.Kurzname == zuggattung,
@@ -488,7 +488,7 @@ namespace DatabaseConnector
                 logger.LogDebug(
                     "Suche nach allen Fahrzeugen der Grundaufstellung.");
 
-                using var context = new AufstellungContext(connectionString);
+                await using var context = new AufstellungContext(connectionString);
 
                 var aufstellungen = await context.Aufstellungen
                     .Include(a => a.Feld)
@@ -505,7 +505,7 @@ namespace DatabaseConnector
         {
             if (crewingElements?.Any() ?? false)
             {
-                using var context = new BesatzungContext(connectionString);
+                await using var context = new BesatzungContext(connectionString);
 
                 context.Database.OpenConnection();
 
@@ -549,7 +549,7 @@ namespace DatabaseConnector
                         leg.Zugnummer,
                         betriebsstelle);
 
-                    using var context = new HaltDispoContext(connectionString);
+                    await using var context = new HaltDispoContext(connectionString);
 
                     var halt = context.Halte
                         .Where(h => h.Betriebsstelle == betriebsstelle)

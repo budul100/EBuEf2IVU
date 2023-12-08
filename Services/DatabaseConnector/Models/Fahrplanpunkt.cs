@@ -3,16 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DatabaseConnector.Models
 {
-    [Table("betriebsstellen_liste")]
-    internal class Betriebsstelle
+    [Table("fahrplanpunkt")]
+    internal class Fahrplanpunkt
     {
         #region Public Properties
 
         [Column("art")]
         public string Art { get; set; }
-
-        [Column("bstart")]
-        public string BetriebsstellenArt { get; set; }
 
         [Key]
         [Column("id")]
@@ -23,9 +20,6 @@ namespace DatabaseConnector.Models
 
         [Column("name")]
         public string Langname { get; set; }
-
-        [Column("nummer")]
-        public int Nummer { get; set; }
 
         #endregion Public Properties
     }

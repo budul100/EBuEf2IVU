@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseConnector.Contexts
 {
-    internal class BetriebsstelleContext
+    internal class FahrplanpunktContext
         : BaseContext
     {
         #region Public Constructors
 
-        public BetriebsstelleContext(string connectionString)
+        public FahrplanpunktContext(string connectionString)
             : base(connectionString)
         { }
 
@@ -16,7 +16,7 @@ namespace DatabaseConnector.Contexts
 
         #region Public Properties
 
-        public DbSet<Betriebsstelle> Betriebsstellen { get; set; }
+        public DbSet<Fahrplanpunkt> Fahrplanpunkte { get; set; }
 
         #endregion Public Properties
     }
