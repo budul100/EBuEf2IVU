@@ -47,8 +47,8 @@ namespace CommonTests
             query.Wait();
 
             Assert.True(query.Result.IVUDatum == query.Result.IVUDatum.Date);
-            Assert.True(query.Result.SessionStart == new TimeSpan(8, 0, 0));
-            Assert.True(query.Result.Wochentag == DayOfWeek.Sunday);
+            Assert.True(query.Result.SessionStart == new TimeSpan(12, 0, 0));
+            Assert.True(query.Result.Wochentag == DayOfWeek.Friday);
         }
 
         [Test]
