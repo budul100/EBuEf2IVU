@@ -4,7 +4,7 @@ using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.Runtime.InteropServices;
 
-namespace Common.Extensions
+namespace Commons.Extensions
 {
     public static class ProgramExtensions
     {

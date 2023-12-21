@@ -1,8 +1,8 @@
-﻿using Common.Converters;
+﻿using Commons.Converters;
 using Newtonsoft.Json;
 using System;
 
-namespace Common.Models
+namespace Commons.Models
 {
     public class TrainPathMessage
     {

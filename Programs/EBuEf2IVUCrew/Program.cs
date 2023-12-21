@@ -1,6 +1,6 @@
 ﻿using CommandLine;
-using Common.Extensions;
-using Common.Interfaces;
+using Commons.Extensions;
+using Commons.Interfaces;
 using EBuEf2IVUBase.Extensions;
 using EBuEf2IVUBase.Settings;
 using Microsoft.Extensions.DependencyInjection;

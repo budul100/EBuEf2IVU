@@ -1,6 +1,6 @@
-﻿using Common.Models;
+﻿using Commons.Models;
 
-namespace Common.Interfaces
+namespace Commons.Interfaces
 {
     public interface IMessage2LegConverter
     {

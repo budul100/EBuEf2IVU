@@ -1,7 +1,7 @@
-using Common.Enums;
-using Common.EventsArgs;
-using Common.Extensions;
-using Common.Interfaces;
+using Commons.Enums;
+using Commons.EventsArgs;
+using Commons.Extensions;
+using Commons.Interfaces;
 using EBuEf2IVUTestBase;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

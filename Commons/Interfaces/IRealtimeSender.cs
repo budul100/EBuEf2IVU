@@ -1,10 +1,10 @@
-using Common.Models;
+using Commons.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Common.Interfaces
+namespace Commons.Interfaces
 {
     public interface IRealtimeSender
     {
@@ -16,8 +16,8 @@ namespace Common.Interfaces
 
         Task ExecuteAsync(DateTime ivuDatum, TimeSpan sessionStart, CancellationToken cancellationToken);
 
-        void Initialize(string host, int port, string path, string username, string password,
-            bool isHttps, string division, int retryTime);
+        void Initialize(string host, int port, bool isHttps, string username, string password, string path,
+            string division, int retryTime);
 
         #endregion Public Methods
     }

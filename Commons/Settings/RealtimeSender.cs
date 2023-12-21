@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Common.Settings
+namespace Commons.Settings
 {
     public class RealtimeSender
         : ConnectorIVUBase

@@ -1,8 +1,8 @@
-﻿using Common.Enums;
+﻿using Commons.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace Common.Models
+namespace Commons.Models
 {
     public class TrainLeg
     {

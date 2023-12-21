@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Common.Converters
+namespace Commons.Converters
 {
     public class IntToBooleanConverter
         : JsonConverter

@@ -1,4 +1,4 @@
-﻿namespace Common.Enums
+﻿namespace Commons.Enums
 {
     public enum MessageType
     {

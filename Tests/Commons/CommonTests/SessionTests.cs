@@ -1,5 +1,5 @@
-using Common.EventsArgs;
-using Common.Interfaces;
+using Commons.EventsArgs;
+using Commons.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -70,7 +70,7 @@ namespace CommonTests
                 stateReceiver: messageReceiverMock.Object);
 
             var wasCalled = false;
-            sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.StateType == Common.Enums.StateType.IsRunning;
+            sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.StateType == Commons.Enums.StateType.IsRunning;
 
             Task.WaitAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
@@ -103,7 +103,7 @@ namespace CommonTests
             var eventsSend = 0;
             sessionStateHandler.SessionChangedEvent += (o, e) =>
             {
-                if (e.StateType == Common.Enums.StateType.InPreparation) eventsSend++;
+                if (e.StateType == Commons.Enums.StateType.InPreparation) eventsSend++;
             };
 
             Task.WhenAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
@@ -127,7 +127,7 @@ namespace CommonTests
             var databaseConnectorMock = new Mock<IDatabaseConnector>();
             databaseConnectorMock
                 .Setup(c => c.GetEBuEfSessionAsync())
-                .Returns(Task.FromResult(new Common.Models.EBuEfSession { Status = Common.Enums.StateType.IsRunning }));
+                .Returns(Task.FromResult(new Commons.Models.EBuEfSession { Status = Commons.Enums.StateType.IsRunning }));
 
             var sessionStateHandler = new StateHandler.Handler(
                 logger: loggerMock.Object,
@@ -135,7 +135,7 @@ namespace CommonTests
                 stateReceiver: messageReceiverMock.Object);
 
             var wasCalled = false;
-            sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.StateType == Common.Enums.StateType.IsRunning;
+            sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.StateType == Commons.Enums.StateType.IsRunning;
 
             Task.WhenAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 

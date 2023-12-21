@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Common.Models
+namespace Commons.Models
 {
     public class TrainPosition
     {

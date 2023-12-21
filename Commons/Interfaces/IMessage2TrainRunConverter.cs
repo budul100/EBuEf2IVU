@@ -1,7 +1,7 @@
-﻿using Common.Models;
+﻿using Commons.Models;
 using System.Collections.Generic;
 
-namespace Common.Interfaces
+namespace Commons.Interfaces
 {
     public interface IMessage2TrainRunConverter
     {

@@ -1,7 +1,7 @@
-﻿using Common.Enums;
+﻿using Commons.Enums;
 using System;
 
-namespace Common.EventsArgs
+namespace Commons.EventsArgs
 {
     public class StateChangedArgs
         : EventArgs

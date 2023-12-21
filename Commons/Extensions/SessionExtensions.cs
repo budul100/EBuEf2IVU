@@ -1,8 +1,8 @@
-﻿using Common.Enums;
-using Common.Models;
+﻿using Commons.Enums;
+using Commons.Models;
 using System;
 
-namespace Common.Extensions
+namespace Commons.Extensions
 {
     public static class SessionExtensions
     {

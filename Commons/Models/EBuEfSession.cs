@@ -1,7 +1,7 @@
-﻿using Common.Enums;
+﻿using Commons.Enums;
 using System;
 
-namespace Common.Models
+namespace Commons.Models
 {
     public class EBuEfSession
     {

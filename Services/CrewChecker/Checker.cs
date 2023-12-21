@@ -1,5 +1,5 @@
-﻿using Common.Interfaces;
-using Common.Models;
+﻿using Commons.Interfaces;
+using Commons.Models;
 using CredentialChannelFactory;
 using CrewChecker.Extensions;
 using EnumerableExtensions;
@@ -51,7 +51,7 @@ namespace CrewChecker
             return result;
         }
 
-        public void Initialize(string host, int port, string path, string username, string password, bool isHttps,
+        public void Initialize(string host, int port, bool isHttps, string username, string password, string path,
             string division, string planningLevel, int retryTime)
         {
             if (string.IsNullOrWhiteSpace(host))

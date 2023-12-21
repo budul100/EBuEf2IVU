@@ -31,12 +31,15 @@
 		<RetryTime>30</RetryTime>
 	</TrainPathReceiver>
 	<TrainPathSender>
+		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->
 		<Host>host.docker.internal</Host>
+		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The value of the settings file is used preferably.-->
 		<Port>20000</Port>
-		<Path>intf.trainpath.standardimport.impl/TrainPathImportWebFacadeBean</Path>
+		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The value of the settings file is used preferably.-->
 		<IsHttps>false</IsHttps>
 		<Username>trainpath</Username>
 		<Password>trainpath</Password>
+		<Path>intf.trainpath.standardimport.impl/TrainPathImportWebFacadeBean</Path>
 		<RetryTime>30</RetryTime>
 		<IgnoreTrainTypes>RF</IgnoreTrainTypes>
 		<!-- Split multiple IgnoreTrainTypes with , -->

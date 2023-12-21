@@ -1,6 +1,6 @@
 using System;
 
-namespace Common.EventsArgs
+namespace Commons.EventsArgs
 {
     public class MessageReceivedArgs
         : EventArgs

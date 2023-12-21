@@ -1,8 +1,8 @@
-﻿using Common.Enums;
+﻿using Commons.Enums;
 using Newtonsoft.Json;
 using System;
 
-namespace Common.Models
+namespace Commons.Models
 {
     public class RealTimeMessage
     {

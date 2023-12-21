@@ -1,6 +1,7 @@
-using Common.Enums;
-using Common.Interfaces;
-using Common.Models;
+using Commons.Enums;
+using Commons.Extensions;
+using Commons.Interfaces;
+using Commons.Models;
 using EBuEf2IVUBase;
 using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
@@ -129,10 +130,10 @@ namespace EBuEf2IVUPath
 
         #region Private Methods
 
-        private async Task<IEnumerable<string>> GetLocationShortnamesAsync(Common.Settings.TrainPathSender senderSettings)
+        private async Task<IEnumerable<string>> GetLocationShortnamesAsync(Commons.Settings.TrainPathSender senderSettings)
         {
             var locationTypes = senderSettings.LocationTypes?.Split(
-                separator: Common.Settings.TrainPathSender.SettingsSeparator,
+                separator: Commons.Settings.TrainPathSender.SettingsSeparator,
                 options: StringSplitOptions.RemoveEmptyEntries);
 
             var result = await databaseConnector.GetLocationShortnamesAsync(locationTypes);
@@ -153,8 +154,8 @@ namespace EBuEf2IVUPath
                 "Der Nachrichten-Empfänger von EBuEf2IVUPath wird gestartet.");
 
             var receiverSettings = config
-                .GetSection(nameof(Common.Settings.TrainPathReceiver))
-                .Get<Common.Settings.TrainPathReceiver>();
+                .GetSection(nameof(Commons.Settings.TrainPathReceiver))
+                .Get<Commons.Settings.TrainPathReceiver>();
 
             trainPathReceiver.Initialize(
                 host: receiverSettings.Host,
@@ -168,37 +169,41 @@ namespace EBuEf2IVUPath
             logger.LogInformation(
                 "Der Trassen-Sender von EBuEf2IVUPath wird gestartet.");
 
-            var senderSettings = config
-                .GetSection(nameof(Common.Settings.TrainPathSender))
-                .Get<Common.Settings.TrainPathSender>();
+            var settings = config
+                .GetSection(nameof(Commons.Settings.TrainPathSender))
+                .Get<Commons.Settings.TrainPathSender>();
 
-            var ignoreTrainTypes = senderSettings.IgnoreTrainTypes?.Split(
-                separator: Common.Settings.TrainPathSender.SettingsSeparator,
+            var ignoreTrainTypes = settings.IgnoreTrainTypes?.Split(
+                separator: Commons.Settings.TrainPathSender.SettingsSeparator,
                 options: StringSplitOptions.RemoveEmptyEntries);
 
-            var locationShortnames = await GetLocationShortnamesAsync(senderSettings);
+            var locationShortnames = await GetLocationShortnamesAsync(settings);
+
+            var host = settings.GetHost();
+            var port = settings.GetPort() ?? 0;
+            var isHttps = settings.GetIsHttps() ?? false;
 
             trainPathSender.Initialize(
-                host: senderSettings.Host,
-                port: senderSettings.Port,
-                path: senderSettings.Path,
-                username: senderSettings.Username,
-                password: senderSettings.Password,
-                isHttps: senderSettings.IsHttps,
-                retryTime: senderSettings.RetryTime,
-                infrastructureManager: senderSettings.InfrastructureManager,
-                orderingTransportationCompany: senderSettings.OrderingTransportationCompany,
-                stoppingReasonStop: senderSettings.StoppingReasonStop,
-                stoppingReasonPass: senderSettings.StoppingReasonPass,
-                trainPathStateRun: senderSettings.TrainPathStateRun,
-                trainPathStateCancelled: senderSettings.TrainPathStateCancelled,
-                importProfile: senderSettings.ImportProfile,
+                host: host,
+                port: port,
+                isHttps: isHttps,
+                username: settings.Username,
+                password: settings.Password,
+                path: settings.Path,
+                retryTime: settings.RetryTime,
+                infrastructureManager: settings.InfrastructureManager,
+                orderingTransportationCompany: settings.OrderingTransportationCompany,
+                stoppingReasonStop: settings.StoppingReasonStop,
+                stoppingReasonPass: settings.StoppingReasonPass,
+                trainPathStateRun: settings.TrainPathStateRun,
+                trainPathStateCancelled: settings.TrainPathStateCancelled,
+                importProfile: settings.ImportProfile,
                 ignoreTrainTypes: ignoreTrainTypes,
                 locationShortnames: locationShortnames,
-                logRequests: senderSettings.LogRequests);
+                logRequests: settings.LogRequests);
         }
 
-        private void OnMessageReceived(object sender, Common.EventsArgs.MessageReceivedArgs e)
+        private void OnMessageReceived(object sender, Commons.EventsArgs.MessageReceivedArgs e)
         {
             logger.LogDebug(
                 "Zugtrassen-Nachricht empfangen: {content}",
@@ -249,8 +254,8 @@ namespace EBuEf2IVUPath
             else
             {
                 var senderSettings = config
-                    .GetSection(nameof(Common.Settings.TrainPathSender))
-                    .Get<Common.Settings.TrainPathSender>();
+                    .GetSection(nameof(Commons.Settings.TrainPathSender))
+                    .Get<Commons.Settings.TrainPathSender>();
 
                 var trainRuns = await databaseConnector.GetTrainRunsPlanAsync(
                     timetableId: ebuefSession.FahrplanId,

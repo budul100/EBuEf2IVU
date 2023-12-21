@@ -1,4 +1,4 @@
-﻿namespace Common.Settings
+﻿namespace Commons.Settings
 {
     public class PositionsReceiver
         : ConnectorEBuEfBase

@@ -1,6 +1,6 @@
-using Common.Extensions;
-using Common.Interfaces;
-using Common.Models;
+using Commons.Extensions;
+using Commons.Interfaces;
+using Commons.Models;
 using EBuEf2IVUTestBase;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,18 +43,18 @@ namespace RealTimeSenderTests
                 .Build();
 
             var senderSettings = host.Services.GetService<IConfiguration>()
-                .GetSection(nameof(Common.Settings.RealtimeSender))
-                .Get<Common.Settings.RealtimeSender>();
+                .GetSection(nameof(Commons.Settings.RealtimeSender))
+                .Get<Commons.Settings.RealtimeSender>();
 
             var sender = host.Services.GetService<IRealtimeSender>();
 
             sender.Initialize(
                 host: senderSettings.Host,
-                port: senderSettings.Port,
-                path: senderSettings.Path,
+                port: senderSettings.Port ?? 0,
+                isHttps: senderSettings.IsHttps ?? true,
                 username: senderSettings.Username,
                 password: senderSettings.Password,
-                isHttps: senderSettings.IsHttps,
+                path: senderSettings.Path,
                 division: senderSettings.Division,
                 retryTime: senderSettings.RetryTime);
 
@@ -62,7 +62,7 @@ namespace RealTimeSenderTests
             {
                 IVUNetzpunkt = "ABC",
                 IVUGleis = "9",
-                IVULegTyp = Common.Enums.LegType.Abfahrt,
+                IVULegTyp = Commons.Enums.LegType.Abfahrt,
                 Zugnummer = "123"
             };
 

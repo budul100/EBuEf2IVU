@@ -1,4 +1,4 @@
-using Common.Models;
+using Commons.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -51,22 +51,22 @@ namespace TrainPathSenderTests
             var logger = loggerFactory.CreateLogger<Sender>();
 
             var senderSettings = config
-                .GetSection(nameof(Common.Settings.TrainPathSender))
-                .Get<Common.Settings.TrainPathSender>();
+                .GetSection(nameof(Commons.Settings.TrainPathSender))
+                .Get<Commons.Settings.TrainPathSender>();
 
             var ignoreTrainTypes = senderSettings.IgnoreTrainTypes?.Split(
-                separator: Common.Settings.TrainPathSender.SettingsSeparator,
+                separator: Commons.Settings.TrainPathSender.SettingsSeparator,
                 options: StringSplitOptions.RemoveEmptyEntries);
 
             sender = new Sender(logger);
 
             sender.Initialize(
                 host: senderSettings.Host,
-                port: senderSettings.Port,
-                path: senderSettings.Path,
+                port: senderSettings.Port ?? 0,
+                isHttps: senderSettings.IsHttps ?? false,
                 username: senderSettings.Username,
                 password: senderSettings.Password,
-                isHttps: senderSettings.IsHttps,
+                path: senderSettings.Path,
                 retryTime: senderSettings.RetryTime,
                 infrastructureManager: senderSettings.InfrastructureManager,
                 orderingTransportationCompany: senderSettings.OrderingTransportationCompany,

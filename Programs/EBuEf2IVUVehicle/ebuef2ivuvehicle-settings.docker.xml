@@ -31,21 +31,23 @@
 		<RetryTime>30</RetryTime>
 	</PositionsReceiver>
 	<RealtimeSender>
-		<Division>EBUEF</Division>
-		<Host>host.docker.internal</Host>
-		<IgnorePrognosis>false</IgnorePrognosis>
-		<RetryTime>30</RetryTime>
-
-		<!--<DateMin>2000-01-01</DateMin>-->
-
-		<!--<Port>20000</Port>
-		<Path>intf.realtime.standardimport.impl/RealtimeImportWebFacadeBean</Path>
-		<IsHttps>false</IsHttps>
-		<Username>ivu</Username>
-		<Password>ivu$admin</Password>-->
-
 		<UseInterfaceServer>true</UseInterfaceServer>
 		<Endpoint>http://host.docker.internal:8080</Endpoint>
+
+		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->
+		<Host>host.docker.internal</Host>
+		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The value of the settings file is used preferably.-->
+		<Port>20000</Port>
+		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The value of the settings file is used preferably.-->
+		<IsHttps>false</IsHttps>
+		<Path>intf.realtime.standardimport.impl/RealtimeImportWebFacadeBean</Path>
+		<Username>ivu</Username>
+		<Password>ivu$admin</Password>
+
+		<Division>EBUEF</Division>
+		<IgnorePrognosis>false</IgnorePrognosis>
+		<RetryTime>30</RetryTime>
+		<!--<DateMin>2000-01-01</DateMin>-->
 	</RealtimeSender>
 	<InfrastructureMappings>
 		<InfrastructureMapping name="XAB_A">

@@ -1,10 +1,10 @@
-﻿using Common.Enums;
-using Common.EventsArgs;
+﻿using Commons.Enums;
+using Commons.EventsArgs;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Common.Interfaces
+namespace Commons.Interfaces
 {
     public interface IStateHandler
     {

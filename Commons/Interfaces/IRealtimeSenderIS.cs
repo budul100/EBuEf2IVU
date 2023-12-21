@@ -1,10 +1,10 @@
-using Common.Models;
+using Commons.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Common.Interfaces
+namespace Commons.Interfaces
 {
     public interface IRealtimeSenderIS
     {

@@ -1,5 +1,5 @@
-﻿using Common.Interfaces;
-using Common.Models;
+﻿using Commons.Interfaces;
+using Commons.Models;
 using CredentialChannelFactory;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -86,8 +86,8 @@ namespace RealtimeSender
             return senderTask;
         }
 
-        public void Initialize(string host, int port, string path, string username, string password,
-            bool isHttps, string division, int retryTime)
+        public void Initialize(string host, int port, bool isHttps, string username, string password,
+            string path, string division, int retryTime)
         {
             if (string.IsNullOrWhiteSpace(host))
             {

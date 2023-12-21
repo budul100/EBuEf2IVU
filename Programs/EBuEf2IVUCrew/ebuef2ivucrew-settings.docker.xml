@@ -26,12 +26,15 @@
 		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
 	</StatusReceiver>
 	<CrewChecker>
+		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->
 		<Host>host.docker.internal</Host>
+		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The value of the settings file is used preferably.-->
 		<Port>20000</Port>
-		<Path>intf.crewontrip.impl/CrewOnTripWebFacadeBean</Path>
+		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The value of the settings file is used preferably.-->
 		<IsHttps>false</IsHttps>
 		<Username>ivu</Username>
 		<Password>ivu$admin</Password>
+		<Path>intf.crewontrip.impl/CrewOnTripWebFacadeBean</Path>
 		<RetryTime>30</RetryTime>
 		<AbfrageIntervalSek>60</AbfrageIntervalSek>
 		<AbfrageVergangenheitMin>15</AbfrageVergangenheitMin>

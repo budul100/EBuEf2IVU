@@ -1,6 +1,6 @@
-using Common.Enums;
-using Common.Extensions;
-using Common.Interfaces;
+using Commons.Enums;
+using Commons.Extensions;
+using Commons.Interfaces;
 using EBuEf2IVUBase;
 using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
@@ -156,35 +156,39 @@ namespace EBuEf2IVUCrew
             logger.LogInformation(
                 "IVU-Connector für EBuEf2IVUCrew wird gestartet.");
 
-            var serviceSettings = config
-                .GetSection(nameof(Common.Settings.CrewChecker))
-                .Get<Common.Settings.CrewChecker>();
+            var settings = config
+                .GetSection(nameof(Commons.Settings.CrewChecker))
+                .Get<Commons.Settings.CrewChecker>();
 
             serviceInterval = new TimeSpan(
                 hours: 0,
                 minutes: 0,
-                seconds: serviceSettings.AbfrageIntervalSek);
+                seconds: settings.AbfrageIntervalSek);
 
             queryDurationPast = new TimeSpan(
                 hours: 0,
-                minutes: serviceSettings.AbfrageVergangenheitMin * -1,
+                minutes: settings.AbfrageVergangenheitMin * -1,
                 seconds: 0);
 
             queryDurationFuture = new TimeSpan(
                 hours: 0,
-                minutes: serviceSettings.AbfrageZukunftMin,
+                minutes: settings.AbfrageZukunftMin,
                 seconds: 0);
 
+            var host = settings.GetHost();
+            var port = settings.GetPort() ?? 0;
+            var isHttps = settings.GetIsHttps() ?? false;
+
             crewChecker.Initialize(
-                host: serviceSettings.Host,
-                port: serviceSettings.Port,
-                path: serviceSettings.Path,
-                username: serviceSettings.Username,
-                password: serviceSettings.Password,
-                isHttps: serviceSettings.IsHttps,
-                division: serviceSettings.Division,
-                planningLevel: serviceSettings.PlanningLevel,
-                retryTime: serviceSettings.RetryTime);
+                host: host,
+                port: port,
+                isHttps: isHttps,
+                username: settings.Username,
+                password: settings.Password,
+                path: settings.Path,
+                division: settings.Division,
+                planningLevel: settings.PlanningLevel,
+                retryTime: settings.RetryTime);
         }
 
         #endregion Private Methods

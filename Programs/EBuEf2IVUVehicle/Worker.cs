@@ -1,8 +1,9 @@
-using Common.Enums;
-using Common.EventsArgs;
-using Common.Interfaces;
-using Common.Models;
-using Common.Settings;
+using Commons.Enums;
+using Commons.EventsArgs;
+using Commons.Extensions;
+using Commons.Interfaces;
+using Commons.Models;
+using Commons.Settings;
 using EBuEf2IVUBase;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -159,8 +160,8 @@ namespace EBuEf2IVUVehicle
                 "Der Ist-Daten-Sender von EBuEf2IVUVehicle wird gestartet.");
 
             var settings = config
-                .GetSection(nameof(Common.Settings.RealtimeSender))
-                .Get<Common.Settings.RealtimeSender>();
+                .GetSection(nameof(Commons.Settings.RealtimeSender))
+                .Get<Commons.Settings.RealtimeSender>();
 
             ignorePrognosis = settings.IgnorePrognosis;
             useInterfaceServer = settings.UseInterfaceServer;
@@ -174,13 +175,17 @@ namespace EBuEf2IVUVehicle
             }
             else
             {
+                var host = settings.GetHost();
+                var port = settings.GetPort() ?? 0;
+                var isHttps = settings.GetIsHttps() ?? false;
+
                 realtimeSender.Initialize(
-                    host: settings.Host,
-                    port: settings.Port,
-                    path: settings.Path,
+                    host: host,
+                    port: port,
+                    isHttps: isHttps,
                     username: settings.Username,
                     password: settings.Password,
-                    isHttps: settings.IsHttps,
+                    path: settings.Path,
                     division: settings.Division,
                     retryTime: settings.RetryTime);
             }

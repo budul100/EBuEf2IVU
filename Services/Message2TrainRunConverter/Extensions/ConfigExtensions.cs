@@ -1,4 +1,4 @@
-﻿using Common.Models;
+﻿using Commons.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -11,8 +11,8 @@ namespace Message2TrainRunConverter.Extensions
         public static Func<TrainPathMessage, DateTime?> GetAbfahrtGetter(this IConfiguration config)
         {
             var senderSettings = config
-                .GetSection(nameof(Common.Settings.TrainPathSender))
-                .Get<Common.Settings.TrainPathSender>();
+                .GetSection(nameof(Commons.Settings.TrainPathSender))
+                .Get<Commons.Settings.TrainPathSender>();
 
             var result = senderSettings.PreferPrognosis
                 ? (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtPrognose ?? m.AbfahrtSoll ?? m.AbfahrtPlan)
@@ -24,8 +24,8 @@ namespace Message2TrainRunConverter.Extensions
         public static Func<TrainPathMessage, DateTime?> GetAnkunftGetter(this IConfiguration config)
         {
             var senderSettings = config
-                .GetSection(nameof(Common.Settings.TrainPathSender))
-                .Get<Common.Settings.TrainPathSender>();
+                .GetSection(nameof(Commons.Settings.TrainPathSender))
+                .Get<Commons.Settings.TrainPathSender>();
 
             var result = senderSettings.PreferPrognosis
                 ? (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftPrognose ?? m.AnkunftSoll ?? m.AnkunftPlan)
