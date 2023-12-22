@@ -34,7 +34,7 @@ DEL /q %TARGETDIR%\*.deb
 
 REM **********************************************************************************
 
-SET SERVICENAME=EBuEf2IVUCrew
+SET SERVICENAME=ebuef2ivucrew
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
 
 echo.
@@ -66,7 +66,7 @@ echo.
 
 REM **********************************************************************************
 
-SET SERVICENAME=EBuEf2IVUPath
+SET SERVICENAME=ebuef2ivupath
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
 
 echo.
@@ -98,7 +98,7 @@ echo.
 
 REM **********************************************************************************
 
-SET SERVICENAME=EBuEf2IVUVehicle
+SET SERVICENAME=ebuef2ivuvehicle
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
 
 echo.
@@ -129,8 +129,18 @@ powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERV
 echo.
 
 REM **********************************************************************************
+
+echo.
+echo.
+echo ***
+echo *** Restore installation ***
+echo ***
+echo.
 
 dotnet restore
+
+REM wsl -e bash ./Create_Docker.sh
+REM echo.
 
 echo.
 pause

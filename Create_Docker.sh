@@ -1,3 +1,8 @@
+# Get into the folder and run script: 	
+#
+# cd /mnt/c/Users/mgr/Entwicklung/EBuEf2IVU
+# sh Create_Docker.sh
+
 echo
 echo "Build ebuef2ivucrew"
 echo

@@ -3,3 +3,7 @@ export PATH='/bin':'/home/mgr/.dotnet/tools':'/mnt/c/Oracle/product/12.2.0/clien
 cd /mnt/c/Users/mgr/Entwicklung/EBuEf2IVU/Programs/$1
 
 dotnet deb --configuration Release --framework $2 --runtime $3
+
+# cd /mnt/c/Users/mgr/Entwicklung/EBuEf2IVU
+# 
+# docker buildx build --network=host -t "$1" -f ./Programs/$1/Dockerfile .
