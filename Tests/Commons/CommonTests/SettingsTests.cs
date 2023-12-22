@@ -11,7 +11,12 @@ namespace CommonTests
         [Test]
         public void UserEnvironmentVariables()
         {
-            const string host = "test";
+            const string endpoint = "testpoint";
+            Environment.SetEnvironmentVariable(SettingsExtensions.EnvironmentIVUEndpoint, endpoint);
+
+            Assert.True(default(Commons.Settings.RealtimeSender).GetEndpoint() == endpoint);
+
+            const string host = "testhost";
             Environment.SetEnvironmentVariable(SettingsExtensions.EnvironmentIVUHost, host);
 
             Assert.True(default(Commons.Settings.RealtimeSender).GetHost() == host);

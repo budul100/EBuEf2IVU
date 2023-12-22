@@ -168,8 +168,10 @@ namespace EBuEf2IVUVehicle
 
             if (useInterfaceServer)
             {
+                var endpoint = settings.GetEndpoint();
+
                 realtimeSenderIS.Initialize(
-                    endpoint: settings.Endpoint,
+                    endpoint: endpoint,
                     division: settings.Division,
                     retryTime: settings.RetryTime);
             }

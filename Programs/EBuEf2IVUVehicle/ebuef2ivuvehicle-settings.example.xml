@@ -32,6 +32,8 @@
 	</PositionsReceiver>
 	<RealtimeSender>
 		<UseInterfaceServer>true</UseInterfaceServer>
+
+		<!--The host can also be defined by the environment variable IVU_IFSERVER_ENDPOINT. The value of the settings file is used preferably.-->
 		<Endpoint>http://ivu.ebuef:8080</Endpoint>
 
 		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->

@@ -7,6 +7,7 @@ namespace Commons.Extensions
     {
         #region Public Fields
 
+        public const string EnvironmentIVUEndpoint = "IVU_IFSERVER_ENDPOINT";
         public const string EnvironmentIVUHost = "IVU_APPSERVER_HOST";
         public const string EnvironmentIVUIsHttps = "IVU_APPSERVER_ISHTTPS";
         public const string EnvironmentIVUPort = "IVU_APPSERVER_PORT";
@@ -14,6 +15,18 @@ namespace Commons.Extensions
         #endregion Public Fields
 
         #region Public Methods
+
+        public static string GetEndpoint(this RealtimeSender settings)
+        {
+            var result = settings?.Endpoint;
+
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                result = Environment.GetEnvironmentVariable(EnvironmentIVUEndpoint);
+            }
+
+            return result;
+        }
 
         public static string GetHost<T>(this T settings)
             where T : ConnectorIVUBase
