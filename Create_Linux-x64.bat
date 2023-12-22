@@ -14,8 +14,6 @@ SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 echo.
 echo ##### Create EBuEf2IVU #####
 echo.
-echo Create any docker files first by starting the Debian bash and running sh Create_Docker.sh
-echo.
 
 echo.
 CHOICE /C mb /N /M "Shall the [b]uild (x.x._X_.0) or the [m]inor version (x._X_.0.0) be increased?"
@@ -141,6 +139,13 @@ dotnet restore
 
 REM wsl -e bash ./Create_Docker.sh
 REM echo.
+
+echo.
+echo Run the following commands in your Linux subsystem to create the repective Docker files.
+echo.
+echo cd /mnt/c/Users/mgr/Entwicklung/EBuEf2IVU
+echo sudo sh Create_Docker.sh
+echo.
 
 echo.
 pause
