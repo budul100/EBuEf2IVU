@@ -33,3 +33,9 @@ echo "Create tar file"
 echo
 
 docker save --output ebuef2ivu.tar ebuef2ivucrew ebuef2ivupath ebuef2ivuvehicle
+
+echo
+echo "Copy tar file"
+echo
+
+cp ebuef2ivu.tar /mnt/c/Users/mgr/Dropbox/Public/EBuEf
