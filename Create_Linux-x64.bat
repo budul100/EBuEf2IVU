@@ -3,12 +3,14 @@
 SET PATH=%PATH%;.
 
 SET FRAMEWORK=net6.0
-SET RUNTIME=linux-x64
+SET RUNTIME1=linux-x64
+SET RUNTIME2=linux-arm64
 
 SET ScriptsDir=.\_Scripts\Build
 
 SET TARGETDIR=.
-SET SOURCEDIR=.\bin\Release\%FRAMEWORK%\%RUNTIME%
+SET SOURCEDIR1=.\bin\Release\%FRAMEWORK%\%RUNTIME1%
+SET SOURCEDIR2=.\bin\Release\%FRAMEWORK%\%RUNTIME2%
 SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 
 echo.
@@ -33,7 +35,6 @@ DEL /q %TARGETDIR%\*.deb
 REM **********************************************************************************
 
 SET SERVICENAME=ebuef2ivucrew
-SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
 
 echo.
 echo.
@@ -49,15 +50,25 @@ if /i "%VERSIONSELECTION%" == "1" (
 
 )
 
-SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME1%.deb
 
-wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME%
+wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME1%
 echo.
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
-XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
-XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR1%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR1%\%DEBFILE% %DROPBOXDIR%
+
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME2%.deb
+
+wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME2%
+echo.
+
+DEL /q %DROPBOXDIR%\%DEBFILE%
+
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %DROPBOXDIR%
 
 powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 echo.
@@ -65,7 +76,6 @@ echo.
 REM **********************************************************************************
 
 SET SERVICENAME=ebuef2ivupath
-SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
 
 echo.
 echo.
@@ -81,15 +91,25 @@ if /i "%VERSIONSELECTION%" == "1" (
 
 )
 
-SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME1%.deb
 
-wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME%
+wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME1%
 echo.
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
-XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
-XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR1%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR1%\%DEBFILE% %DROPBOXDIR%
+
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME2%.deb
+
+wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME2%
+echo.
+
+DEL /q %DROPBOXDIR%\%DEBFILE%
+
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %DROPBOXDIR%
 
 powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 echo.
@@ -97,7 +117,6 @@ echo.
 REM **********************************************************************************
 
 SET SERVICENAME=ebuef2ivuvehicle
-SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
 
 echo.
 echo.
@@ -113,15 +132,25 @@ if /i "%VERSIONSELECTION%" == "1" (
 
 )
 
-SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME%.deb
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME1%.deb
 
-wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME%
+wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME1%
 echo.
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
-XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %TARGETDIR%
-XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR%\%DEBFILE% %DROPBOXDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR1%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR1%\%DEBFILE% %DROPBOXDIR%
+
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME2%.deb
+
+wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME2%
+echo.
+
+DEL /q %DROPBOXDIR%\%DEBFILE%
+
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %DROPBOXDIR%
 
 powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 echo.
@@ -144,6 +173,7 @@ echo.
 echo Run the following commands in your Linux subsystem to create the repective Docker files.
 echo.
 echo cd /mnt/c/Users/mgr/Entwicklung/EBuEf2IVU
+echo docker login git.tu-berlin.de:5000
 echo sudo sh Create_Docker.sh
 echo.
 
