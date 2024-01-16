@@ -13,7 +13,7 @@ echo
 echo "Build ebuef2ivupath"
 echo
 
-docker buildx build --network=host -t "ebuef2ivupath" -f ./Programs/EBuEf2IVUPath/Dockerfile .
+docker buildx build --network=host -t git.tu-berlin.de:5000/ebuef/ebueftools/ebuef2ivupath -f ./Programs/EBuEf2IVUCrew/Dockerfile .
 
 echo
 echo "Build ebuef2ivuvehicle"
