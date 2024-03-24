@@ -1,14 +1,9 @@
-﻿namespace EBuEf2IVUBase.Settings
+﻿namespace Commons.Settings
 {
     public class StatusReceiver
+        : ConnectorEBuEfBase
     {
         #region Public Properties
-
-        public string Host { get; set; }
-
-        public int Port { get; set; }
-
-        public int RetryTime { get; set; }
 
         public string StartPattern { get; set; }
 

@@ -8,6 +8,7 @@ using Commons.Models;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using TrainPathSender;
+using Commons.Settings;
 
 namespace TrainPathSenderTests
 {
@@ -84,8 +85,8 @@ namespace TrainPathSenderTests
         public void InitialImport()
         {
             var connectorSettings = config
-                .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
-                .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
+                .GetSection(nameof(EBuEfDBConnector))
+                .Get<EBuEfDBConnector>();
 
             var databaseConnector = new DatabaseConnector.Connector(loggerFactory.CreateLogger<DatabaseConnector.Connector>());
 

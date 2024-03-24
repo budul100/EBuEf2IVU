@@ -26,6 +26,9 @@ namespace Commons.Interfaces
 
         void Initialize(string host, int port, int retryTime, string startPattern, string statusPattern);
 
+        void Initialize(string server, string topic, int retryTime, string startPattern,
+            string statusPattern);
+
         #endregion Public Methods
     }
 }

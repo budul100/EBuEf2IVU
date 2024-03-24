@@ -19,6 +19,7 @@
 		<RetryTime>30</RetryTime>
 	</EBuEfDBConnector>
 	<StatusReceiver>
+		<UseMulticast>true</UseMulticast>
 		<MulticastHost>224.0.0.8</MulticastHost>
 		<MulticastPort>4454</MulticastPort>
 		<RetryTime>30</RetryTime>
@@ -26,6 +27,7 @@
 		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
 	</StatusReceiver>
 	<PositionsReceiver>
+		<UseMulticast>true</UseMulticast>
 		<MulticastHost>224.0.0.7</MulticastHost>
 		<MulticastPort>4453</MulticastPort>
 		<RetryTime>30</RetryTime>

@@ -18,7 +18,7 @@ namespace EBuEf2IVUPathTests
     {
         #region Private Fields
 
-        private const string SettingsPath = @"..\..\..\..\..\..\Programs\EBuEf2IVUPath\ebuef2ivupath-settings.example.xml";
+        private const string SettingsPath = @"..\..\..\EBuEf2IVUPathTests.example.xml";
 
         #endregion Private Fields
 
@@ -29,10 +29,12 @@ namespace EBuEf2IVUPathTests
         {
             var wasCalled = false;
 
+            var stateHandlerMock = GetStateHandlerMock();
+            var multicastReceiver = new Mock<IMulticastReceiver>();
+            var mqttReceiver = new Mock<IMQTTReceiver>();
+
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 sessionCallback: () => wasCalled = true);
-            var stateHandlerMock = GetStateHandlerMock();
-            var messageReceiverMock = new Mock<IMulticastReceiver>();
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -40,7 +42,7 @@ namespace EBuEf2IVUPathTests
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, messageReceiverMock))
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, multicastReceiver.Object, mqttReceiver.Object))
                 .Build();
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -63,12 +65,14 @@ namespace EBuEf2IVUPathTests
         [Test]
         public void InitializeSessionTwice()
         {
+            var stateHandlerMock = GetStateHandlerMock();
+            var multicastReceiver = new Mock<IMulticastReceiver>();
+            var mqttReceiver = new Mock<IMQTTReceiver>();
+
             var eventCount = 0;
 
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 trainRunsPlanCallback: () => eventCount++);
-            var stateHandlerMock = GetStateHandlerMock();
-            var messageReceiverMock = new Mock<IMulticastReceiver>();
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -76,7 +80,7 @@ namespace EBuEf2IVUPathTests
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, messageReceiverMock))
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, multicastReceiver.Object, mqttReceiver.Object))
                 .Build();
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -111,7 +115,7 @@ namespace EBuEf2IVUPathTests
         #region Private Methods
 
         private static void ConfigureServices(IServiceCollection services, Mock<IDatabaseConnector> databaseConnectorMock,
-            Mock<IStateHandler> stateHandlerMock, Mock<IMulticastReceiver> messageReceiverMock)
+            Mock<IStateHandler> stateHandlerMock, IMulticastReceiver multicastReceiver, IMQTTReceiver mQTTReceiver)
         {
             services.AddHostedService<EBuEf2IVUPath.Worker>();
 
@@ -119,7 +123,8 @@ namespace EBuEf2IVUPathTests
             services.AddSingleton(databaseConnectorMock.Object);
             services.AddSingleton(stateHandlerMock.Object);
 
-            services.AddSingleton(messageReceiverMock.Object);
+            services.AddSingleton(multicastReceiver);
+            services.AddSingleton(mQTTReceiver);
             services.AddSingleton<IMessage2TrainRunConverter, Message2TrainRunConverter.Converter>();
 
             services.AddSingleton<ITrainPathSender, TrainPathSender.Sender>();

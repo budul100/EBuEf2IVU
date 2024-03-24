@@ -1,10 +1,10 @@
-﻿using CommandLine;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using CommandLine;
 using Commons.Extensions;
 using Commons.Interfaces;
 using EBuEf2IVUBase.Extensions;
 using EBuEf2IVUBase.Settings;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace EBuEf2IVUVehicle
@@ -33,9 +33,11 @@ namespace EBuEf2IVUVehicle
             services.AddHostedService<Worker>();
 
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
-            services.AddSingleton<IStateHandler, StateHandler.Handler>();
 
             services.AddTransient<IMulticastReceiver, MulticastReceiver.Receiver>();
+            services.AddTransient<IMQTTReceiver, MQTTReceiver.Receiver>();
+
+            services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IMessage2LegConverter, Message2LegConverter.Converter>();
 
             services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();

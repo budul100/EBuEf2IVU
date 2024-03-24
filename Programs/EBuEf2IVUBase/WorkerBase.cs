@@ -1,15 +1,15 @@
-using Commons.Enums;
-using Commons.EventsArgs;
-using Commons.Interfaces;
-using Commons.Models;
-using EBuEf2IVUBase.Settings;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Commons.Enums;
+using Commons.EventsArgs;
+using Commons.Interfaces;
+using Commons.Models;
+using Commons.Settings;
 
 namespace EBuEf2IVUBase
 {
@@ -92,12 +92,24 @@ namespace EBuEf2IVUBase
                 .GetSection(nameof(StatusReceiver))
                 .Get<StatusReceiver>();
 
-            sessionStateHandler.Initialize(
-                host: statucReceiverSettings.Host,
-                port: statucReceiverSettings.Port,
-                retryTime: statucReceiverSettings.RetryTime,
-                startPattern: statucReceiverSettings.StartPattern,
-                statusPattern: statucReceiverSettings.StatusPattern);
+            if (statucReceiverSettings.UseMulticast)
+            {
+                sessionStateHandler.Initialize(
+                    host: statucReceiverSettings.MulticastHost,
+                    port: statucReceiverSettings.MulticastPort,
+                    retryTime: statucReceiverSettings.RetryTime,
+                    startPattern: statucReceiverSettings.StartPattern,
+                    statusPattern: statucReceiverSettings.StatusPattern);
+            }
+            else
+            {
+                sessionStateHandler.Initialize(
+                    server: statucReceiverSettings.MqttServer,
+                    topic: statucReceiverSettings.MqttTopic,
+                    retryTime: statucReceiverSettings.RetryTime,
+                    startPattern: statucReceiverSettings.StartPattern,
+                    statusPattern: statucReceiverSettings.StatusPattern);
+            }
 
             await sessionStateHandler.ExecuteAsync(cancellationToken);
         }

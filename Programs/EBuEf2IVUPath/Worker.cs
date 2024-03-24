@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.Extensions;
 using Commons.Interfaces;
@@ -12,7 +5,14 @@ using Commons.Models;
 using Commons.Settings;
 using EBuEf2IVUBase;
 using EnumerableExtensions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EBuEf2IVUPath
 {
@@ -24,6 +24,7 @@ namespace EBuEf2IVUPath
         private const string MessageTypePaths = "Zugtrassen";
 
         private readonly IMessage2TrainRunConverter messageConverter;
+        private readonly IMQTTReceiver mqttReceiver;
         private readonly IMulticastReceiver multicastReceiver;
         private readonly ITrainPathSender trainPathSender;
 
@@ -35,13 +36,16 @@ namespace EBuEf2IVUPath
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
-            IMulticastReceiver multicastReceiver, IMessage2TrainRunConverter messageConverter, ITrainPathSender trainPathSender,
-            ILogger<Worker> logger)
+            IMulticastReceiver multicastReceiver, IMQTTReceiver mqttReceiver, IMessage2TrainRunConverter messageConverter,
+            ITrainPathSender trainPathSender, ILogger<Worker> logger)
             : base(config: config, sessionStateHandler: sessionStateHandler, databaseConnector: databaseConnector,
                   logger: logger, assembly: Assembly.GetExecutingAssembly())
         {
             this.multicastReceiver = multicastReceiver;
             this.multicastReceiver.MessageReceivedEvent += OnMessageReceived;
+
+            this.mqttReceiver = mqttReceiver;
+            this.mqttReceiver.MessageReceivedEvent += OnMessageReceived;
 
             this.messageConverter = messageConverter;
             this.trainPathSender = trainPathSender;
@@ -55,7 +59,8 @@ namespace EBuEf2IVUPath
         {
             _ = InitializeConnectionAsync(workerCancellationToken);
 
-            InitializePathReceiver();
+            var pathReceiver = GetPathReceiver();
+
             await InitializePathSenderAsync();
 
             while (!workerCancellationToken.IsCancellationRequested)
@@ -71,7 +76,7 @@ namespace EBuEf2IVUPath
                         if (isSessionRunning
                             && sessionStateHandler.StateType != StateType.IsPaused)
                         {
-                            var receiverTask = multicastReceiver.ExecuteAsync(sessionCancellationToken);
+                            var receiverTask = pathReceiver.ExecuteAsync(sessionCancellationToken);
 
                             var senderTask = trainPathSender.ExecuteAsync(
                                 ivuDatum: ebuefSession.IVUDatum,
@@ -149,20 +154,35 @@ namespace EBuEf2IVUPath
             return result;
         }
 
-        private void InitializePathReceiver()
+        private IMessageReceiver GetPathReceiver()
         {
             logger.LogInformation(
                 "Der Nachrichten-Empfänger von EBuEf2IVUPath wird gestartet.");
 
-            var receiverSettings = config
+            var settings = config
                 .GetSection(nameof(TrainPathReceiver))
                 .Get<TrainPathReceiver>();
 
-            multicastReceiver.Initialize(
-                host: receiverSettings.MulticastHost,
-                port: receiverSettings.MulticastPort,
-                retryTime: receiverSettings.RetryTime,
-                messageType: MessageTypePaths);
+            if (settings.UseMulticast)
+            {
+                multicastReceiver.Initialize(
+                    host: settings.MulticastHost,
+                    port: settings.MulticastPort,
+                    retryTime: settings.RetryTime,
+                    messageType: MessageTypePaths);
+
+                return multicastReceiver;
+            }
+            else
+            {
+                mqttReceiver.Initialize(
+                    server: settings.MqttServer,
+                    topic: settings.MqttTopic,
+                    retryTime: settings.RetryTime,
+                    messageType: MessageTypePaths);
+
+                return mqttReceiver;
+            }
         }
 
         private async Task InitializePathSenderAsync()

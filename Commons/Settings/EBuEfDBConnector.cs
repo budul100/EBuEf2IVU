@@ -1,4 +1,4 @@
-﻿namespace EBuEf2IVUBase.Settings
+﻿namespace Commons.Settings
 {
     public class EBuEfDBConnector
     {

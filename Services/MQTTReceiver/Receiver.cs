@@ -17,6 +17,7 @@ namespace MQTTReceiver
     {
         #region Private Fields
 
+        private string messageType;
         private Task receiverTask;
         private AsyncRetryPolicy retryPolicy;
         private string server;
@@ -46,10 +47,11 @@ namespace MQTTReceiver
             return receiverTask;
         }
 
-        public void Initialize(string server, string topic, int retryTime)
+        public void Initialize(string server, string topic, int retryTime, string messageType)
         {
             this.server = server;
             this.topic = topic;
+            this.messageType = messageType;
 
             retryPolicy = Policy
                 .Handle<Exception>()
@@ -103,9 +105,10 @@ namespace MQTTReceiver
                 cancellationToken: cancellationToken);
 
             logger.LogDebug(
-                "MQTT receiver is subscribed on {server} for topics in {topic}.",
+                "MQTT receiver is subscribed on {server} (topic {topic}) for messages of type {type}.",
                 server,
-                topic);
+                topic,
+                messageType);
         }
 
         private void SendMessageReceived(MqttApplicationMessage message)

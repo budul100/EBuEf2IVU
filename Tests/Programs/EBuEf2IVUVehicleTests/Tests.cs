@@ -31,11 +31,12 @@ namespace EBuEf2IVUVehicleTests
         {
             var wasCalled = false;
 
+            var stateHandlerMock = GetStateHandlerMock();
+            var multicastReceiver = new Mock<IMulticastReceiver>();
+            var mqttReceiver = new Mock<IMQTTReceiver>();
+
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 sessionCallback: () => wasCalled = true);
-
-            var stateHandlerMock = GetStateHandlerMock();
-            var messageReceiverMock = new Mock<IMulticastReceiver>();
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -43,7 +44,7 @@ namespace EBuEf2IVUVehicleTests
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices(services => ConfigureServices(services, messageReceiverMock.Object, databaseConnectorMock, stateHandlerMock))
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, multicastReceiver.Object, mqttReceiver.Object))
                 .Build();
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -71,12 +72,13 @@ namespace EBuEf2IVUVehicleTests
             //<Division>[Set correct division]</Division>
             //<Host>[Set hostname of app server]</Host>
 
-            var testDate = new DateTime(2022, 8, 4);
+            var stateHandlerMock = GetStateHandlerMock();
+            var multicastReceiver = new Mock<IMulticastReceiver>();
+            var mqttReceiver = new Mock<IMQTTReceiver>();
 
+            var testDate = new DateTime(2022, 8, 4);
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 ivuDatum: testDate);
-            var stateHandlerMock = GetStateHandlerMock();
-            var messageReceiverMock = new Mock<IMulticastReceiver>();
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -84,7 +86,7 @@ namespace EBuEf2IVUVehicleTests
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices(services => ConfigureServices(services, messageReceiverMock.Object, databaseConnectorMock, stateHandlerMock))
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, multicastReceiver.Object, mqttReceiver.Object))
                 .Build();
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -93,7 +95,7 @@ namespace EBuEf2IVUVehicleTests
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
 
             const string messageContent = "{\"zugnummer\":\"13\",\"decoder\":null,\"simulationszeit\":\"1970-01-01 01:00:00\",\"betriebsstelle\":\"BGS\",\"signaltyp\":\"ESig\",\"start_gleis\":\"1\",\"ziel_gleis\":\"2\",\"modus\":\"istzeit\"}";
-            messageReceiverMock.Raise(m => m.MessageReceivedEvent += null, new MessageReceivedArgs(messageContent));
+            multicastReceiver.Raise(m => m.MessageReceivedEvent += null, new MessageReceivedArgs(messageContent));
 
             Thread.Sleep(1000);
         }
@@ -101,13 +103,14 @@ namespace EBuEf2IVUVehicleTests
         [Test]
         public void UpdateRealtimeInDatabase()
         {
+            var stateHandlerMock = GetStateHandlerMock();
+            var multicastReceiver = new Mock<IMulticastReceiver>();
+            var mqttReceiver = new Mock<IMQTTReceiver>();
+
             var legReceived = default(TrainLeg);
 
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 addRealtimeCallback: l => legReceived = l);
-
-            var stateHandlerMock = GetStateHandlerMock();
-            var messageReceiverMock = new Mock<IMulticastReceiver>();
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -115,7 +118,7 @@ namespace EBuEf2IVUVehicleTests
                 .CreateDefaultBuilder()
                 .GetHostBuilder()
                 .ConfigureAppConfiguration((_, config) => config.ConfigureAppConfiguration(settingsPath))
-                .ConfigureServices(services => ConfigureServices(services, messageReceiverMock.Object, databaseConnectorMock, stateHandlerMock))
+                .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, multicastReceiver.Object, mqttReceiver.Object))
                 .Build();
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -124,7 +127,7 @@ namespace EBuEf2IVUVehicleTests
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
 
             const string messageContent = "{\"zugnummer\":\"13\",\"decoder\":null,\"simulationszeit\":\"1970-01-01 01:00:00\",\"betriebsstelle\":\"BGS\",\"signaltyp\":\"ESig\",\"start_gleis\":\"1\",\"ziel_gleis\":\"2\",\"modus\":\"istzeit\"}";
-            messageReceiverMock.Raise(m => m.MessageReceivedEvent += null, new MessageReceivedArgs(messageContent));
+            multicastReceiver.Raise(m => m.MessageReceivedEvent += null, new MessageReceivedArgs(messageContent));
 
             Thread.Sleep(1000);
 
@@ -137,15 +140,17 @@ namespace EBuEf2IVUVehicleTests
 
         #region Private Methods
 
-        private static void ConfigureServices(IServiceCollection services, IMulticastReceiver messageReceiver,
-            Mock<IDatabaseConnector> databaseConnectorMock, Mock<IStateHandler> stateHandlerMock)
+        private static void ConfigureServices(IServiceCollection services, Mock<IDatabaseConnector> databaseConnectorMock,
+            Mock<IStateHandler> stateHandlerMock, IMulticastReceiver multicastReceiver, IMQTTReceiver mQTTReceiver)
         {
             services.AddHostedService<EBuEf2IVUVehicle.Worker>();
 
             services.AddTransient<Mock<ILogger>>();
             services.AddSingleton(databaseConnectorMock.Object);
             services.AddSingleton(stateHandlerMock.Object);
-            services.AddSingleton(messageReceiver);
+
+            services.AddSingleton(multicastReceiver);
+            services.AddSingleton(mQTTReceiver);
             services.AddSingleton<IMessage2LegConverter, Message2LegConverter.Converter>();
 
             services.AddSingleton<IRealtimeSenderIS, RealtimeSenderIS.Sender>();

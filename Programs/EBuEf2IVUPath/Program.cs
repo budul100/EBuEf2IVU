@@ -1,10 +1,10 @@
-﻿using CommandLine;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using CommandLine;
 using Commons.Extensions;
 using Commons.Interfaces;
 using EBuEf2IVUBase.Extensions;
 using EBuEf2IVUBase.Settings;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace EBuEf2IVUPath
@@ -32,10 +32,12 @@ namespace EBuEf2IVUPath
         {
             services.AddHostedService<Worker>();
 
-            services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
 
             services.AddTransient<IMulticastReceiver, MulticastReceiver.Receiver>();
+            services.AddTransient<IMQTTReceiver, MQTTReceiver.Receiver>();
+
+            services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IMessage2TrainRunConverter, Message2TrainRunConverter.Converter>();
 
             services.AddSingleton<ITrainPathSender, TrainPathSender.Sender>();

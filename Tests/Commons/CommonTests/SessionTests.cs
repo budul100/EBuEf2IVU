@@ -1,13 +1,14 @@
+using Commons.EventsArgs;
+using Commons.Interfaces;
+using Commons.Settings;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Commons.EventsArgs;
-using Commons.Interfaces;
-using Moq;
-using NUnit.Framework;
 
 namespace CommonTests
 {
@@ -31,8 +32,8 @@ namespace CommonTests
         public void GetSessionData()
         {
             var connectorSettings = config
-                .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
-                .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
+                .GetSection(nameof(EBuEfDBConnector))
+                .Get<EBuEfDBConnector>();
 
             var loggerMock = new Mock<ILogger<DatabaseConnector.Connector>>();
 
@@ -58,10 +59,11 @@ namespace CommonTests
         public void GetSessionNotStarted()
         {
             var connectorSettings = config
-                .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
-                .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
+                .GetSection(nameof(EBuEfDBConnector))
+                .Get<EBuEfDBConnector>();
 
-            var messageReceiverMock = new Mock<IMulticastReceiver>();
+            var multicastReceiverMock = new Mock<IMulticastReceiver>();
+            var mqttReceiverMock = new Mock<IMQTTReceiver>();
             var loggerMock = new Mock<ILogger<StateHandler.Handler>>();
 
             var databaseConnectorMock = new Mock<IDatabaseConnector>();
@@ -70,7 +72,8 @@ namespace CommonTests
             var sessionStateHandler = new StateHandler.Handler(
                 logger: loggerMock.Object,
                 databaseConnector: databaseConnectorMock.Object,
-                multicastReceiver: messageReceiverMock.Object);
+                multicastReceiver: multicastReceiverMock.Object,
+                mqttReceiver: mqttReceiverMock.Object);
 
             var wasCalled = false;
             sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.StateType == Commons.Enums.StateType.IsRunning;
@@ -84,17 +87,20 @@ namespace CommonTests
         public void GetSessionPreparationTwice()
         {
             var connectorSettings = config
-                .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
-                .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
+                .GetSection(nameof(EBuEfDBConnector))
+                .Get<EBuEfDBConnector>();
 
-            var messageReceiverMock = new Mock<IMulticastReceiver>();
+            var multicastReceiverMock = new Mock<IMulticastReceiver>();
+            var mqttReceiverMock = new Mock<IMQTTReceiver>();
             var loggerMock = new Mock<ILogger<StateHandler.Handler>>();
+
             var databaseConnectorMock = new Mock<IDatabaseConnector>();
 
             var sessionStateHandler = new StateHandler.Handler(
                 logger: loggerMock.Object,
                 databaseConnector: databaseConnectorMock.Object,
-                multicastReceiver: messageReceiverMock.Object);
+                multicastReceiver: multicastReceiverMock.Object,
+                mqttReceiver: mqttReceiverMock.Object);
 
             sessionStateHandler.Initialize(
                 host: default,
@@ -111,8 +117,8 @@ namespace CommonTests
 
             Task.WhenAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
-            messageReceiverMock.Raise(r => r.MessageReceivedEvent += null, new MessageReceivedArgs("SESSION NEW STATUS 1"));
-            messageReceiverMock.Raise(r => r.MessageReceivedEvent += null, new MessageReceivedArgs("SESSION NEW STATUS 1"));
+            multicastReceiverMock.Raise(r => r.MessageReceivedEvent += null, new MessageReceivedArgs("SESSION NEW STATUS 1"));
+            multicastReceiverMock.Raise(r => r.MessageReceivedEvent += null, new MessageReceivedArgs("SESSION NEW STATUS 1"));
 
             Assert.That(eventsSend, Is.EqualTo(2));
         }
@@ -121,10 +127,11 @@ namespace CommonTests
         public void GetSessionStarted()
         {
             var connectorSettings = config
-                .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
-                .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
+                .GetSection(nameof(EBuEfDBConnector))
+                .Get<EBuEfDBConnector>();
 
-            var messageReceiverMock = new Mock<IMulticastReceiver>();
+            var multicastReceiverMock = new Mock<IMulticastReceiver>();
+            var mqttReceiverMock = new Mock<IMQTTReceiver>();
             var loggerMock = new Mock<ILogger<StateHandler.Handler>>();
 
             var databaseConnectorMock = new Mock<IDatabaseConnector>();
@@ -135,7 +142,8 @@ namespace CommonTests
             var sessionStateHandler = new StateHandler.Handler(
                 logger: loggerMock.Object,
                 databaseConnector: databaseConnectorMock.Object,
-                multicastReceiver: messageReceiverMock.Object);
+                multicastReceiver: multicastReceiverMock.Object,
+                mqttReceiver: mqttReceiverMock.Object);
 
             var wasCalled = false;
             sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.StateType == Commons.Enums.StateType.IsRunning;

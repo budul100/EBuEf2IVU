@@ -1,8 +1,3 @@
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.EventsArgs;
 using Commons.Extensions;
@@ -10,7 +5,12 @@ using Commons.Interfaces;
 using Commons.Models;
 using Commons.Settings;
 using EBuEf2IVUBase;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EBuEf2IVUVehicle
 {
@@ -22,6 +22,7 @@ namespace EBuEf2IVUVehicle
         private const string MessageTypePositions = "Echtzeit-Positionen";
 
         private readonly IMessage2LegConverter messageConverter;
+        private readonly IMQTTReceiver mqttReceiver;
         private readonly IMulticastReceiver multicastReceiver;
         private readonly IRealtimeSender realtimeSender;
         private readonly IRealtimeSenderIS realtimeSenderIS;
@@ -36,13 +37,16 @@ namespace EBuEf2IVUVehicle
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
-            IMulticastReceiver multicastReceiver, IMessage2LegConverter messageConverter, IRealtimeSender realtimeSender,
-            IRealtimeSenderIS realtimeSenderIS, ILogger<Worker> logger)
+            IMulticastReceiver multicastReceiver, IMQTTReceiver mqttReceiver, IMessage2LegConverter messageConverter,
+            IRealtimeSender realtimeSender, IRealtimeSenderIS realtimeSenderIS, ILogger<Worker> logger)
             : base(config: config, sessionStateHandler: sessionStateHandler, databaseConnector: databaseConnector,
                   logger: logger, assembly: Assembly.GetExecutingAssembly())
         {
             this.multicastReceiver = multicastReceiver;
             this.multicastReceiver.MessageReceivedEvent += OnMessageReceivedAsync;
+
+            this.mqttReceiver = mqttReceiver;
+            this.mqttReceiver.MessageReceivedEvent += OnMessageReceivedAsync;
 
             this.messageConverter = messageConverter;
             this.realtimeSenderIS = realtimeSenderIS;
@@ -57,7 +61,8 @@ namespace EBuEf2IVUVehicle
         {
             _ = InitializeConnectionAsync(workerCancellationToken);
 
-            InitializePositionReceiver();
+            var positionReceiver = GetPositionReceiver();
+
             InitializeRealtimeSender();
 
             while (!workerCancellationToken.IsCancellationRequested)
@@ -66,7 +71,7 @@ namespace EBuEf2IVUVehicle
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                var receiverTask = multicastReceiver.ExecuteAsync(sessionCancellationToken);
+                var receiverTask = positionReceiver.ExecuteAsync(sessionCancellationToken);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
@@ -138,7 +143,7 @@ namespace EBuEf2IVUVehicle
 
         #region Private Methods
 
-        private void InitializePositionReceiver()
+        private IMessageReceiver GetPositionReceiver()
         {
             logger.LogInformation(
                 "Der Nachrichten-Empfänger von EBuEf2IVUVehicle wird gestartet.");
@@ -147,11 +152,26 @@ namespace EBuEf2IVUVehicle
                 .GetSection(nameof(PositionsReceiver))
                 .Get<PositionsReceiver>();
 
-            multicastReceiver.Initialize(
-                host: settings.MulticastHost,
-                port: settings.MulticastPort,
-                retryTime: settings.RetryTime,
-                messageType: MessageTypePositions);
+            if (settings.UseMulticast)
+            {
+                multicastReceiver.Initialize(
+                    host: settings.MulticastHost,
+                    port: settings.MulticastPort,
+                    retryTime: settings.RetryTime,
+                    messageType: MessageTypePositions);
+
+                return multicastReceiver;
+            }
+            else
+            {
+                mqttReceiver.Initialize(
+                    server: settings.MqttServer,
+                    topic: settings.MqttTopic,
+                    retryTime: settings.RetryTime,
+                    messageType: MessageTypePositions);
+
+                return mqttReceiver;
+            }
         }
 
         private void InitializeRealtimeSender()

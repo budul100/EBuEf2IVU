@@ -20,8 +20,10 @@ namespace StateHandler
 
         private readonly IDatabaseConnector databaseConnector;
         private readonly ILogger logger;
+        private readonly IMQTTReceiver mqttReceiver;
         private readonly IMulticastReceiver multicastReceiver;
 
+        private IMessageReceiver messageReceiver;
         private Regex sessionStartRegex;
         private Regex sessionStatusRegex;
 
@@ -29,13 +31,17 @@ namespace StateHandler
 
         #region Public Constructors
 
-        public Handler(ILogger<Handler> logger, IDatabaseConnector databaseConnector, IMulticastReceiver multicastReceiver)
+        public Handler(ILogger<Handler> logger, IDatabaseConnector databaseConnector,
+            IMulticastReceiver multicastReceiver, IMQTTReceiver mqttReceiver)
         {
             this.logger = logger;
             this.databaseConnector = databaseConnector;
 
             this.multicastReceiver = multicastReceiver;
             this.multicastReceiver.MessageReceivedEvent += OnStatusReceived;
+
+            this.mqttReceiver = mqttReceiver;
+            this.mqttReceiver.MessageReceivedEvent += OnStatusReceived;
         }
 
         #endregion Public Constructors
@@ -58,7 +64,22 @@ namespace StateHandler
         {
             await SetSessionStatusInitally();
 
-            await multicastReceiver.ExecuteAsync(cancellationToken);
+            await messageReceiver.ExecuteAsync(cancellationToken);
+        }
+
+        public void Initialize(string server, string topic, int retryTime, string sessionStartPattern,
+            string sessionStatusPattern)
+        {
+            mqttReceiver.Initialize(
+                server: server,
+                topic: topic,
+                retryTime: retryTime,
+                messageType: MessageTypeState);
+
+            messageReceiver = mqttReceiver;
+
+            sessionStartRegex = sessionStartPattern.GetSessionStartRegex();
+            sessionStatusRegex = sessionStatusPattern.GetSessionStatusRegex();
         }
 
         public void Initialize(string host, int port, int retryTime, string sessionStartPattern,
@@ -69,6 +90,8 @@ namespace StateHandler
                 port: port,
                 retryTime: retryTime,
                 messageType: MessageTypeState);
+
+            messageReceiver = multicastReceiver;
 
             sessionStartRegex = sessionStartPattern.GetSessionStartRegex();
             sessionStatusRegex = sessionStatusPattern.GetSessionStatusRegex();
