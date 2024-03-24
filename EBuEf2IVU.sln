@@ -66,6 +66,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Additionals", "Additionals"
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTTReceiver", "Services\MQTTReceiver\MQTTReceiver.csproj", "{BD994678-DD40-4C8E-AADF-3AE84960466F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -156,6 +158,10 @@ Global
 		{59E9EC19-E624-4518-9ACD-B3723D493193}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59E9EC19-E624-4518-9ACD-B3723D493193}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59E9EC19-E624-4518-9ACD-B3723D493193}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD994678-DD40-4C8E-AADF-3AE84960466F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD994678-DD40-4C8E-AADF-3AE84960466F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD994678-DD40-4C8E-AADF-3AE84960466F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD994678-DD40-4C8E-AADF-3AE84960466F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -184,6 +190,7 @@ Global
 		{8E2917E9-86E7-4C9D-BA9D-136DF3C226DC} = {EB4A5585-B06C-492D-B1C8-451FC1EEBAD2}
 		{7223DA49-C402-4B7F-AC1A-B4185E47044E} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
 		{59E9EC19-E624-4518-9ACD-B3723D493193} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
+		{BD994678-DD40-4C8E-AADF-3AE84960466F} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E929A830-61A1-48FF-9596-23961F1A08C4}

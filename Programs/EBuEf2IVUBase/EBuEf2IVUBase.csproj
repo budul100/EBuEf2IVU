@@ -19,6 +19,10 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Commons\Commons.csproj" />
+		<ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
+		<ProjectReference Include="..\..\Services\MQTTReceiver\MQTTReceiver.csproj" />
+		<ProjectReference Include="..\..\Services\MulticastReceiver\MulticastReceiver.csproj" />
+		<ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj" />
 	</ItemGroup>
 
 	<ProjectExtensions>

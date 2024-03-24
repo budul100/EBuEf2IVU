@@ -1,13 +1,13 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Commons.Enums;
+﻿using Commons.Enums;
 using Commons.EventsArgs;
 using Commons.Extensions;
 using Commons.Interfaces;
+using Microsoft.Extensions.Logging;
 using StateHandler.Extensions;
+using System;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace StateHandler
 {
@@ -20,7 +20,7 @@ namespace StateHandler
 
         private readonly IDatabaseConnector databaseConnector;
         private readonly ILogger logger;
-        private readonly IMulticastReceiver stateReceiver;
+        private readonly IMulticastReceiver multicastReceiver;
 
         private Regex sessionStartRegex;
         private Regex sessionStatusRegex;
@@ -29,13 +29,13 @@ namespace StateHandler
 
         #region Public Constructors
 
-        public Handler(ILogger<Handler> logger, IDatabaseConnector databaseConnector, IMulticastReceiver stateReceiver)
+        public Handler(ILogger<Handler> logger, IDatabaseConnector databaseConnector, IMulticastReceiver multicastReceiver)
         {
             this.logger = logger;
-
             this.databaseConnector = databaseConnector;
-            this.stateReceiver = stateReceiver;
-            this.stateReceiver.MessageReceivedEvent += OnStatusReceived;
+
+            this.multicastReceiver = multicastReceiver;
+            this.multicastReceiver.MessageReceivedEvent += OnStatusReceived;
         }
 
         #endregion Public Constructors
@@ -58,13 +58,13 @@ namespace StateHandler
         {
             await SetSessionStatusInitally();
 
-            await stateReceiver.ExecuteAsync(cancellationToken);
+            await multicastReceiver.ExecuteAsync(cancellationToken);
         }
 
         public void Initialize(string host, int port, int retryTime, string sessionStartPattern,
             string sessionStatusPattern)
         {
-            stateReceiver.Initialize(
+            multicastReceiver.Initialize(
                 host: host,
                 port: port,
                 retryTime: retryTime,

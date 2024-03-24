@@ -70,7 +70,7 @@ namespace CommonTests
             var sessionStateHandler = new StateHandler.Handler(
                 logger: loggerMock.Object,
                 databaseConnector: databaseConnectorMock.Object,
-                stateReceiver: messageReceiverMock.Object);
+                multicastReceiver: messageReceiverMock.Object);
 
             var wasCalled = false;
             sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.StateType == Commons.Enums.StateType.IsRunning;
@@ -94,7 +94,7 @@ namespace CommonTests
             var sessionStateHandler = new StateHandler.Handler(
                 logger: loggerMock.Object,
                 databaseConnector: databaseConnectorMock.Object,
-                stateReceiver: messageReceiverMock.Object);
+                multicastReceiver: messageReceiverMock.Object);
 
             sessionStateHandler.Initialize(
                 host: default,
@@ -135,7 +135,7 @@ namespace CommonTests
             var sessionStateHandler = new StateHandler.Handler(
                 logger: loggerMock.Object,
                 databaseConnector: databaseConnectorMock.Object,
-                stateReceiver: messageReceiverMock.Object);
+                multicastReceiver: messageReceiverMock.Object);
 
             var wasCalled = false;
             sessionStateHandler.SessionChangedEvent += (o, e) => wasCalled = e.StateType == Commons.Enums.StateType.IsRunning;

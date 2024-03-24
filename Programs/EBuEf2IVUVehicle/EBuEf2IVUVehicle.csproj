@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
@@ -34,13 +34,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Commons\Commons.csproj" />
-		<ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
 		<ProjectReference Include="..\..\Services\Message2LegConverter\Message2LegConverter.csproj" />
-		<ProjectReference Include="..\..\Services\MulticastReceiver\MulticastReceiver.csproj" />
 		<ProjectReference Include="..\..\Services\RealtimeSender\RealtimeSender.csproj" />
 		<ProjectReference Include="..\..\Services\RealtimeSenderIS\RealtimeSenderIS.csproj" />
-		<ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj" />
 		<ProjectReference Include="..\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
 	</ItemGroup>
 
