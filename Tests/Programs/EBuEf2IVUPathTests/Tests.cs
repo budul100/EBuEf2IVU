@@ -1,15 +1,15 @@
+using System.IO;
+using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.EventsArgs;
 using Commons.Extensions;
 using Commons.Interfaces;
 using EBuEf2IVUTestBase;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using System.IO;
-using System.Threading;
 
 namespace EBuEf2IVUPathTests
 {
@@ -46,18 +46,18 @@ namespace EBuEf2IVUPathTests
             var cancellationTokenSource = new CancellationTokenSource();
 
             host.StartAsync(cancellationTokenSource.Token);
-            Assert.False(wasCalled);
+            Assert.That(wasCalled, Is.False);
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
-            Assert.True(wasCalled);
+            Assert.That(wasCalled, Is.True);
 
             wasCalled = false;
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsPaused));
-            Assert.False(wasCalled);
+            Assert.That(wasCalled, Is.False);
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
-            Assert.True(wasCalled);
+            Assert.That(wasCalled, Is.True);
         }
 
         [Test]
@@ -82,28 +82,28 @@ namespace EBuEf2IVUPathTests
             var cancellationTokenSource = new CancellationTokenSource();
 
             host.StartAsync(cancellationTokenSource.Token);
-            Assert.True(eventCount == 0);
+            Assert.That(eventCount, Is.EqualTo(0));
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.InPreparation));
-            Assert.True(eventCount == 1);
+            Assert.That(eventCount, Is.EqualTo(1));
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.InPreparation));
-            Assert.True(eventCount == 2);
+            Assert.That(eventCount, Is.EqualTo(2));
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
-            Assert.True(eventCount == 2);
+            Assert.That(eventCount, Is.EqualTo(2));
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsPaused));
-            Assert.True(eventCount == 2);
+            Assert.That(eventCount, Is.EqualTo(2));
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
-            Assert.True(eventCount == 2);
+            Assert.That(eventCount, Is.EqualTo(2));
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsEnded));
-            Assert.True(eventCount == 2);
+            Assert.That(eventCount, Is.EqualTo(2));
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
-            Assert.True(eventCount == 3);
+            Assert.That(eventCount, Is.EqualTo(3));
         }
 
         #endregion Public Methods

@@ -1,17 +1,17 @@
-using Commons.Extensions;
-using Commons.Interfaces;
-using Commons.Models;
-using EBuEf2IVUTestBase;
+using System;
+using System.IO;
+using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Commons.Extensions;
+using Commons.Interfaces;
+using Commons.Models;
+using EBuEf2IVUTestBase;
 using Moq;
 using NUnit.Framework;
 using RealtimeSender;
-using System;
-using System.IO;
-using System.Threading;
 
 namespace RealTimeSenderTests
 {
@@ -77,7 +77,7 @@ namespace RealTimeSenderTests
 
             Thread.Sleep(5000);
 
-            Assert.True(hasSocketException);
+            Assert.That(hasSocketException, Is.True);
         }
 
         #endregion Public Methods

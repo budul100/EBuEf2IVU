@@ -1,12 +1,12 @@
-using Commons.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json;
-using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Commons.Models;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using TrainPathSender;
 
 namespace TrainPathSenderTests
@@ -33,7 +33,7 @@ namespace TrainPathSenderTests
             var content = File.ReadAllText("TrainPathMessages.json");
             var messages = JsonConvert.DeserializeObject<TrainPathMessage[]>(content);
 
-            Assert.True(messages.Length > 0);
+            Assert.That(messages.Length > 0, Is.True);
         }
 
         [SetUp]

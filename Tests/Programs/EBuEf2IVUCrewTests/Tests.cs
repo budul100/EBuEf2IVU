@@ -1,19 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.EventsArgs;
 using Commons.Extensions;
 using Commons.Interfaces;
 using Commons.Models;
 using EBuEf2IVUTestBase;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace EBuEf2IVUCrewTests
 {
@@ -46,7 +46,7 @@ namespace EBuEf2IVUCrewTests
             var cancellationTokenSource = new CancellationTokenSource();
             host.StartAsync(cancellationTokenSource.Token);
 
-            Assert.True(wasCalled);
+            Assert.That(wasCalled, Is.True);
         }
 
         [Test]
@@ -71,18 +71,18 @@ namespace EBuEf2IVUCrewTests
                 .Build();
 
             host.StartAsync(cancellationTokenSource.Token);
-            Assert.False(wasCalled);
+            Assert.That(wasCalled, Is.False);
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
-            Assert.True(wasCalled);
+            Assert.That(wasCalled, Is.True);
 
             wasCalled = false;
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsPaused));
-            Assert.False(wasCalled);
+            Assert.That(wasCalled, Is.False);
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
-            Assert.True(wasCalled);
+            Assert.That(wasCalled, Is.True);
         }
 
         #endregion Public Methods

@@ -1,17 +1,17 @@
+using System;
+using System.IO;
+using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.EventsArgs;
 using Commons.Extensions;
 using Commons.Interfaces;
 using Commons.Models;
 using EBuEf2IVUTestBase;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.IO;
-using System.Threading;
 
 namespace EBuEf2IVUVehicleTests
 {
@@ -49,18 +49,18 @@ namespace EBuEf2IVUVehicleTests
             var cancellationTokenSource = new CancellationTokenSource();
 
             host.StartAsync(cancellationTokenSource.Token);
-            Assert.False(wasCalled);
+            Assert.That(wasCalled, Is.False);
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
-            Assert.True(wasCalled);
+            Assert.That(wasCalled, Is.True);
 
             wasCalled = false;
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsPaused));
-            Assert.False(wasCalled);
+            Assert.That(wasCalled, Is.False);
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
-            Assert.True(wasCalled);
+            Assert.That(wasCalled, Is.True);
         }
 
         [Test]
@@ -128,10 +128,9 @@ namespace EBuEf2IVUVehicleTests
 
             Thread.Sleep(1000);
 
-            Assert.True(legReceived.EBuEfGleisVon == "1");
-            Assert.True(legReceived.EBuEfGleisNach == "2");
-
-            Assert.True(legReceived.IVUGleis == "2");
+            Assert.That(legReceived.EBuEfGleisVon, Is.EqualTo("1"));
+            Assert.That(legReceived.EBuEfGleisNach, Is.EqualTo("2"));
+            Assert.That(legReceived.IVUGleis, Is.EqualTo("2"));
         }
 
         #endregion Public Methods

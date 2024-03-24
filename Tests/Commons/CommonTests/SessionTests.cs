@@ -1,13 +1,13 @@
-using Commons.EventsArgs;
-using Commons.Interfaces;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Moq;
-using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Commons.EventsArgs;
+using Commons.Interfaces;
+using Moq;
+using NUnit.Framework;
 
 namespace CommonTests
 {
@@ -46,9 +46,9 @@ namespace CommonTests
             var query = databaseConnector.GetEBuEfSessionAsync();
             query.Wait();
 
-            Assert.True(query.Result.IVUDatum == query.Result.IVUDatum.Date);
-            Assert.True(query.Result.SessionStart == new TimeSpan(12, 0, 0));
-            Assert.True(query.Result.Wochentag == DayOfWeek.Friday);
+            Assert.That(query.Result.IVUDatum, Is.EqualTo(query.Result.IVUDatum.Date));
+            Assert.That(query.Result.Wochentag, Is.EqualTo(DayOfWeek.Friday));
+            Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(12, 0, 0)));
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace CommonTests
 
             Task.WaitAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
-            Assert.False(wasCalled);
+            Assert.That(wasCalled, Is.False);
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace CommonTests
             messageReceiverMock.Raise(r => r.MessageReceivedEvent += null, new MessageReceivedArgs("SESSION NEW STATUS 1"));
             messageReceiverMock.Raise(r => r.MessageReceivedEvent += null, new MessageReceivedArgs("SESSION NEW STATUS 1"));
 
-            Assert.True(eventsSend == 2);
+            Assert.That(eventsSend, Is.EqualTo(2));
         }
 
         [Test]
@@ -139,7 +139,7 @@ namespace CommonTests
 
             Task.WhenAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
-            Assert.True(wasCalled);
+            Assert.That(wasCalled, Is.True);
         }
 
         [SetUp]
