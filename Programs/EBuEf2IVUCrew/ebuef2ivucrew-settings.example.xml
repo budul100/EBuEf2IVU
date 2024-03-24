@@ -19,8 +19,8 @@
 		<RetryTime>30</RetryTime>
 	</EBuEfDBConnector>
 	<StatusReceiver>
-		<Host>224.0.0.8</Host>
-		<Port>4454</Port>
+		<MulticastHost>224.0.0.8</MulticastHost>
+		<MulticastPort>4454</MulticastPort>
 		<RetryTime>30</RetryTime>
 		<StartPattern>ZN SET DISPATCH</StartPattern>
 		<StatusPattern>SESSION NEW STATUS $</StatusPattern>

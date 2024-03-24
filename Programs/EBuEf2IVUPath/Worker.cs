@@ -159,8 +159,8 @@ namespace EBuEf2IVUPath
                 .Get<TrainPathReceiver>();
 
             multicastReceiver.Initialize(
-                host: receiverSettings.Host,
-                port: receiverSettings.Port,
+                host: receiverSettings.MulticastHost,
+                port: receiverSettings.MulticastPort,
                 retryTime: receiverSettings.RetryTime,
                 messageType: MessageTypePaths);
         }

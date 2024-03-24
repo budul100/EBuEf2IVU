@@ -148,8 +148,8 @@ namespace EBuEf2IVUVehicle
                 .Get<PositionsReceiver>();
 
             multicastReceiver.Initialize(
-                host: settings.Host,
-                port: settings.Port,
+                host: settings.MulticastHost,
+                port: settings.MulticastPort,
                 retryTime: settings.RetryTime,
                 messageType: MessageTypePositions);
         }
