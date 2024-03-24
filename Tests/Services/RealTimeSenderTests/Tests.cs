@@ -29,9 +29,9 @@ namespace RealTimeSenderTests
         [Test]
         public void SendRealtime()
         {
-            var hasSocketException = false;
+            var hasException = false;
 
-            var loggerMock = GetLoggerMock<Sender>(() => hasSocketException = true);
+            var loggerMock = GetLoggerMock<Sender>(() => hasException = true);
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -77,7 +77,7 @@ namespace RealTimeSenderTests
 
             Thread.Sleep(5000);
 
-            Assert.That(hasSocketException, Is.True);
+            Assert.That(hasException, Is.True);
         }
 
         #endregion Public Methods

@@ -78,6 +78,15 @@ namespace EBuEf2IVUTestBase
                     (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
                 .Callback(() => errorCallback?.Invoke());
 
+            result
+                .Setup(x => x.Log(
+                    It.Is<LogLevel>(l => l == LogLevel.Error),
+                    It.IsAny<EventId>(),
+                    It.IsAny<It.IsAnyType>(),
+                    It.IsAny<EntryPointNotFoundException>(),
+                    (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
+                .Callback(() => errorCallback?.Invoke());
+
             return result;
         }
 

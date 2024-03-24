@@ -46,9 +46,12 @@ namespace CommonTests
             var query = databaseConnector.GetEBuEfSessionAsync();
             query.Wait();
 
+            var curOffset = TimeZoneInfo.Local.BaseUtcOffset;
+            var expOffset = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time").BaseUtcOffset;
+
             Assert.That(query.Result.IVUDatum, Is.EqualTo(query.Result.IVUDatum.Date));
             Assert.That(query.Result.Wochentag, Is.EqualTo(DayOfWeek.Friday));
-            Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(12, 0, 0)));
+            Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(12, 0, 0).Add(curOffset).Subtract(expOffset)));
         }
 
         [Test]
