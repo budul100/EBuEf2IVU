@@ -1,15 +1,15 @@
+using System;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.EventsArgs;
 using Commons.Interfaces;
 using Commons.Models;
 using EBuEf2IVUBase.Settings;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace EBuEf2IVUBase
 {

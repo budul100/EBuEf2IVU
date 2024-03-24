@@ -32,7 +32,7 @@ namespace EBuEf2IVUPathTests
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 sessionCallback: () => wasCalled = true);
             var stateHandlerMock = GetStateHandlerMock();
-            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var messageReceiverMock = new Mock<IMulticastReceiver>();
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -68,7 +68,7 @@ namespace EBuEf2IVUPathTests
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 trainRunsPlanCallback: () => eventCount++);
             var stateHandlerMock = GetStateHandlerMock();
-            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var messageReceiverMock = new Mock<IMulticastReceiver>();
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -111,7 +111,7 @@ namespace EBuEf2IVUPathTests
         #region Private Methods
 
         private static void ConfigureServices(IServiceCollection services, Mock<IDatabaseConnector> databaseConnectorMock,
-            Mock<IStateHandler> stateHandlerMock, Mock<IMessageReceiver> messageReceiverMock)
+            Mock<IStateHandler> stateHandlerMock, Mock<IMulticastReceiver> messageReceiverMock)
         {
             services.AddHostedService<EBuEf2IVUPath.Worker>();
 

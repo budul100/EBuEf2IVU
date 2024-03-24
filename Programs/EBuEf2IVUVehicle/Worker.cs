@@ -1,3 +1,8 @@
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.EventsArgs;
 using Commons.Extensions;
@@ -5,12 +10,7 @@ using Commons.Interfaces;
 using Commons.Models;
 using Commons.Settings;
 using EBuEf2IVUBase;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace EBuEf2IVUVehicle
 {
@@ -22,7 +22,7 @@ namespace EBuEf2IVUVehicle
         private const string MessageTypePositions = "Echtzeit-Positionen";
 
         private readonly IMessage2LegConverter messageConverter;
-        private readonly IMessageReceiver positionsReceiver;
+        private readonly IMulticastReceiver multicastReceiver;
         private readonly IRealtimeSender realtimeSender;
         private readonly IRealtimeSenderIS realtimeSenderIS;
 
@@ -36,13 +36,13 @@ namespace EBuEf2IVUVehicle
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
-            IMessageReceiver positionsReceiver, IMessage2LegConverter messageConverter, IRealtimeSender realtimeSender,
+            IMulticastReceiver multicastReceiver, IMessage2LegConverter messageConverter, IRealtimeSender realtimeSender,
             IRealtimeSenderIS realtimeSenderIS, ILogger<Worker> logger)
             : base(config: config, sessionStateHandler: sessionStateHandler, databaseConnector: databaseConnector,
                   logger: logger, assembly: Assembly.GetExecutingAssembly())
         {
-            this.positionsReceiver = positionsReceiver;
-            this.positionsReceiver.MessageReceivedEvent += OnMessageReceivedAsync;
+            this.multicastReceiver = multicastReceiver;
+            this.multicastReceiver.MessageReceivedEvent += OnMessageReceivedAsync;
 
             this.messageConverter = messageConverter;
             this.realtimeSenderIS = realtimeSenderIS;
@@ -66,7 +66,7 @@ namespace EBuEf2IVUVehicle
 
                 var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
 
-                var receiverTask = positionsReceiver.ExecuteAsync(sessionCancellationToken);
+                var receiverTask = multicastReceiver.ExecuteAsync(sessionCancellationToken);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
@@ -147,7 +147,7 @@ namespace EBuEf2IVUVehicle
                 .GetSection(nameof(PositionsReceiver))
                 .Get<PositionsReceiver>();
 
-            positionsReceiver.Initialize(
+            multicastReceiver.Initialize(
                 host: settings.Host,
                 port: settings.Port,
                 retryTime: settings.RetryTime,

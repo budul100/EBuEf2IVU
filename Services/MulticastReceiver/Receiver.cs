@@ -1,26 +1,25 @@
-using Commons.EventsArgs;
-using Commons.Interfaces;
-using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Retry;
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Commons.EventsArgs;
+using Commons.Interfaces;
+using Polly;
+using Polly.Retry;
 
-namespace MessageReceiver
+namespace MulticastReceiver
 {
-    public class Receiver
-        : IMessageReceiver
+    public class Receiver(ILogger<Receiver> logger)
+        : IMulticastReceiver
     {
         #region Private Fields
 
         private const char EndChar = '\0';
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
 
         private string host;
         private string messageType;
@@ -29,15 +28,6 @@ namespace MessageReceiver
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Receiver(ILogger<Receiver> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Events
 
@@ -51,10 +41,10 @@ namespace MessageReceiver
         {
             if (receiverTask == default)
             {
-                cancellationToken.Register(() => StopTask());
+                cancellationToken.Register(StopTask);
 
                 receiverTask = retryPolicy.ExecuteAsync(
-                    action: (t) => RunReceiverAsync(t),
+                    action: RunReceiverAsync,
                     cancellationToken: cancellationToken);
             }
 
@@ -71,9 +61,7 @@ namespace MessageReceiver
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
                     sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: (exception, reconnection) => OnRetry(
-                        exception: exception,
-                        reconnection: reconnection));
+                    onRetry: OnRetry);
         }
 
         #endregion Public Methods
@@ -138,7 +126,7 @@ namespace MessageReceiver
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var result = await udpClient.ReceiveAsync();
+                var result = await udpClient.ReceiveAsync(cancellationToken);
                 SendMessageReceived(result);
             }
         }
@@ -147,10 +135,10 @@ namespace MessageReceiver
         {
             var bytes = result.Buffer;
 
-            if (bytes?.Any() ?? false)
+            if (bytes?.Length > 0)
             {
                 var content = Encoding.ASCII.GetString(
-                    bytes: bytes.ToArray(),
+                    bytes: [.. bytes],
                     index: 0,
                     count: bytes.Length).TrimEnd(EndChar);
 

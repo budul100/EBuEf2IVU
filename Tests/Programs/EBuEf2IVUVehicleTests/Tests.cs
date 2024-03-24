@@ -35,7 +35,7 @@ namespace EBuEf2IVUVehicleTests
                 sessionCallback: () => wasCalled = true);
 
             var stateHandlerMock = GetStateHandlerMock();
-            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var messageReceiverMock = new Mock<IMulticastReceiver>();
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -76,7 +76,7 @@ namespace EBuEf2IVUVehicleTests
             var databaseConnectorMock = GetDatabaseConnectorMock(
                 ivuDatum: testDate);
             var stateHandlerMock = GetStateHandlerMock();
-            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var messageReceiverMock = new Mock<IMulticastReceiver>();
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -107,7 +107,7 @@ namespace EBuEf2IVUVehicleTests
                 addRealtimeCallback: l => legReceived = l);
 
             var stateHandlerMock = GetStateHandlerMock();
-            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var messageReceiverMock = new Mock<IMulticastReceiver>();
 
             var settingsPath = Path.GetFullPath(SettingsPath);
 
@@ -137,7 +137,7 @@ namespace EBuEf2IVUVehicleTests
 
         #region Private Methods
 
-        private static void ConfigureServices(IServiceCollection services, IMessageReceiver messageReceiver,
+        private static void ConfigureServices(IServiceCollection services, IMulticastReceiver messageReceiver,
             Mock<IDatabaseConnector> databaseConnectorMock, Mock<IStateHandler> stateHandlerMock)
         {
             services.AddHostedService<EBuEf2IVUVehicle.Worker>();

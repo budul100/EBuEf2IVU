@@ -35,7 +35,7 @@ namespace EBuEf2IVUCrew
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
 
-            services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
+            services.AddTransient<IMulticastReceiver, MulticastReceiver.Receiver>();
             services.AddSingleton<ICrewChecker, CrewChecker.Checker>();
         }
 

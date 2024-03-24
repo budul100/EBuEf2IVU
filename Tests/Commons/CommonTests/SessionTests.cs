@@ -61,7 +61,7 @@ namespace CommonTests
                 .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
                 .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
 
-            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var messageReceiverMock = new Mock<IMulticastReceiver>();
             var loggerMock = new Mock<ILogger<StateHandler.Handler>>();
 
             var databaseConnectorMock = new Mock<IDatabaseConnector>();
@@ -87,7 +87,7 @@ namespace CommonTests
                 .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
                 .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
 
-            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var messageReceiverMock = new Mock<IMulticastReceiver>();
             var loggerMock = new Mock<ILogger<StateHandler.Handler>>();
             var databaseConnectorMock = new Mock<IDatabaseConnector>();
 
@@ -124,7 +124,7 @@ namespace CommonTests
                 .GetSection(nameof(EBuEf2IVUBase.Settings.EBuEfDBConnector))
                 .Get<EBuEf2IVUBase.Settings.EBuEfDBConnector>();
 
-            var messageReceiverMock = new Mock<IMessageReceiver>();
+            var messageReceiverMock = new Mock<IMulticastReceiver>();
             var loggerMock = new Mock<ILogger<StateHandler.Handler>>();
 
             var databaseConnectorMock = new Mock<IDatabaseConnector>();

@@ -1,13 +1,13 @@
-﻿using Commons.Enums;
-using Commons.EventsArgs;
-using Commons.Extensions;
-using Commons.Interfaces;
-using Microsoft.Extensions.Logging;
-using StateHandler.Extensions;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Commons.Enums;
+using Commons.EventsArgs;
+using Commons.Extensions;
+using Commons.Interfaces;
+using StateHandler.Extensions;
 
 namespace StateHandler
 {
@@ -20,7 +20,7 @@ namespace StateHandler
 
         private readonly IDatabaseConnector databaseConnector;
         private readonly ILogger logger;
-        private readonly IMessageReceiver stateReceiver;
+        private readonly IMulticastReceiver stateReceiver;
 
         private Regex sessionStartRegex;
         private Regex sessionStatusRegex;
@@ -29,7 +29,7 @@ namespace StateHandler
 
         #region Public Constructors
 
-        public Handler(ILogger<Handler> logger, IDatabaseConnector databaseConnector, IMessageReceiver stateReceiver)
+        public Handler(ILogger<Handler> logger, IDatabaseConnector databaseConnector, IMulticastReceiver stateReceiver)
         {
             this.logger = logger;
 

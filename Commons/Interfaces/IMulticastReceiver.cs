@@ -1,11 +1,11 @@
-using Commons.EventsArgs;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Commons.EventsArgs;
 
 namespace Commons.Interfaces
 {
-    public interface IMessageReceiver
+    public interface IMulticastReceiver
     {
         #region Public Events
 

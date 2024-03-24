@@ -1,17 +1,18 @@
-using Commons.Enums;
-using Commons.Extensions;
-using Commons.Interfaces;
-using Commons.Models;
-using EBuEf2IVUBase;
-using EnumerableExtensions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Commons.Enums;
+using Commons.Extensions;
+using Commons.Interfaces;
+using Commons.Models;
+using Commons.Settings;
+using EBuEf2IVUBase;
+using EnumerableExtensions;
+using Newtonsoft.Json;
 
 namespace EBuEf2IVUPath
 {
@@ -23,7 +24,7 @@ namespace EBuEf2IVUPath
         private const string MessageTypePaths = "Zugtrassen";
 
         private readonly IMessage2TrainRunConverter messageConverter;
-        private readonly IMessageReceiver trainPathReceiver;
+        private readonly IMulticastReceiver multicastReceiver;
         private readonly ITrainPathSender trainPathSender;
 
         private bool initalPathsSent;
@@ -34,13 +35,13 @@ namespace EBuEf2IVUPath
         #region Public Constructors
 
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
-            IMessageReceiver messageReceiver, IMessage2TrainRunConverter messageConverter, ITrainPathSender trainPathSender,
+            IMulticastReceiver multicastReceiver, IMessage2TrainRunConverter messageConverter, ITrainPathSender trainPathSender,
             ILogger<Worker> logger)
             : base(config: config, sessionStateHandler: sessionStateHandler, databaseConnector: databaseConnector,
                   logger: logger, assembly: Assembly.GetExecutingAssembly())
         {
-            this.trainPathReceiver = messageReceiver;
-            this.trainPathReceiver.MessageReceivedEvent += OnMessageReceived;
+            this.multicastReceiver = multicastReceiver;
+            this.multicastReceiver.MessageReceivedEvent += OnMessageReceived;
 
             this.messageConverter = messageConverter;
             this.trainPathSender = trainPathSender;
@@ -70,7 +71,7 @@ namespace EBuEf2IVUPath
                         if (isSessionRunning
                             && sessionStateHandler.StateType != StateType.IsPaused)
                         {
-                            var receiverTask = trainPathReceiver.ExecuteAsync(sessionCancellationToken);
+                            var receiverTask = multicastReceiver.ExecuteAsync(sessionCancellationToken);
 
                             var senderTask = trainPathSender.ExecuteAsync(
                                 ivuDatum: ebuefSession.IVUDatum,
@@ -154,10 +155,10 @@ namespace EBuEf2IVUPath
                 "Der Nachrichten-Empfänger von EBuEf2IVUPath wird gestartet.");
 
             var receiverSettings = config
-                .GetSection(nameof(Commons.Settings.TrainPathReceiver))
-                .Get<Commons.Settings.TrainPathReceiver>();
+                .GetSection(nameof(TrainPathReceiver))
+                .Get<TrainPathReceiver>();
 
-            trainPathReceiver.Initialize(
+            multicastReceiver.Initialize(
                 host: receiverSettings.Host,
                 port: receiverSettings.Port,
                 retryTime: receiverSettings.RetryTime,

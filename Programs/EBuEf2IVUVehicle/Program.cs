@@ -35,7 +35,7 @@ namespace EBuEf2IVUVehicle
             services.AddSingleton<IDatabaseConnector, DatabaseConnector.Connector>();
             services.AddSingleton<IStateHandler, StateHandler.Handler>();
 
-            services.AddTransient<IMessageReceiver, MessageReceiver.Receiver>();
+            services.AddTransient<IMulticastReceiver, MulticastReceiver.Receiver>();
             services.AddSingleton<IMessage2LegConverter, Message2LegConverter.Converter>();
 
             services.AddSingleton<IRealtimeSender, RealtimeSender.Sender>();

@@ -33,7 +33,7 @@
 		<ProjectReference Include="..\..\Commons\Commons.csproj" />
 		<ProjectReference Include="..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
 		<ProjectReference Include="..\..\Services\Message2TrainRunConverter\Message2TrainRunConverter.csproj" />
-		<ProjectReference Include="..\..\Services\MessageReceiver\MessageReceiver.csproj" />
+		<ProjectReference Include="..\..\Services\MulticastReceiver\MulticastReceiver.csproj" />
 		<ProjectReference Include="..\..\Services\StateHandler\StateHandler.csproj" />
 		<ProjectReference Include="..\..\Services\TrainPathSender\TrainPathSender.csproj" />
 		<ProjectReference Include="..\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnector", "Servic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commons", "Commons\Commons.csproj", "{9B60D84D-DA2D-4487-85EE-FA259EB80403}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageReceiver", "Services\MessageReceiver\MessageReceiver.csproj", "{D98CEFE4-06DB-4F43-B6C8-2FBEB40435E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MulticastReceiver", "Services\MulticastReceiver\MulticastReceiver.csproj", "{D98CEFE4-06DB-4F43-B6C8-2FBEB40435E1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{B66A038D-89B1-4317-BD2D-85C054B7CA12}"
 EndProject
@@ -59,8 +59,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Message2TrainRunConverter",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Additionals", "Additionals", "{032BE8ED-2172-4A71-B280-2309E66AAB54}"
 	ProjectSection(SolutionItems) = preProject
-		Create_Linux-x64.bat = Create_Linux-x64.bat
 		Create_Docker.sh = Create_Docker.sh
+		Create_Linux-x64.bat = Create_Linux-x64.bat
 		Create_Linux-x64.sh = Create_Linux-x64.sh
 		docker-compose.yml = docker-compose.yml
 		README.md = README.md
