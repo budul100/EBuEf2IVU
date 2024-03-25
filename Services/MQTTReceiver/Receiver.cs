@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,11 +13,16 @@ using Polly.Retry;
 
 namespace MQTTReceiver
 {
-    public class Receiver(ILogger<Receiver> logger)
-        : IMQTTReceiver
+    public class Receiver
+        : IMQTTReceiver, IDisposable
     {
         #region Private Fields
 
+        private readonly ILogger<Receiver> logger;
+        private readonly IMqttClient mqttClient;
+        private readonly MqttFactory mqttFactory;
+
+        private bool isDisposed;
         private string messageType;
         private Task receiverTask;
         private AsyncRetryPolicy retryPolicy;
@@ -25,6 +31,20 @@ namespace MQTTReceiver
 
         #endregion Private Fields
 
+        #region Public Constructors
+
+        public Receiver(ILogger<Receiver> logger)
+        {
+            this.logger = logger;
+
+            mqttFactory = new MqttFactory();
+
+            mqttClient = mqttFactory.CreateMqttClient();
+            mqttClient.ApplicationMessageReceivedAsync += e => Task.Run(() => SendMessageReceived(e.ApplicationMessage));
+        }
+
+        #endregion Public Constructors
+
         #region Public Events
 
         public event EventHandler<MessageReceivedArgs> MessageReceivedEvent;
@@ -32,6 +52,15 @@ namespace MQTTReceiver
         #endregion Public Events
 
         #region Public Methods
+
+        public void Dispose()
+        {
+            Dispose(
+                isDisposing: true);
+
+            GC.SuppressFinalize(
+                obj: this);
+        }
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {
@@ -62,6 +91,25 @@ namespace MQTTReceiver
 
         #endregion Public Methods
 
+        #region Protected Methods
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (!isDisposed)
+            {
+                if (isDisposing)
+                {
+                    StopTask();
+
+                    mqttClient.Dispose();
+                }
+
+                isDisposed = true;
+            }
+        }
+
+        #endregion Protected Methods
+
         #region Private Methods
 
         private void OnRetry(Exception exception, TimeSpan reconnection)
@@ -82,15 +130,9 @@ namespace MQTTReceiver
 
         private async Task RunReceiverAsync(CancellationToken cancellationToken)
         {
-            var mqttFactory = new MqttFactory();
-
-            using var mqttClient = mqttFactory.CreateMqttClient();
-
             var mqttClientOptions = new MqttClientOptionsBuilder()
                 .WithTcpServer(server)
                 .Build();
-
-            mqttClient.ApplicationMessageReceivedAsync += e => Task.Run(() => SendMessageReceived(e.ApplicationMessage));
 
             await mqttClient.ConnectAsync(
                 options: mqttClientOptions,

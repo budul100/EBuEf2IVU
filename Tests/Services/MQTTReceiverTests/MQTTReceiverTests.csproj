@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
@@ -18,9 +18,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\Programs\EBuEf2IVUVehicle\EBuEf2IVUVehicle.csproj" />
-	  <ProjectReference Include="..\..\..\Services\RealtimeSender\RealtimeSender.csproj" />
-	  <ProjectReference Include="..\..\Commons\EBuEf2IVUTestBase\EBuEf2IVUTestBase.csproj" />
+		<ProjectReference Include="..\..\..\Services\MQTTReceiver\MQTTReceiver.csproj" />
+		<ProjectReference Include="..\..\Commons\EBuEf2IVUTestBase\EBuEf2IVUTestBase.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -28,7 +27,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="RealTimeSenderTests.example.xml">
+	  <None Update="MQTTReceiverTests.example.xml">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

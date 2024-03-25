@@ -68,6 +68,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Additionals", "Additionals"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTTReceiver", "Services\MQTTReceiver\MQTTReceiver.csproj", "{BD994678-DD40-4C8E-AADF-3AE84960466F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTTReceiverTests", "Tests\Services\MQTTReceiverTests\MQTTReceiverTests.csproj", "{B2C14665-C9EF-49F4-80B4-594E3852BB11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -162,6 +164,10 @@ Global
 		{BD994678-DD40-4C8E-AADF-3AE84960466F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD994678-DD40-4C8E-AADF-3AE84960466F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD994678-DD40-4C8E-AADF-3AE84960466F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2C14665-C9EF-49F4-80B4-594E3852BB11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2C14665-C9EF-49F4-80B4-594E3852BB11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2C14665-C9EF-49F4-80B4-594E3852BB11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2C14665-C9EF-49F4-80B4-594E3852BB11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -191,6 +197,7 @@ Global
 		{7223DA49-C402-4B7F-AC1A-B4185E47044E} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
 		{59E9EC19-E624-4518-9ACD-B3723D493193} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
 		{BD994678-DD40-4C8E-AADF-3AE84960466F} = {B66A038D-89B1-4317-BD2D-85C054B7CA12}
+		{B2C14665-C9EF-49F4-80B4-594E3852BB11} = {EB4A5585-B06C-492D-B1C8-451FC1EEBAD2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E929A830-61A1-48FF-9596-23961F1A08C4}

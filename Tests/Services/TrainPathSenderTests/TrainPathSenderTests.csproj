@@ -21,6 +21,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Using Include="NUnit.Framework" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Update="TrainPathSenderTests.example.xml">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
