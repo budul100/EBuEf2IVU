@@ -1,3 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.Extensions;
 using Commons.Interfaces;
@@ -5,14 +12,7 @@ using Commons.Models;
 using Commons.Settings;
 using EBuEf2IVUBase;
 using EnumerableExtensions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace EBuEf2IVUPath
 {
@@ -165,9 +165,12 @@ namespace EBuEf2IVUPath
 
             if (settings.UseMulticast)
             {
+                var port = settings.Port
+                    ?? ConnectorEBuEfBase.MulticastPort;
+
                 multicastReceiver.Initialize(
-                    host: settings.MulticastHost,
-                    port: settings.MulticastPort,
+                    host: settings.Server,
+                    port: port,
                     retryTime: settings.RetryTime,
                     messageType: MessageTypePaths);
 
@@ -176,8 +179,9 @@ namespace EBuEf2IVUPath
             else
             {
                 mqttReceiver.Initialize(
-                    server: settings.MqttServer,
-                    topic: settings.MqttTopic,
+                    server: settings.Server,
+                    port: settings.Port,
+                    topic: settings.Topic,
                     retryTime: settings.RetryTime,
                     messageType: MessageTypePaths);
 

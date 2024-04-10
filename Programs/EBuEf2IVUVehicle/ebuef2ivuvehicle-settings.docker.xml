@@ -19,15 +19,19 @@
 		<RetryTime>30</RetryTime>
 	</EBuEfDBConnector>
 	<StatusReceiver>
-		<MulticastHost>224.0.0.8</MulticastHost>
-		<MulticastPort>4454</MulticastPort>
+		<UseMulticast>false</UseMulticast>
+		<Server>224.0.0.8</Server>
+		<!--<Port>4454</Port>-->
+		<Topic>mqtt4454</Topic>
 		<RetryTime>30</RetryTime>
 		<StartPattern>ZN SET DISPATCH</StartPattern>
 		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
 	</StatusReceiver>
 	<PositionsReceiver>
-		<MulticastHost>224.0.0.7</MulticastHost>
-		<MulticastPort>4453</MulticastPort>
+		<UseMulticast>false</UseMulticast>
+		<Server>224.0.0.7</Server>
+		<!--<Port>4453</Port>-->
+		<Topic>mqtt4453</Topic>
 		<RetryTime>30</RetryTime>
 	</PositionsReceiver>
 	<RealtimeSender>

@@ -1,8 +1,8 @@
-﻿using Commons.Enums;
-using Commons.EventsArgs;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Commons.Enums;
+using Commons.EventsArgs;
 
 namespace Commons.Interfaces
 {
@@ -26,7 +26,7 @@ namespace Commons.Interfaces
 
         void Initialize(string host, int port, int retryTime, string startPattern, string statusPattern);
 
-        void Initialize(string server, string topic, int retryTime, string startPattern,
+        void Initialize(string server, int? port, string topic, int retryTime, string startPattern,
             string statusPattern);
 
         #endregion Public Methods

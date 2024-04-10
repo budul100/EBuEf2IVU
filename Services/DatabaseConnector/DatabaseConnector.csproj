@@ -5,7 +5,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="8.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="8.0.4" />
 		<PackageReference Include="budul.ConverterExtensions" Version="1.6.2" />
 		<PackageReference Include="budul.EnumerableExtensions" Version="1.33.0" />
 		<PackageReference Include="budul.StringExtensions" Version="1.18.2" />

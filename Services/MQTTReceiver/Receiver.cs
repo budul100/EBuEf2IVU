@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +23,7 @@ namespace MQTTReceiver
 
         private bool isDisposed;
         private string messageType;
+        private int? port;
         private Task receiverTask;
         private AsyncRetryPolicy retryPolicy;
         private string server;
@@ -76,9 +76,10 @@ namespace MQTTReceiver
             return receiverTask;
         }
 
-        public void Initialize(string server, string topic, int retryTime, string messageType)
+        public void Initialize(string server, int? port, string topic, int retryTime, string messageType)
         {
             this.server = server;
+            this.port = port;
             this.topic = topic;
             this.messageType = messageType;
 
@@ -118,11 +119,16 @@ namespace MQTTReceiver
 
             if (exception.GetType() != typeof(OperationCanceledException))
             {
+                var address = port.HasValue
+                    ? $"{server}:{port}"
+                    : server;
+
                 logger.LogError(
                     exception,
-                    "Fehler beim MQTT-Empfänger {server}: {message}\r\n" +
+                    "Fehler beim MQTT-Empfänger {address} (topic {topic}). {message}\r\n" +
                     "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
-                    server,
+                    address,
+                    topic,
                     exception.Message,
                     reconnection.TotalSeconds);
             }
@@ -131,8 +137,9 @@ namespace MQTTReceiver
         private async Task RunReceiverAsync(CancellationToken cancellationToken)
         {
             var mqttClientOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer(server)
-                .Build();
+                .WithTcpServer(
+                    server: server,
+                    port: port).Build();
 
             await mqttClient.ConnectAsync(
                 options: mqttClientOptions,
@@ -146,9 +153,13 @@ namespace MQTTReceiver
                 options: mqttSubscribeOptions,
                 cancellationToken: cancellationToken);
 
+            var address = port.HasValue
+                ? $"{server}:{port}"
+                : server;
+
             logger.LogDebug(
-                "MQTT receiver is subscribed on {server} (topic {topic}) for messages of type {type}.",
-                server,
+                "MQTT receiver is subscribed on {address} (topic {topic}) for messages of type {type}.",
+                address,
                 topic,
                 messageType);
         }

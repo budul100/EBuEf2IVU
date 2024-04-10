@@ -44,8 +44,8 @@ namespace MQTTReceiverTests
             using var sender = mqttFactory.CreateMqttClient();
 
             var senderOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer(MqttServer)
-                .Build();
+                .WithTcpServer(
+                    server: MqttServer).Build();
 
             await sender.ConnectAsync(senderOptions, CancellationToken.None);
 
@@ -70,6 +70,7 @@ namespace MQTTReceiverTests
 
             receiver.Initialize(
                 server: MqttServer,
+                port: default,
                 topic: MqttTopic,
                 retryTime: 30,
                 messageType: default);

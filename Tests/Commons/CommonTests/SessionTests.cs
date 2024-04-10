@@ -1,14 +1,14 @@
-using Commons.EventsArgs;
-using Commons.Interfaces;
-using Commons.Settings;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Moq;
-using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Commons.EventsArgs;
+using Commons.Interfaces;
+using Commons.Settings;
+using Moq;
+using NUnit.Framework;
 
 namespace CommonTests
 {

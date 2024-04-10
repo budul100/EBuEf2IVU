@@ -1,3 +1,8 @@
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.EventsArgs;
 using Commons.Extensions;
@@ -5,12 +10,7 @@ using Commons.Interfaces;
 using Commons.Models;
 using Commons.Settings;
 using EBuEf2IVUBase;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace EBuEf2IVUVehicle
 {
@@ -154,9 +154,12 @@ namespace EBuEf2IVUVehicle
 
             if (settings.UseMulticast)
             {
+                var port = settings.Port
+                    ?? ConnectorEBuEfBase.MulticastPort;
+
                 multicastReceiver.Initialize(
-                    host: settings.MulticastHost,
-                    port: settings.MulticastPort,
+                    host: settings.Server,
+                    port: port,
                     retryTime: settings.RetryTime,
                     messageType: MessageTypePositions);
 
@@ -165,8 +168,9 @@ namespace EBuEf2IVUVehicle
             else
             {
                 mqttReceiver.Initialize(
-                    server: settings.MqttServer,
-                    topic: settings.MqttTopic,
+                    server: settings.Server,
+                    port: settings.Port,
+                    topic: settings.Topic,
                     retryTime: settings.RetryTime,
                     messageType: MessageTypePositions);
 

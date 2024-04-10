@@ -5,7 +5,7 @@ namespace Commons.Interfaces
     {
         #region Public Methods
 
-        void Initialize(string server, string topic, int retryTime, string messageType);
+        void Initialize(string server, int? port, string topic, int retryTime, string messageType);
 
         #endregion Public Methods
     }

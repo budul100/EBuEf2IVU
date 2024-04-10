@@ -1,13 +1,13 @@
-﻿using Commons.Enums;
-using Commons.EventsArgs;
-using Commons.Extensions;
-using Commons.Interfaces;
-using Microsoft.Extensions.Logging;
-using StateHandler.Extensions;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Commons.Enums;
+using Commons.EventsArgs;
+using Commons.Extensions;
+using Commons.Interfaces;
+using StateHandler.Extensions;
 
 namespace StateHandler
 {
@@ -67,11 +67,12 @@ namespace StateHandler
             await messageReceiver.ExecuteAsync(cancellationToken);
         }
 
-        public void Initialize(string server, string topic, int retryTime, string sessionStartPattern,
+        public void Initialize(string server, int? port, string topic, int retryTime, string sessionStartPattern,
             string sessionStatusPattern)
         {
             mqttReceiver.Initialize(
                 server: server,
+                port: port,
                 topic: topic,
                 retryTime: retryTime,
                 messageType: MessageTypeState);

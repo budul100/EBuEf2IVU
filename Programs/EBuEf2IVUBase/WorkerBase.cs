@@ -88,27 +88,31 @@ namespace EBuEf2IVUBase
                 retryTime: databaseConnectionSettings.RetryTime,
                 cancellationToken: cancellationToken);
 
-            var statucReceiverSettings = config
+            var statusReceiverSettings = config
                 .GetSection(nameof(StatusReceiver))
                 .Get<StatusReceiver>();
 
-            if (statucReceiverSettings.UseMulticast)
+            if (statusReceiverSettings.UseMulticast)
             {
+                var port = statusReceiverSettings.Port
+                    ?? ConnectorEBuEfBase.MulticastPort;
+
                 sessionStateHandler.Initialize(
-                    host: statucReceiverSettings.MulticastHost,
-                    port: statucReceiverSettings.MulticastPort,
-                    retryTime: statucReceiverSettings.RetryTime,
-                    startPattern: statucReceiverSettings.StartPattern,
-                    statusPattern: statucReceiverSettings.StatusPattern);
+                    host: statusReceiverSettings.Server,
+                    port: port,
+                    retryTime: statusReceiverSettings.RetryTime,
+                    startPattern: statusReceiverSettings.StartPattern,
+                    statusPattern: statusReceiverSettings.StatusPattern);
             }
             else
             {
                 sessionStateHandler.Initialize(
-                    server: statucReceiverSettings.MqttServer,
-                    topic: statucReceiverSettings.MqttTopic,
-                    retryTime: statucReceiverSettings.RetryTime,
-                    startPattern: statucReceiverSettings.StartPattern,
-                    statusPattern: statucReceiverSettings.StatusPattern);
+                    server: statusReceiverSettings.Server,
+                    port: statusReceiverSettings.Port,
+                    topic: statusReceiverSettings.Topic,
+                    retryTime: statusReceiverSettings.RetryTime,
+                    startPattern: statusReceiverSettings.StartPattern,
+                    statusPattern: statusReceiverSettings.StatusPattern);
             }
 
             await sessionStateHandler.ExecuteAsync(cancellationToken);

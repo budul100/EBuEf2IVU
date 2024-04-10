@@ -2,17 +2,21 @@
 {
     public abstract class ConnectorEBuEfBase
     {
+        #region Public Fields
+
+        public const int MulticastPort = 5355;
+
+        #endregion Public Fields
+
         #region Public Properties
 
-        public string MqttServer { get; set; }
-
-        public string MqttTopic { get; set; }
-
-        public string MulticastHost { get; set; }
-
-        public int MulticastPort { get; set; }
+        public int? Port { get; set; } = MulticastPort;
 
         public int RetryTime { get; set; }
+
+        public string Server { get; set; }
+
+        public string Topic { get; set; }
 
         public bool UseMulticast { get; set; }
 
