@@ -1,26 +1,24 @@
-using Commons.Enums;
-using Commons.Extensions;
-using Commons.Interfaces;
-using EBuEf2IVUBase;
-using EnumerableExtensions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Commons.Enums;
+using Commons.Extensions;
+using Commons.Interfaces;
+using EBuEf2IVUBase;
+using EnumerableExtensions;
 
 namespace EBuEf2IVUCrew
 {
-    public class Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
-        ICrewChecker crewChecker, ILogger<Worker> logger)
-        : WorkerBase(config: config, sessionStateHandler: sessionStateHandler, databaseConnector: databaseConnector,
-            logger: logger, assembly: Assembly.GetExecutingAssembly())
+    public class Worker
+        : WorkerBase
     {
         #region Private Fields
 
-        private readonly ICrewChecker crewChecker = crewChecker;
+        private readonly ICrewChecker crewChecker;
 
         private bool isSessionRunning;
         private TimeSpan queryDurationFuture;
@@ -28,6 +26,18 @@ namespace EBuEf2IVUCrew
         private TimeSpan serviceInterval;
 
         #endregion Private Fields
+
+        #region Public Constructors
+
+        public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
+            ICrewChecker crewChecker, ILogger<Worker> logger)
+            : base(config: config, sessionStateHandler: sessionStateHandler, databaseConnector: databaseConnector,
+                  logger: logger, assembly: Assembly.GetExecutingAssembly())
+        {
+            this.crewChecker = crewChecker;
+        }
+
+        #endregion Public Constructors
 
         #region Protected Methods
 
