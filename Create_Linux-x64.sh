@@ -2,6 +2,7 @@ export PATH="$PATH:/home/mgr/.dotnet/tools"
 
 cd /mnt/c/Users/mgr/Entwicklung/EBuEf2IVU/Programs/$1
 
+dotnet restore
 dotnet deb --configuration Release --framework $2 --runtime $3
 dotnet msbuild /p:TargetFramework=$2 /p:RuntimeIdentifier=$3 /p:Configuration=Release /t:CreateDeb
 
