@@ -32,7 +32,7 @@ echo
 echo "Create tar file"
 echo
 
-docker save --output ebuef2ivu.tar ebuef2ivucrew ebuef2ivupath ebuef2ivuvehicle
+docker save --output ebuef2ivu.tar git.tu-berlin.de:5000/ebuef/ebueftools/ebuef2ivucrew git.tu-berlin.de:5000/ebuef/ebueftools/ebuef2ivupath git.tu-berlin.de:5000/ebuef/ebueftools/ebuef2ivuvehicle
 
 echo
 echo "Copy tar file"

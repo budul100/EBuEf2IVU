@@ -174,7 +174,7 @@ echo Run the following commands in your Linux subsystem to create the repective 
 echo.
 echo cd /mnt/c/Users/mgr/Entwicklung/EBuEf2IVU
 echo docker login git.tu-berlin.de:5000
-echo sudo sh Create_Docker.sh
+echo sh Create_Docker.sh
 echo.
 
 echo.
