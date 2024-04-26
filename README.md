@@ -13,7 +13,7 @@ Multiple services to connect EBuEf applications and IVU applications.
 
 ## Additional remarks
 
-* Check port availibility in WSL2: `nc -zv "<Computer name>.local" <Port>
+* Check port availibility in WSL2: `nc -zv "<Computer name>.local" <Port>`
 * Send multicast messages in WSL2: `echo "<Message>" | netcat -u <Address> <Port>`
 
 * Set WSL2 port proxy on Windows host: `netsh interface portproxy add v4tov4 listenport=<Port> listenaddress=0.0.0.0 connectport=<Port> connectaddress=127.0.0.1`
