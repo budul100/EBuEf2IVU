@@ -22,12 +22,12 @@ namespace MQTTReceiver
         private readonly IMqttClient mqttClient;
         private readonly MqttFactory mqttFactory;
 
+        private string host;
         private bool isDisposed;
         private string messageType;
         private int? port;
         private Task receiverTask;
         private AsyncRetryPolicy retryPolicy;
-        private string server;
         private string topic;
 
         #endregion Private Fields
@@ -77,9 +77,9 @@ namespace MQTTReceiver
             return receiverTask;
         }
 
-        public void Initialize(string server, int? port, string topic, int retryTime, string messageType)
+        public void Initialize(string host, int? port, string topic, int retryTime, string messageType)
         {
-            this.server = server;
+            this.host = host;
             this.port = port;
             this.topic = topic;
             this.messageType = messageType;
@@ -121,8 +121,8 @@ namespace MQTTReceiver
             if (exception.GetType() != typeof(OperationCanceledException))
             {
                 var address = port.HasValue
-                    ? $"{server}:{port}"
-                    : server;
+                    ? $"{host}:{port}"
+                    : host;
 
                 logger.LogError(
                     exception,
@@ -144,7 +144,7 @@ namespace MQTTReceiver
         {
             var mqttClientOptions = new MqttClientOptionsBuilder()
                 .WithTcpServer(
-                    server: server,
+                    host: host,
                     port: port).Build();
 
             await mqttClient.ConnectAsync(
@@ -160,8 +160,8 @@ namespace MQTTReceiver
                 cancellationToken: cancellationToken);
 
             var address = port.HasValue
-                ? $"{server}:{port}"
-                : server;
+                ? $"{host}:{port}"
+                : host;
 
             logger.LogDebug(
                 "MQTT receiver is subscribed on {address} (topic {topic}) for messages of type {type}.",
