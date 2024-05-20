@@ -8,6 +8,7 @@ using Polly.Retry;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace TrainPathSender
     {
         #region Private Fields
 
-        private readonly ConcurrentQueue<IEnumerable<TrainRun>> importsQueue = new ConcurrentQueue<IEnumerable<TrainRun>>();
+        private readonly ConcurrentQueue<IEnumerable<TrainRun>> importsQueue = new();
         private readonly ILogger<Sender> logger;
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
@@ -131,6 +132,11 @@ namespace TrainPathSender
                 "Die Verbindung wird in {reconection} Sekunden wieder versucht.",
                 exception.Message,
                 reconnection.TotalSeconds);
+
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
         }
 
         private async Task RunSenderAsync(CancellationToken cancellationToken)

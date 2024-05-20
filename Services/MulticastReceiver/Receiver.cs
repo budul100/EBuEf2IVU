@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -9,7 +11,6 @@ using Commons.EventsArgs;
 using Commons.Interfaces;
 using Polly;
 using Polly.Retry;
-using System.Linq;
 
 namespace MulticastReceiver
 {
@@ -107,6 +108,11 @@ namespace MulticastReceiver
                         exception.Message,
                         reconnection.TotalSeconds);
                 }
+            }
+
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
             }
         }
 

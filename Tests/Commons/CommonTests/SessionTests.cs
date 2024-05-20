@@ -1,15 +1,15 @@
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Commons.EventsArgs;
 using Commons.Extensions;
 using Commons.Interfaces;
 using Commons.Settings;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CommonTests
 {
@@ -55,8 +55,8 @@ namespace CommonTests
             // The values must possibly adjusted if a new database was imported
 
             Assert.That(query.Result.IVUDatum, Is.EqualTo(query.Result.IVUDatum.Date));
-            Assert.That(query.Result.Wochentag, Is.EqualTo(DayOfWeek.Sunday));
-            Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(8, 0, 0).Add(curOffset).Subtract(expOffset)));
+            Assert.That(query.Result.Wochentag, Is.EqualTo(DayOfWeek.Friday));
+            Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(12, 0, 0).Add(curOffset).Subtract(expOffset)));
         }
 
         [Test]

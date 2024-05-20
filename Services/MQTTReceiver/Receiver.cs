@@ -1,14 +1,15 @@
-﻿using Commons.EventsArgs;
-using Commons.Interfaces;
+﻿using System;
+using System.Diagnostics;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Commons.EventsArgs;
+using Commons.Interfaces;
 using MQTTnet;
 using MQTTnet.Client;
 using Polly;
 using Polly.Retry;
-using System;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MQTTReceiver
 {
@@ -131,6 +132,11 @@ namespace MQTTReceiver
                     topic,
                     exception.Message,
                     reconnection.TotalSeconds);
+            }
+
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
             }
         }
 

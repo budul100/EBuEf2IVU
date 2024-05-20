@@ -1,14 +1,13 @@
-using System;
-using System.IO;
-using System.Threading;
+using Commons.Extensions;
+using Commons.Models;
+using Commons.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Commons.Extensions;
-
-using Commons.Models;
-using Commons.Settings;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Threading;
 using TrainPathSender;
 
 namespace TrainPathSenderTests

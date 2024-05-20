@@ -1,16 +1,17 @@
-﻿using Commons.Interfaces;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Commons.Interfaces;
 using Commons.Models;
 using CredentialChannelFactory;
 using CrewChecker.Extensions;
 using EnumerableExtensions;
-using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace CrewChecker
 {
@@ -180,6 +181,11 @@ namespace CrewChecker
                 "Die Verbindung wird in {reconnectionPeriod} Sekunden wieder versucht.",
                 exception.Message,
                 reconnection.TotalSeconds);
+
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
         }
 
         #endregion Private Methods

@@ -7,6 +7,7 @@ using RealtimeSenderIS.Converters;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.ServiceModel;
 using System.Threading;
@@ -20,7 +21,7 @@ namespace RealtimeSenderIS
         #region Private Fields
 
         private readonly ILogger logger;
-        private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new ConcurrentQueue<RealTimeInfoTO>();
+        private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new();
 
         private RealTimeInformationImportFacadeClient client;
         private Message2RealtimeInfo converter;
@@ -132,6 +133,11 @@ namespace RealtimeSenderIS
                 "Die Verbindung wird in {reconnection} Sekunden wieder versucht.",
                 exception.Message,
                 reconnection.TotalSeconds);
+
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
         }
 
         private async Task RunSenderAsync(CancellationToken cancellationToken)
