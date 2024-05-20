@@ -1,17 +1,17 @@
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Commons.Extensions;
 using Commons.Interfaces;
 using EBuEf2IVUTestBase;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Moq;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Server;
 using MQTTReceiver;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MQTTReceiverTests
 {

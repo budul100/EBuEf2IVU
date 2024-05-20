@@ -15,12 +15,18 @@
 		</WriteTo>
 	</Serilog>
 	<EBuEfDBConnector>
+		<!--The connection string can also be defined by the environment variables. The value of the settings file is used preferably.-->
+		<!--The variables are MYSQL_STD_HOST, MYSQL_STD_DBNAME, MYSQL_STD_USER, and MYSQL_STD_PASSWORD.-->
 		<ConnectionString>SERVER=host.docker.internal;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
 		<RetryTime>30</RetryTime>
 	</EBuEfDBConnector>
 	<StatusReceiver>
+		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT=mqtt/multicast. The value of the settings file is used preferably.-->
 		<UseMulticast>false</UseMulticast>
-		<Server>224.0.0.8</Server>
+		<!--The multicast host can also be defined by the environment variable EBUEF_HOSTNAME. The value of the settings file is used preferably.-->
+		<!--The MQTT host can also be defined by the environment variable MQTT_BROKER_IP. The value of the settings file is used preferably.-->
+		<Host>224.0.0.8</Host>
+		<!--The port can also be defined by the environment variable EBUEF_HOSTPORT. The value of the settings file is used preferably.-->
 		<!--<Port>4454</Port>-->
 		<Topic>mqtt4454</Topic>
 		<RetryTime>30</RetryTime>
@@ -28,18 +34,19 @@
 		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
 	</StatusReceiver>
 	<PositionsReceiver>
+		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT=mqtt/multicast. The value of the settings file is used preferably.-->
 		<UseMulticast>false</UseMulticast>
-		<Server>224.0.0.7</Server>
+		<!--The host can also be defined by the environment variable EBUEF_HOSTNAME. The value of the settings file is used preferably.-->
+		<Host>224.0.0.7</Host>
+		<!--The port can also be defined by the environment variable EBUEF_HOSTPORT. The value of the settings file is used preferably.-->
 		<!--<Port>4453</Port>-->
 		<Topic>mqtt4453</Topic>
 		<RetryTime>30</RetryTime>
 	</PositionsReceiver>
 	<RealtimeSender>
 		<UseInterfaceServer>true</UseInterfaceServer>
-
-		<!--The host can also be defined by the environment variable IVU_IFSERVER_ENDPOINT. The value of the settings file is used preferably.-->
+		<!--The endpoint can also be defined by the environment variable IVU_IFSERVER_ENDPOINT. The value of the settings file is used preferably.-->
 		<Endpoint>http://host.docker.internal:8080</Endpoint>
-
 		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->
 		<Host>host.docker.internal</Host>
 		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The value of the settings file is used preferably.-->
@@ -49,7 +56,6 @@
 		<Path>intf.realtime.standardimport.impl/RealtimeImportWebFacadeBean</Path>
 		<Username>ivu</Username>
 		<Password>ivu$admin</Password>
-
 		<Division>EBUEF</Division>
 		<IgnorePrognosis>false</IgnorePrognosis>
 		<RetryTime>30</RetryTime>

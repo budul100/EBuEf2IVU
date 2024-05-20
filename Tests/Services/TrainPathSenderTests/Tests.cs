@@ -90,7 +90,7 @@ namespace TrainPathSenderTests
                 .Get<EBuEfDBConnector>();
 
             var databaseConnector = new DatabaseConnector.Connector(loggerFactory.CreateLogger<DatabaseConnector.Connector>());
-            var connectionString = connectorSettings.GetConnectionString();
+            var connectionString = connectorSettings.GetDBConnectionString();
 
             databaseConnector.Initialize(
                 connectionString: connectionString,

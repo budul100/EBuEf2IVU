@@ -12,24 +12,24 @@ namespace CommonTests
         public void UserEnvironmentVariables()
         {
             const string endpoint = "testpoint";
-            Environment.SetEnvironmentVariable(SettingsExtensions.EnvironmentIVUEndpoint, endpoint);
+            Environment.SetEnvironmentVariable(SettingsExtensions.EnvironmentIVUIFEndpoint, endpoint);
 
-            Assert.That(default(Commons.Settings.RealtimeSender).GetEndpoint(), Is.EqualTo(endpoint));
+            Assert.That(default(Commons.Settings.RealtimeSender).GetIVUIFServerEndpoint(), Is.EqualTo(endpoint));
 
             const string host = "testhost";
-            Environment.SetEnvironmentVariable(SettingsExtensions.EnvironmentIVUHost, host);
+            Environment.SetEnvironmentVariable(SettingsExtensions.EnvironmentIVUAppHost, host);
 
-            Assert.That(default(Commons.Settings.RealtimeSender).GetHost(), Is.EqualTo(host));
+            Assert.That(default(Commons.Settings.RealtimeSender).GetIVUAppServerHost(), Is.EqualTo(host));
 
             const int port = 9999;
-            Environment.SetEnvironmentVariable(SettingsExtensions.EnvironmentIVUPort, port.ToString());
+            Environment.SetEnvironmentVariable(SettingsExtensions.EnvironmentIVUAppPort, port.ToString());
 
-            Assert.That(default(Commons.Settings.RealtimeSender).GetPort(), Is.EqualTo(port));
+            Assert.That(default(Commons.Settings.RealtimeSender).GetIVUAppServerPort(), Is.EqualTo(port));
 
             const bool isHttps = true;
-            Environment.SetEnvironmentVariable(SettingsExtensions.EnvironmentIVUIsHttps, isHttps.ToString());
+            Environment.SetEnvironmentVariable(SettingsExtensions.EnvironmentIVUAppSecure, isHttps.ToString());
 
-            Assert.That(default(Commons.Settings.RealtimeSender).GetIsHttps(), Is.EqualTo(isHttps));
+            Assert.That(default(Commons.Settings.RealtimeSender).GetIVUAppServerSecure(), Is.EqualTo(isHttps));
         }
 
         #endregion Public Methods

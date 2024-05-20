@@ -1,14 +1,14 @@
-﻿using System;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Commons.EventsArgs;
+﻿using Commons.EventsArgs;
 using Commons.Interfaces;
+using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
 using Polly;
 using Polly.Retry;
+using System;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MQTTReceiver
 {

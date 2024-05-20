@@ -15,12 +15,18 @@
 		</WriteTo>
 	</Serilog>
 	<EBuEfDBConnector>
+		<!--The connection string can also be defined by the environment variables. The value of the settings file is used preferably.-->
+		<!--The variables are MYSQL_STD_HOST, MYSQL_STD_DBNAME, MYSQL_STD_USER, and MYSQL_STD_PASSWORD.-->
 		<ConnectionString>SERVER=db.ebuef;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
 		<RetryTime>30</RetryTime>
 	</EBuEfDBConnector>
 	<StatusReceiver>
+		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT=mqtt/multicast. The value of the settings file is used preferably.-->
 		<UseMulticast>false</UseMulticast>
-		<Server>224.0.0.8</Server>
+		<!--The multicast host can also be defined by the environment variable EBUEF_HOSTNAME. The value of the settings file is used preferably.-->
+		<!--The MQTT host can also be defined by the environment variable MQTT_BROKER_IP. The value of the settings file is used preferably.-->
+		<Host>224.0.0.8</Host>
+		<!--The port can also be defined by the environment variable EBUEF_HOSTPORT. The value of the settings file is used preferably.-->
 		<!--<Port>4454</Port>-->
 		<Topic>mqtt4454</Topic>
 		<RetryTime>30</RetryTime>
@@ -28,8 +34,11 @@
 		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
 	</StatusReceiver>
 	<TrainPathReceiver>
+		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT=mqtt/multicast. The value of the settings file is used preferably.-->
 		<UseMulticast>false</UseMulticast>
-		<Server>224.0.0.9</Server>
+		<!--The host can also be defined by the environment variable EBUEF_HOSTNAME. The value of the settings file is used preferably.-->
+		<Host>224.0.0.9</Host>
+		<!--The port can also be defined by the environment variable EBUEF_HOSTPORT. The value of the settings file is used preferably.-->
 		<!--<Port>4455</Port>-->
 		<Topic>mqtt4455</Topic>
 		<RetryTime>30</RetryTime>

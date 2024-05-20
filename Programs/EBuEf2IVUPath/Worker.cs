@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.Extensions;
 using Commons.Interfaces;
@@ -12,7 +5,14 @@ using Commons.Models;
 using Commons.Settings;
 using EBuEf2IVUBase;
 using EnumerableExtensions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EBuEf2IVUPath
 {
@@ -163,13 +163,16 @@ namespace EBuEf2IVUPath
                 .GetSection(nameof(TrainPathReceiver))
                 .Get<TrainPathReceiver>();
 
-            if (settings.UseMulticast)
+            var useMulticast = settings.GetEBuEfUseMC();
+
+            if (useMulticast)
             {
-                var port = settings.Port
+                var host = settings.GetEBuEfHostMC();
+                var port = settings.GetEBuEfPort()
                     ?? ConnectorEBuEfBase.MulticastPort;
 
                 multicastReceiver.Initialize(
-                    host: settings.Server,
+                    host: host,
                     port: port,
                     retryTime: settings.RetryTime,
                     messageType: MessageTypePaths);
@@ -178,9 +181,12 @@ namespace EBuEf2IVUPath
             }
             else
             {
+                var host = settings.GetEBuEfHostMQTT();
+                var port = settings.GetEBuEfPort();
+
                 mqttReceiver.Initialize(
-                    server: settings.Server,
-                    port: settings.Port,
+                    server: host,
+                    port: port,
                     topic: settings.Topic,
                     retryTime: settings.RetryTime,
                     messageType: MessageTypePaths);
@@ -204,9 +210,9 @@ namespace EBuEf2IVUPath
 
             var locationShortnames = await GetLocationShortnamesAsync(settings);
 
-            var host = settings.GetHost();
-            var port = settings.GetPort() ?? 0;
-            var isHttps = settings.GetIsHttps() ?? false;
+            var host = settings.GetIVUAppServerHost();
+            var port = settings.GetIVUAppServerPort() ?? 0;
+            var isHttps = settings.GetIVUAppServerSecure() ?? false;
 
             trainPathSender.Initialize(
                 host: host,

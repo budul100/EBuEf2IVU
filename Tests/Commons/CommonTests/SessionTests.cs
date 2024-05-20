@@ -39,7 +39,7 @@ namespace CommonTests
             var loggerMock = new Mock<ILogger<DatabaseConnector.Connector>>();
 
             var databaseConnector = new DatabaseConnector.Connector(loggerMock.Object);
-            var connectionString = connectorSettings.GetConnectionString();
+            var connectionString = connectorSettings.GetDBConnectionString();
 
             databaseConnector.Initialize(
                 connectionString: connectionString,
@@ -52,9 +52,11 @@ namespace CommonTests
             var curOffset = TimeZoneInfo.Local.BaseUtcOffset;
             var expOffset = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time").BaseUtcOffset;
 
+            // The values must possibly adjusted if a new database was imported
+
             Assert.That(query.Result.IVUDatum, Is.EqualTo(query.Result.IVUDatum.Date));
-            Assert.That(query.Result.Wochentag, Is.EqualTo(DayOfWeek.Friday));
-            Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(12, 0, 0).Add(curOffset).Subtract(expOffset)));
+            Assert.That(query.Result.Wochentag, Is.EqualTo(DayOfWeek.Sunday));
+            Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(8, 0, 0).Add(curOffset).Subtract(expOffset)));
         }
 
         [Test]

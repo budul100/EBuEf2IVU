@@ -1,6 +1,5 @@
-﻿using System;
-using Microsoft.Extensions.Hosting;
-using Commons.Settings;
+﻿using Commons.Settings;
+using System;
 
 namespace Commons.Extensions
 {
@@ -13,16 +12,22 @@ namespace Commons.Extensions
         public const string EnvironmentDBPassword = "MYSQL_STD_PASSWORD";
         public const string EnvironmentDBUser = "MYSQL_STD_USER";
 
-        public const string EnvironmentIVUEndpoint = "IVU_IFSERVER_ENDPOINT";
-        public const string EnvironmentIVUHost = "IVU_APPSERVER_HOST";
-        public const string EnvironmentIVUIsHttps = "IVU_APPSERVER_ISHTTPS";
-        public const string EnvironmentIVUPort = "IVU_APPSERVER_PORT";
+        public const string EnvironmentEBuEfFormat = "MESSAGE_FORMAT";
+        public const string EnvironmentEBuEfFormatMulticast = "multicast";
+        public const string EnvironmentEBuEfHostMC = "EBUEF_HOSTNAME";
+        public const string EnvironmentEBuEfHostMQTT = "MQTT_BROKER_IP";
+        public const string EnvironmentEBuEfPort = "EBUEF_HOSTPORT";
+
+        public const string EnvironmentIVUAppHost = "IVU_APPSERVER_HOST";
+        public const string EnvironmentIVUAppPort = "IVU_APPSERVER_PORT";
+        public const string EnvironmentIVUAppSecure = "IVU_APPSERVER_ISHTTPS";
+        public const string EnvironmentIVUIFEndpoint = "IVU_IFSERVER_ENDPOINT";
 
         #endregion Public Fields
 
         #region Public Methods
 
-        public static string GetConnectionString(this EBuEfDBConnector settings)
+        public static string GetDBConnectionString(this EBuEfDBConnector settings)
         {
             var result = settings?.ConnectionString;
 
@@ -39,39 +44,99 @@ namespace Commons.Extensions
             return result;
         }
 
-        public static string GetEndpoint(this RealtimeSender settings)
+        public static string GetEBuEfHostMC<T>(this T settings)
+            where T : ConnectorEBuEfBase
         {
-            var result = settings?.Endpoint;
+            var result = settings?.Host;
 
             if (string.IsNullOrWhiteSpace(result))
             {
-                result = Environment.GetEnvironmentVariable(EnvironmentIVUEndpoint);
+                result = Environment.GetEnvironmentVariable(EnvironmentEBuEfHostMC);
             }
 
             return result;
         }
 
-        public static string GetHost<T>(this T settings)
+        public static string GetEBuEfHostMQTT<T>(this T settings)
+            where T : ConnectorEBuEfBase
+        {
+            var result = settings?.Host;
+
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                result = Environment.GetEnvironmentVariable(EnvironmentEBuEfHostMQTT);
+            }
+
+            return result;
+        }
+
+        public static int? GetEBuEfPort<T>(this T settings)
+            where T : ConnectorEBuEfBase
+        {
+            var result = settings?.Port;
+
+            if (!result.HasValue
+                && Int32.TryParse(
+                    s: Environment.GetEnvironmentVariable(EnvironmentEBuEfPort),
+                    result: out int value))
+            {
+                result = value;
+            }
+
+            return result;
+        }
+
+        public static bool GetEBuEfUseMC<T>(this T settings)
+            where T : ConnectorEBuEfBase
+        {
+            var result = settings?.UseMulticast;
+
+            if (!result.HasValue)
+            {
+                result = Environment.GetEnvironmentVariable(EnvironmentEBuEfFormat) ==
+                    Environment.GetEnvironmentVariable(EnvironmentEBuEfFormatMulticast);
+            }
+
+            return result ?? false;
+        }
+
+        public static string GetIVUAppServerHost<T>(this T settings)
             where T : ConnectorIVUBase
         {
             var result = settings?.Host;
 
             if (string.IsNullOrWhiteSpace(result))
             {
-                result = Environment.GetEnvironmentVariable(EnvironmentIVUHost);
+                result = Environment.GetEnvironmentVariable(EnvironmentIVUAppHost);
             }
 
             return result;
         }
 
-        public static bool? GetIsHttps<T>(this T settings)
+        public static int? GetIVUAppServerPort<T>(this T settings)
+            where T : ConnectorIVUBase
+        {
+            var result = settings?.Port;
+
+            if (!result.HasValue
+                && Int32.TryParse(
+                    s: Environment.GetEnvironmentVariable(EnvironmentIVUAppPort),
+                    result: out int value))
+            {
+                result = value;
+            }
+
+            return result;
+        }
+
+        public static bool? GetIVUAppServerSecure<T>(this T settings)
             where T : ConnectorIVUBase
         {
             var result = settings?.IsHttps;
 
             if (!result.HasValue
                 && bool.TryParse(
-                    value: Environment.GetEnvironmentVariable(EnvironmentIVUIsHttps),
+                    value: Environment.GetEnvironmentVariable(EnvironmentIVUAppSecure),
                     result: out bool value))
             {
                 result = value;
@@ -80,17 +145,13 @@ namespace Commons.Extensions
             return result;
         }
 
-        public static int? GetPort<T>(this T settings)
-            where T : ConnectorIVUBase
+        public static string GetIVUIFServerEndpoint(this RealtimeSender settings)
         {
-            var result = settings?.Port;
+            var result = settings?.Endpoint;
 
-            if (!result.HasValue
-                && Int32.TryParse(
-                    s: Environment.GetEnvironmentVariable(EnvironmentIVUPort),
-                    result: out int value))
+            if (string.IsNullOrWhiteSpace(result))
             {
-                result = value;
+                result = Environment.GetEnvironmentVariable(EnvironmentIVUIFEndpoint);
             }
 
             return result;

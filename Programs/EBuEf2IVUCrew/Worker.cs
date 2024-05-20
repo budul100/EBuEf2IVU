@@ -174,9 +174,9 @@ namespace EBuEf2IVUCrew
                 minutes: settings.AbfrageZukunftMin,
                 seconds: 0);
 
-            var host = settings.GetHost();
-            var port = settings.GetPort() ?? 0;
-            var isHttps = settings.GetIsHttps() ?? false;
+            var host = settings.GetIVUAppServerHost();
+            var port = settings.GetIVUAppServerPort() ?? 0;
+            var isHttps = settings.GetIVUAppServerSecure() ?? false;
 
             crewChecker.Initialize(
                 host: host,
