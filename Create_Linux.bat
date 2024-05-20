@@ -5,12 +5,14 @@ SET PATH=%PATH%;.
 SET FRAMEWORK=net6.0
 SET RUNTIME1=linux-x64
 SET RUNTIME2=linux-arm64
+SET RUNTIME3=linux-arm
 
 SET ScriptsDir=.\_Scripts\Build
 
 SET TARGETDIR=.
 SET SOURCEDIR1=.\bin\Release\%FRAMEWORK%\%RUNTIME1%
 SET SOURCEDIR2=.\bin\Release\%FRAMEWORK%\%RUNTIME2%
+SET SOURCEDIR3=.\bin\Release\%FRAMEWORK%\%RUNTIME3%
 SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
 
 echo.
@@ -52,7 +54,7 @@ if /i "%VERSIONSELECTION%" == "1" (
 
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME1%.deb
 
-wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME1%
+wsl -e bash ./Create_Linux.sh %SERVICENAME% %FRAMEWORK% %RUNTIME1%
 echo.
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
@@ -62,13 +64,23 @@ XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR1%\%DEBFILE% %DROPBOXDIR%
 
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME2%.deb
 
-wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME2%
+wsl -e bash ./Create_Linux.sh %SERVICENAME% %FRAMEWORK% %RUNTIME2%
 echo.
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
 XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %TARGETDIR%
 XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %DROPBOXDIR%
+
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME3%.deb
+
+wsl -e bash ./Create_Linux.sh %SERVICENAME% %FRAMEWORK% %RUNTIME3%
+echo.
+
+DEL /q %DROPBOXDIR%\%DEBFILE%
+
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR3%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR3%\%DEBFILE% %DROPBOXDIR%
 
 powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 echo.
@@ -93,7 +105,7 @@ if /i "%VERSIONSELECTION%" == "1" (
 
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME1%.deb
 
-wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME1%
+wsl -e bash ./Create_Linux.sh %SERVICENAME% %FRAMEWORK% %RUNTIME1%
 echo.
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
@@ -103,13 +115,23 @@ XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR1%\%DEBFILE% %DROPBOXDIR%
 
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME2%.deb
 
-wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME2%
+wsl -e bash ./Create_Linux.sh %SERVICENAME% %FRAMEWORK% %RUNTIME2%
 echo.
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
 XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %TARGETDIR%
 XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %DROPBOXDIR%
+
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME3%.deb
+
+wsl -e bash ./Create_Linux.sh %SERVICENAME% %FRAMEWORK% %RUNTIME3%
+echo.
+
+DEL /q %DROPBOXDIR%\%DEBFILE%
+
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR3%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR3%\%DEBFILE% %DROPBOXDIR%
 
 powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 echo.
@@ -134,7 +156,7 @@ if /i "%VERSIONSELECTION%" == "1" (
 
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME1%.deb
 
-wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME1%
+wsl -e bash ./Create_Linux.sh %SERVICENAME% %FRAMEWORK% %RUNTIME1%
 echo.
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
@@ -144,13 +166,23 @@ XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR1%\%DEBFILE% %DROPBOXDIR%
 
 SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME2%.deb
 
-wsl -e bash ./Create_Linux-x64.sh %SERVICENAME% %FRAMEWORK% %RUNTIME2%
+wsl -e bash ./Create_Linux.sh %SERVICENAME% %FRAMEWORK% %RUNTIME2%
 echo.
 
 DEL /q %DROPBOXDIR%\%DEBFILE%
 
 XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %TARGETDIR%
 XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR2%\%DEBFILE% %DROPBOXDIR%
+
+SET DEBFILE=%SERVICENAME%.*.*.*.%RUNTIME3%.deb
+
+wsl -e bash ./Create_Linux.sh %SERVICENAME% %FRAMEWORK% %RUNTIME3%
+echo.
+
+DEL /q %DROPBOXDIR%\%DEBFILE%
+
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR3%\%DEBFILE% %TARGETDIR%
+XCOPY /y .\Programs\%SERVICENAME%\%SOURCEDIR3%\%DEBFILE% %DROPBOXDIR%
 
 powershell "%ScriptsDir%\Update_VersionBuild.ps1 -projectPaths '.\Programs\%SERVICENAME%\%SERVICENAME%.csproj'"
 echo.

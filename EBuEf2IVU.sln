@@ -60,15 +60,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Additionals", "Additionals", "{032BE8ED-2172-4A71-B280-2309E66AAB54}"
 	ProjectSection(SolutionItems) = preProject
 		Create_Docker.sh = Create_Docker.sh
-		Create_Linux-x64.bat = Create_Linux-x64.bat
-		Create_Linux-x64.sh = Create_Linux-x64.sh
 		docker-compose.yml = docker-compose.yml
+		Create_Linux.sh = Create_Linux.sh
+		Create_Linux.bat = Create_Linux.bat
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTTReceiver", "Services\MQTTReceiver\MQTTReceiver.csproj", "{BD994678-DD40-4C8E-AADF-3AE84960466F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTReceiver", "Services\MQTTReceiver\MQTTReceiver.csproj", "{BD994678-DD40-4C8E-AADF-3AE84960466F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTTReceiverTests", "Tests\Services\MQTTReceiverTests\MQTTReceiverTests.csproj", "{B2C14665-C9EF-49F4-80B4-594E3852BB11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTReceiverTests", "Tests\Services\MQTTReceiverTests\MQTTReceiverTests.csproj", "{B2C14665-C9EF-49F4-80B4-594E3852BB11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
