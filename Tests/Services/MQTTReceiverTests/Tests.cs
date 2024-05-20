@@ -1,17 +1,17 @@
-using Commons.Extensions;
-using Commons.Interfaces;
-using EBuEf2IVUTestBase;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Commons.Extensions;
+using Commons.Interfaces;
+using EBuEf2IVUTestBase;
 using Moq;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Server;
 using MQTTReceiver;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MQTTReceiverTests
 {
@@ -44,8 +44,7 @@ namespace MQTTReceiverTests
             using var sender = mqttFactory.CreateMqttClient();
 
             var senderOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer(
-                    server: MqttServer).Build();
+                .WithTcpServer(MqttServer).Build();
 
             await sender.ConnectAsync(senderOptions, CancellationToken.None);
 
