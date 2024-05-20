@@ -208,7 +208,7 @@ echo cd /mnt/c/Users/mgr/Entwicklung/EBuEf2IVU
 echo docker login git.tu-berlin.de:5000
 echo sh Create_Docker.sh
 echo.
-echo Check name server is necessary: <https://stackoverflow.com/a/67756837/5103334>
+echo Check the name server on debian in case of git connection errors: <https://stackoverflow.com/a/67756837/5103334>
 echo.
 
 echo.
