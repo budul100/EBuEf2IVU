@@ -4,11 +4,12 @@ using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Commons.Extensions;
+
 using Commons.Models;
-using Newtonsoft.Json;
-using NUnit.Framework;
-using TrainPathSender;
 using Commons.Settings;
+using Newtonsoft.Json;
+using TrainPathSender;
 
 namespace TrainPathSenderTests
 {
@@ -89,9 +90,10 @@ namespace TrainPathSenderTests
                 .Get<EBuEfDBConnector>();
 
             var databaseConnector = new DatabaseConnector.Connector(loggerFactory.CreateLogger<DatabaseConnector.Connector>());
+            var connectionString = connectorSettings.GetConnectionString();
 
             databaseConnector.Initialize(
-                connectionString: connectorSettings.ConnectionString,
+                connectionString: connectionString,
                 retryTime: connectorSettings.RetryTime,
                 cancellationToken: new CancellationToken());
 

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.EventsArgs;
+using Commons.Extensions;
 using Commons.Interfaces;
 using Commons.Models;
 using Commons.Settings;
@@ -82,6 +83,8 @@ namespace EBuEf2IVUBase
             var databaseConnectionSettings = config
                 .GetSection(nameof(EBuEfDBConnector))
                 .Get<EBuEfDBConnector>();
+
+            var connectionString = databaseConnectionSettings.GetConnectionString();
 
             databaseConnector.Initialize(
                 connectionString: databaseConnectionSettings.ConnectionString,

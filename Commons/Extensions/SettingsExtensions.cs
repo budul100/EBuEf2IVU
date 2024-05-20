@@ -1,11 +1,17 @@
-﻿using Commons.Settings;
-using System;
+﻿using System;
+using Microsoft.Extensions.Hosting;
+using Commons.Settings;
 
 namespace Commons.Extensions
 {
     public static class SettingsExtensions
     {
         #region Public Fields
+
+        public const string EnvironmentDBHost = "MYSQL_STD_HOST";
+        public const string EnvironmentDBName = "MYSQL_STD_DBNAME";
+        public const string EnvironmentDBPassword = "MYSQL_STD_PASSWORD";
+        public const string EnvironmentDBUser = "MYSQL_STD_USER";
 
         public const string EnvironmentIVUEndpoint = "IVU_IFSERVER_ENDPOINT";
         public const string EnvironmentIVUHost = "IVU_APPSERVER_HOST";
@@ -15,6 +21,23 @@ namespace Commons.Extensions
         #endregion Public Fields
 
         #region Public Methods
+
+        public static string GetConnectionString(this EBuEfDBConnector settings)
+        {
+            var result = settings?.ConnectionString;
+
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                var server = Environment.GetEnvironmentVariable(EnvironmentDBHost);
+                var database = Environment.GetEnvironmentVariable(EnvironmentDBName);
+                var uid = Environment.GetEnvironmentVariable(EnvironmentDBUser);
+                var password = Environment.GetEnvironmentVariable(EnvironmentDBPassword);
+
+                result = $"SERVER={server};DATABASE={database};UID={uid};PASSWORD={password};SslMode=none";
+            }
+
+            return result;
+        }
 
         public static string GetEndpoint(this RealtimeSender settings)
         {

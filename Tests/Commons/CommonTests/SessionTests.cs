@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Commons.EventsArgs;
+using Commons.Extensions;
 using Commons.Interfaces;
 using Commons.Settings;
 using Moq;
@@ -38,9 +39,10 @@ namespace CommonTests
             var loggerMock = new Mock<ILogger<DatabaseConnector.Connector>>();
 
             var databaseConnector = new DatabaseConnector.Connector(loggerMock.Object);
+            var connectionString = connectorSettings.GetConnectionString();
 
             databaseConnector.Initialize(
-                connectionString: connectorSettings.ConnectionString,
+                connectionString: connectionString,
                 retryTime: connectorSettings.RetryTime,
                 cancellationToken: new CancellationToken());
 
