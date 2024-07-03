@@ -1,15 +1,15 @@
-using Commons.Enums;
-using Commons.Extensions;
-using Commons.Interfaces;
-using EBuEf2IVUBase;
-using EnumerableExtensions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Commons.Enums;
+using Commons.Extensions;
+using Commons.Interfaces;
+using EBuEf2IVUBase;
+using EnumerableExtensions;
 
 namespace EBuEf2IVUCrew
 {
@@ -134,6 +134,7 @@ namespace EBuEf2IVUCrew
             {
                 var tripNumbers = trainRuns
                     .Select(t => t.Zugnummer.ToString()).ToArray();
+
                 var crewingElements = await crewChecker.GetCrewingElementsAsync(
                     tripNumbers: tripNumbers,
                     date: ivuDatum,

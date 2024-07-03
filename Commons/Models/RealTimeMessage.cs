@@ -1,6 +1,6 @@
-﻿using Commons.Enums;
+﻿using System;
+using Commons.Enums;
 using Newtonsoft.Json;
-using System;
 
 namespace Commons.Models
 {

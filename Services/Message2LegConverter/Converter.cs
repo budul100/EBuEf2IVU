@@ -1,16 +1,16 @@
-﻿using Commons.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Commons.Enums;
 using Commons.Interfaces;
 using Commons.Models;
 using ConverterExtensions;
 using EBuEf2IVUVehicle.Settings;
 using EnumerableExtensions;
 using Message2LegConverter.Extensions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using RegexExtensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Message2LegConverter
 {
@@ -75,8 +75,8 @@ namespace Message2LegConverter
                 else if (dateMin.HasValue)
                 {
                     logger.LogWarning(
-                        "Die Simulationszeit der eingegangenen Nachricht liegt vor dem frühesten " +
-                        "erlaubten Datum {dateMin}: {message]",
+                        "Die Simulationszeit der eingegangenen Nachricht liegt " +
+                        "vor dem frühesten erlaubten Datum {dateMin}: {message}",
                         dateMin.Value,
                         message);
                 }
@@ -89,7 +89,7 @@ namespace Message2LegConverter
 
         #region Private Methods
 
-        private TrainLeg GetTrainLeg(RealTimeMessage message, InfrastructureMapping mapping)
+        private static TrainLeg GetTrainLeg(RealTimeMessage message, InfrastructureMapping mapping)
         {
             var ebuefZeitVon = mapping != default
                 ? TimeSpan.FromSeconds(mapping.EBuEfVonVerschiebungSekunden.ToInt())

@@ -1,15 +1,15 @@
-using Commons.EventsArgs;
-using Commons.Extensions;
-using Commons.Interfaces;
-using Commons.Settings;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Moq;
-using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Commons.EventsArgs;
+using Commons.Extensions;
+using Commons.Interfaces;
+using Commons.Settings;
+using Moq;
+using NUnit.Framework;
 
 namespace CommonTests
 {
@@ -32,13 +32,14 @@ namespace CommonTests
         [Test]
         public void GetSessionData()
         {
+            var loggerMock = new Mock<ILogger<DatabaseConnector.Connector>>();
+
+            var databaseConnector = new DatabaseConnector.Connector(loggerMock.Object);
+
             var connectorSettings = config
                 .GetSection(nameof(EBuEfDBConnector))
                 .Get<EBuEfDBConnector>();
 
-            var loggerMock = new Mock<ILogger<DatabaseConnector.Connector>>();
-
-            var databaseConnector = new DatabaseConnector.Connector(loggerMock.Object);
             var connectionString = connectorSettings.GetDBConnectionString();
 
             databaseConnector.Initialize(

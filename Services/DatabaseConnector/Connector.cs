@@ -1,3 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.Interfaces;
 using Commons.Models;
@@ -7,17 +15,9 @@ using DatabaseConnector.Extensions;
 using DatabaseConnector.Models;
 using EnumerableExtensions;
 using Epoch.net;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
 using StringExtensions;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DatabaseConnector
 {
@@ -529,7 +529,9 @@ namespace DatabaseConnector
 
                 context.Database.OpenConnection();
 
-                var besatzungen = await GetCrewingsAsync(crewingElements, queryCancellationToken);
+                var besatzungen = await GetCrewingsAsync(
+                    crewingElements: crewingElements,
+                    queryCancellationToken: queryCancellationToken);
 
                 if (besatzungen.Any())
                 {
