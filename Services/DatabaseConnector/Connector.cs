@@ -1,11 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.Interfaces;
 using Commons.Models;
@@ -15,9 +7,17 @@ using DatabaseConnector.Extensions;
 using DatabaseConnector.Models;
 using EnumerableExtensions;
 using Epoch.net;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
 using StringExtensions;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DatabaseConnector
 {
@@ -398,12 +398,26 @@ namespace DatabaseConnector
 
                 await using var context = new HaltDispoContext(connectionString);
 
-                var halte = await context.Halte
-                    .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
-                    .Where(h => h.AbfahrtIst.HasValue || h.AbfahrtSoll.HasValue || h.AbfahrtPlan.HasValue)
-                    .Where(h => (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) >= minTime)
-                    .Where(h => (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) <= maxTime)
-                    .ToArrayAsync(queryCancellationToken);
+                IEnumerable<HaltDispo> halte;
+
+                if (minTime <= maxTime)
+                {
+                    halte = await context.Halte
+                        .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
+                        .Where(h => h.AbfahrtIst.HasValue || h.AbfahrtSoll.HasValue || h.AbfahrtPlan.HasValue)
+                        .Where(h => ((h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) >= minTime)
+                            && ((h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) <= maxTime))
+                        .ToArrayAsync(queryCancellationToken);
+                }
+                else
+                {
+                    halte = await context.Halte
+                        .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
+                        .Where(h => h.AbfahrtIst.HasValue || h.AbfahrtSoll.HasValue || h.AbfahrtPlan.HasValue)
+                        .Where(h => ((h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) >= minTime)
+                            || ((h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) <= maxTime))
+                        .ToArrayAsync(queryCancellationToken);
+                }
 
                 result = halte.GetTrainRuns(
                     preferPrognosis: false).ToArray();

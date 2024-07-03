@@ -1,3 +1,8 @@
+using Commons.EventsArgs;
+using Commons.Interfaces;
+using Microsoft.Extensions.Logging;
+using Polly;
+using Polly.Retry;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -6,11 +11,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Commons.EventsArgs;
-using Commons.Interfaces;
-using Polly;
-using Polly.Retry;
 
 namespace MulticastReceiver
 {

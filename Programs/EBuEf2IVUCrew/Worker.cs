@@ -1,15 +1,15 @@
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.Extensions;
 using Commons.Interfaces;
 using EBuEf2IVUBase;
 using EnumerableExtensions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EBuEf2IVUCrew
 {
@@ -112,9 +112,11 @@ namespace EBuEf2IVUCrew
 
         private async Task CheckCrewsAsync(CancellationToken sessionCancellationToken)
         {
-            var minTime = ebuefSession.GetSimTime()
+            var simTime = ebuefSession.GetSimTime();
+
+            var minTime = simTime
                 .Add(queryDurationPast).TimeOfDay;
-            var maxTime = ebuefSession.GetSimTime()
+            var maxTime = simTime
                 .Add(queryDurationFuture).TimeOfDay;
 
             var trainRuns = await databaseConnector.GetTrainRunsDispoAsync(
