@@ -57,7 +57,7 @@ namespace CommonTests
 
             Assert.That(query.Result.IVUDatum, Is.EqualTo(query.Result.IVUDatum.Date));
             Assert.That(query.Result.Wochentag, Is.EqualTo(DayOfWeek.Friday));
-            Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(12, 0, 0).Add(curOffset).Subtract(expOffset)));
+            Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(10, 0, 0).Add(curOffset).Subtract(expOffset)));
         }
 
         [Test]
