@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<RuntimeIdentifiers>win-x64;linux-x64;linux-arm64;linux-arm</RuntimeIdentifiers>
 		<StartupObject>EBuEf2IVUPath.Program</StartupObject>
 		<AssemblyVersion>1.5.2</AssemblyVersion>
