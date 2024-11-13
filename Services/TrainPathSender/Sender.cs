@@ -1,18 +1,18 @@
-﻿using Commons.Interfaces;
-using Commons.Models;
-using CredentialChannelFactory;
-using EnumerableExtensions;
-using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Retry;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TrainPathImportService;
+using Microsoft.Extensions.Logging;
+using Commons.Interfaces;
+using Commons.Models;
+using CredentialChannelFactory;
+using EnumerableExtensions;
+using Polly;
+using Polly.Retry;
+using TrainPathImportService110;
 using TrainPathSender.Converters;
 using TrainPathSender.Extensions;
 
@@ -89,8 +89,8 @@ namespace TrainPathSender
                 orderingTransportationCompany: orderingTransportationCompany,
                 stoppingReasonStop: stoppingReasonStop,
                 stoppingReasonPass: stoppingReasonPass,
-                trainPathStateRun: trainPathStateRun,
-                trainPathStateCancelled: trainPathStateCancelled,
+                trainPathStateRun: trainPathStateRun.GetTrainPathState(),
+                trainPathStateCancelled: trainPathStateCancelled.GetTrainPathState(),
                 importProfile: importProfile,
                 locationShortnames: locationShortnames);
 

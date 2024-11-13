@@ -6,7 +6,7 @@
   },
   "ExtendedData": {
     "inputs": [
-      "http://bnb18327.ivu-ag.com:20000/intf.trainpath.standardimport.impl/TrainPathImportWebFacadeBean?wsdl"
+      "../../../../_Additionals/TrainPathImport/1.09/TrainPathImport.wsdl"
     ],
     "collectionTypes": [
       "System.Array",

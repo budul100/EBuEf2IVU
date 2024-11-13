@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TrainPathImportService
+namespace TrainPathImportService109
 {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
@@ -1721,9 +1721,9 @@ namespace TrainPathImportService
     {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ivu.de/mb/intf/trainpath/standard/remote", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(TrainPathImportService.TechnicalFaultResponse), Action="http://www.ivu.de/mb/intf/trainpath/standard/remote", Name="technicalFaultResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(TrainPathImportService109.TechnicalFaultResponse), Action="http://www.ivu.de/mb/intf/trainpath/standard/remote", Name="technicalFaultResponse")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<TrainPathImportService.importTrainPathsResponse> importTrainPathsAsync(TrainPathImportService.importTrainPaths request);
+        System.Threading.Tasks.Task<TrainPathImportService109.importTrainPathsResponse> importTrainPathsAsync(TrainPathImportService109.importTrainPaths request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1734,13 +1734,13 @@ namespace TrainPathImportService
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.ivu.de/mb/intf/trainpath/standard/remote", Order=0)]
-        public TrainPathImportService.TrainPathImportRequest trainPathImportRequest;
+        public TrainPathImportService109.TrainPathImportRequest trainPathImportRequest;
         
         public importTrainPaths()
         {
         }
         
-        public importTrainPaths(TrainPathImportService.TrainPathImportRequest trainPathImportRequest)
+        public importTrainPaths(TrainPathImportService109.TrainPathImportRequest trainPathImportRequest)
         {
             this.trainPathImportRequest = trainPathImportRequest;
         }
@@ -1754,26 +1754,26 @@ namespace TrainPathImportService
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.ivu.de/mb/intf/trainpath/standard/remote", Order=0)]
-        public TrainPathImportService.TrainPathImportResponse trainPathImportResponse;
+        public TrainPathImportService109.TrainPathImportResponse trainPathImportResponse;
         
         public importTrainPathsResponse()
         {
         }
         
-        public importTrainPathsResponse(TrainPathImportService.TrainPathImportResponse trainPathImportResponse)
+        public importTrainPathsResponse(TrainPathImportService109.TrainPathImportResponse trainPathImportResponse)
         {
             this.trainPathImportResponse = trainPathImportResponse;
         }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
-    internal interface TrainPathImportWebFacadeChannel : TrainPathImportService.TrainPathImportWebFacade, System.ServiceModel.IClientChannel
+    internal interface TrainPathImportWebFacadeChannel : TrainPathImportService109.TrainPathImportWebFacade, System.ServiceModel.IClientChannel
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
-    internal partial class TrainPathImportWebFacadeClient : System.ServiceModel.ClientBase<TrainPathImportService.TrainPathImportWebFacade>, TrainPathImportService.TrainPathImportWebFacade
+    internal partial class TrainPathImportWebFacadeClient : System.ServiceModel.ClientBase<TrainPathImportService109.TrainPathImportWebFacade>, TrainPathImportService109.TrainPathImportWebFacade
     {
         
         /// <summary>
@@ -1817,16 +1817,16 @@ namespace TrainPathImportService
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<TrainPathImportService.importTrainPathsResponse> TrainPathImportService.TrainPathImportWebFacade.importTrainPathsAsync(TrainPathImportService.importTrainPaths request)
+        System.Threading.Tasks.Task<TrainPathImportService109.importTrainPathsResponse> TrainPathImportService109.TrainPathImportWebFacade.importTrainPathsAsync(TrainPathImportService109.importTrainPaths request)
         {
             return base.Channel.importTrainPathsAsync(request);
         }
         
-        public System.Threading.Tasks.Task<TrainPathImportService.importTrainPathsResponse> importTrainPathsAsync(TrainPathImportService.TrainPathImportRequest trainPathImportRequest)
+        public System.Threading.Tasks.Task<TrainPathImportService109.importTrainPathsResponse> importTrainPathsAsync(TrainPathImportService109.TrainPathImportRequest trainPathImportRequest)
         {
-            TrainPathImportService.importTrainPaths inValue = new TrainPathImportService.importTrainPaths();
+            TrainPathImportService109.importTrainPaths inValue = new TrainPathImportService109.importTrainPaths();
             inValue.trainPathImportRequest = trainPathImportRequest;
-            return ((TrainPathImportService.TrainPathImportWebFacade)(this)).importTrainPathsAsync(inValue);
+            return ((TrainPathImportService109.TrainPathImportWebFacade)(this)).importTrainPathsAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()

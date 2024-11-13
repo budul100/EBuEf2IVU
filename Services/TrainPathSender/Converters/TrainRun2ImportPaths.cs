@@ -1,9 +1,9 @@
-﻿using Commons.Models;
-using EnumerableExtensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TrainPathImportService;
+using Commons.Models;
+using EnumerableExtensions;
+using TrainPathImportService110;
 using TrainPathSender.Extensions;
 
 namespace TrainPathSender.Converters
@@ -12,18 +12,14 @@ namespace TrainPathSender.Converters
     {
         #region Private Fields
 
-        private const string SingleDayBitmask = "1";
-        private const string StopType = "STOP_POST";
-        private const string TimetableVersionId = "Timetable";
-
         private readonly string importProfile;
         private readonly string infrastructureManager;
         private readonly IEnumerable<string> locationShortnames;
         private readonly string orderingTransportationCompany;
         private readonly string stoppingReasonPass;
         private readonly string stoppingReasonStop;
-        private readonly string trainPathStateCancelled;
-        private readonly string trainPathStateRun;
+        private readonly State trainPathStateCancelled;
+        private readonly State trainPathStateRun;
 
         private string sessionKey;
         private TimetableVersion timetableVersion;
@@ -33,8 +29,8 @@ namespace TrainPathSender.Converters
         #region Public Constructors
 
         public TrainRun2ImportPaths(string infrastructureManager, string orderingTransportationCompany,
-            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
-            string trainPathStateCancelled, string importProfile, IEnumerable<string> locationShortnames)
+            string stoppingReasonStop, string stoppingReasonPass, State trainPathStateRun,
+            State trainPathStateCancelled, string importProfile, IEnumerable<string> locationShortnames)
         {
             this.infrastructureManager = infrastructureManager;
             this.orderingTransportationCompany = orderingTransportationCompany;
@@ -50,9 +46,9 @@ namespace TrainPathSender.Converters
 
         #region Public Methods
 
-        public importTrainPaths Convert(IEnumerable<TrainRun> trainRuns)
+        public importTrainPathsRequest Convert(IEnumerable<TrainRun> trainRuns)
         {
-            var result = default(importTrainPaths);
+            var result = default(importTrainPathsRequest);
 
             if (trainRuns.AnyItem())
             {
@@ -70,7 +66,7 @@ namespace TrainPathSender.Converters
                     trainPaths = trainPaths,
                 };
 
-                result = new importTrainPaths
+                result = new importTrainPathsRequest
                 {
                     trainPathImportRequest = request,
                 };
@@ -83,7 +79,7 @@ namespace TrainPathSender.Converters
         {
             this.sessionKey = sessionKey;
 
-            timetableVersion = GetTimetableVersion(ivuDatum);
+            timetableVersion = ivuDatum.GetTimetableVersion();
         }
 
         #endregion Public Methods
@@ -103,7 +99,7 @@ namespace TrainPathSender.Converters
                 {
                     abbreviation = networkPoint,
                     id = networkPoint,
-                    stopType = StopType,
+                    stopType = StopType.STOP_POST,
                 };
 
                 yield return result;
@@ -117,24 +113,6 @@ namespace TrainPathSender.Converters
                 : stoppingReasonStop;
 
             yield return result;
-        }
-
-        private TimetableVersion GetTimetableVersion(DateTime ivuDatum)
-        {
-            var validity = new DateInterval
-            {
-                begin = ivuDatum,
-                bitmask = SingleDayBitmask,
-                end = ivuDatum,
-            };
-
-            var result = new TimetableVersion
-            {
-                id = TimetableVersionId,
-                validity = validity,
-            };
-
-            return result;
         }
 
         private TrainPathKeyTimetableVersion GetTimetableVersionKey()
@@ -204,14 +182,14 @@ namespace TrainPathSender.Converters
                     && relevant != relevants[0];
 
                 var departureSpecified = relevant.Abfahrt.HasValue
-                    && relevant != relevants.Last();
+                    && relevant != relevants[^1];
 
                 var times = new Times
                 {
                     operationalArrivalTime = relevant.Ankunft ?? default,
-                    operationalArrivalTimeTextSpecified = arrivalSpecified,
+                    operationalArrivalTimeSpecified = arrivalSpecified,
                     operationalDepartureTime = relevant.Abfahrt ?? default,
-                    operationalDepartureTimeTextSpecified = departureSpecified,
+                    operationalDepartureTimeSpecified = departureSpecified,
                 };
 
                 var stoppingReasons = GetStoppingReasons(relevant).ToArray();

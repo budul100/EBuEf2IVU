@@ -1,0 +1,16 @@
+{
+  "ExtendedData": {
+    "inputs": [
+      "../../../../_Additionals/TrainPathImport/1.10/TrainPathImport_1.10.wsdl"
+    ],
+    "collectionTypes": [
+      "System.Array",
+      "System.Collections.Generic.Dictionary`2"
+    ],
+    "namespaceMappings": [
+      "*, ServiceReference1"
+    ],
+    "targetFramework": "net6.0",
+    "typeReuseMode": "All"
+  }
+}
