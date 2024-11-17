@@ -25,7 +25,7 @@
 		<UseMulticast>false</UseMulticast>
 		<!--The multicast host can also be defined by the environment variable EBUEF_HOSTNAME. The value of the settings file is used preferably.-->
 		<!--The MQTT host can also be defined by the environment variable MQTT_BROKER_IP. The value of the settings file is used preferably.-->
-		<Host>224.0.0.8</Host>
+		<Host>localhost</Host>
 		<!--The port can also be defined by the environment variable EBUEF_HOSTPORT. The value of the settings file is used preferably.-->
 		<!--<Port>4454</Port>-->
 		<Topic>mqtt4454</Topic>
@@ -37,7 +37,7 @@
 		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT=mqtt/multicast. The value of the settings file is used preferably.-->
 		<UseMulticast>false</UseMulticast>
 		<!--The host can also be defined by the environment variable EBUEF_HOSTNAME. The value of the settings file is used preferably.-->
-		<Host>224.0.0.9</Host>
+		<Host>localhost</Host>
 		<!--The port can also be defined by the environment variable EBUEF_HOSTPORT. The value of the settings file is used preferably.-->
 		<!--<Port>4455</Port>-->
 		<Topic>mqtt4455</Topic>
@@ -45,9 +45,9 @@
 	</TrainPathReceiver>
 	<TrainPathSender>
 		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->
-		<Host>ivu.ebuef</Host>
+		<Host>localhost</Host>
 		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The value of the settings file is used preferably.-->
-		<Port>20000</Port>
+		<Port>24100</Port>
 		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The value of the settings file is used preferably.-->
 		<IsHttps>false</IsHttps>
 		<Username>trainpath</Username>
