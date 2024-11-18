@@ -1,16 +1,22 @@
-import paho.mqtt.client as mqtt
+import os
 
-# Define the MQTT broker details
-broker = 'localhost'  # Replace with your broker address
+#broker = 'localhost'  # Replace with your broker address
+broker = os.getenv('MQTTBROKER')
+#topic = 'mqtt4454'  # Replace with your topic
+topic = os.getenv('MQTTTOPIC')
+#message = 'ZN SET DISPATCH'  # Replace with your message
+message = os.getenv('MQTTMESSAGE')
+
 port = 1883  # Replace with your broker port if different
-topic = 'mqtt4454'  # Replace with your topic
-message = 'ZN SET DISPATCH'  # Replace with your message
+
+import paho.mqtt.client as mqtt
 
 # Define the callback function for connection
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected to broker")
         client.publish(topic, message)
+
         print(f"Message '{message}' sent to topic '{topic}'")
     else:
         print(f"Connection failed with code {rc}")
