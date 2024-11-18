@@ -11,7 +11,7 @@ $currentFolder = $baseDir
 do 
 {
   $dirs = Get-ChildItem $currentFolder -directory -recurse | Where-Object { (Get-ChildItem $_.fullName).count -eq 0 } | Select-Object -expandproperty FullName
-  $dirs | Foreach-Object { Remove-Item $_ }
+  $dirs | Foreach-Object { Remove-Item $_ -Recurse }
 } 
 while ($dirs.count -gt 0)
 
