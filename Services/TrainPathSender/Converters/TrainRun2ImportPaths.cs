@@ -8,41 +8,16 @@ using TrainPathSender.Extensions;
 
 namespace TrainPathSender.Converters
 {
-    internal class TrainRun2ImportPaths
+    internal class TrainRun2ImportPaths(string infrastructureManager, string orderingTransportationCompany,
+        string stoppingReasonStop, string stoppingReasonPass, State trainPathStateRun, State trainPathStateCancelled,
+        string importProfile, IEnumerable<string> locationShortnames)
     {
         #region Private Fields
-
-        private readonly string importProfile;
-        private readonly string infrastructureManager;
-        private readonly IEnumerable<string> locationShortnames;
-        private readonly string orderingTransportationCompany;
-        private readonly string stoppingReasonPass;
-        private readonly string stoppingReasonStop;
-        private readonly State trainPathStateCancelled;
-        private readonly State trainPathStateRun;
 
         private string sessionKey;
         private TimetableVersion timetableVersion;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public TrainRun2ImportPaths(string infrastructureManager, string orderingTransportationCompany,
-            string stoppingReasonStop, string stoppingReasonPass, State trainPathStateRun,
-            State trainPathStateCancelled, string importProfile, IEnumerable<string> locationShortnames)
-        {
-            this.infrastructureManager = infrastructureManager;
-            this.orderingTransportationCompany = orderingTransportationCompany;
-            this.stoppingReasonStop = stoppingReasonStop;
-            this.stoppingReasonPass = stoppingReasonPass;
-            this.trainPathStateRun = trainPathStateRun;
-            this.trainPathStateCancelled = trainPathStateCancelled;
-            this.importProfile = importProfile;
-            this.locationShortnames = locationShortnames;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -187,9 +162,9 @@ namespace TrainPathSender.Converters
                 var times = new Times
                 {
                     operationalArrivalTime = relevant.Ankunft ?? default,
-                    operationalArrivalTimeSpecified = arrivalSpecified,
+                    operationalArrivalTimeTextSpecified = arrivalSpecified,
                     operationalDepartureTime = relevant.Abfahrt ?? default,
-                    operationalDepartureTimeSpecified = departureSpecified,
+                    operationalDepartureTimeTextSpecified = departureSpecified,
                 };
 
                 var stoppingReasons = GetStoppingReasons(relevant).ToArray();

@@ -1,6 +1,6 @@
-﻿using Commons.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Commons.Enums;
 
 namespace Commons.Models
 {

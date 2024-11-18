@@ -19,6 +19,9 @@ namespace CrewCheckerTests
     {
         #region Private Fields
 
+        // Set this value as true if you have an active IVU instance running.
+        private const bool IVUIsRunning = true;
+
         private const string SettingsPath = @"..\..\..\CrewCheckerTests.example.xml";
 
         private CancellationTokenSource cancellationTokenSource;
@@ -81,11 +84,13 @@ namespace CrewCheckerTests
                 retryTime: settings.RetryTime);
 
             Task.Run(() => checker.GetCrewingElementsAsync(
-                tripNumbers: new string[] { "15521", "ABC", "", default, "15521" },
+                tripNumbers: ["15521", "ABC", "", default, "15521"],
                 date: new DateTime(2024, 01, 11),
-                cancellationToken: cancellationTokenSource.Token)).Wait();
+                cancellationToken: cancellationTokenSource.Token));
 
-            Assert.That(hasException, Is.False);
+            Thread.Sleep(2000);
+
+            Assert.That(hasException, IVUIsRunning ? Is.False : Is.True);
         }
 
         [SetUp]

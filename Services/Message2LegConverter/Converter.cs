@@ -14,28 +14,16 @@ using RegexExtensions;
 
 namespace Message2LegConverter
 {
-    public class Converter
+    public class Converter(IConfiguration config, ILogger<Converter> logger)
         : IMessage2LegConverter
     {
         #region Private Fields
 
-        private readonly DateTime? dateMin;
-        private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
-        private readonly ILogger logger;
+        private readonly DateTime? dateMin = config.GetDateMin();
+        private readonly IEnumerable<InfrastructureMapping> infrastructureMappings = config.GetInfrastructureMappings();
+        private readonly ILogger logger = logger;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Converter(IConfiguration config, ILogger<Converter> logger)
-        {
-            this.logger = logger;
-
-            infrastructureMappings = config.GetInfrastructureMappings();
-            dateMin = config.GetDateMin();
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 

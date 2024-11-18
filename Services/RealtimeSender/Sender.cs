@@ -1,26 +1,27 @@
-﻿using Commons.Interfaces;
-using Commons.Models;
-using CredentialChannelFactory;
-using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Retry;
-using RealtimeSender.Converters;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Commons.Interfaces;
+using Commons.Models;
+using CredentialChannelFactory;
+using EnumerableExtensions;
+using Polly;
+using Polly.Retry;
+using RealtimeSender.Converters;
 
 namespace RealtimeSender
 {
-    public class Sender
+    public class Sender(ILogger<Sender> logger)
         : IRealtimeSender
     {
         #region Private Fields
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
         private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new();
 
         private Factory<RealTimeInformationImportFacadeChannel> channelFactory;
@@ -29,15 +30,6 @@ namespace RealtimeSender
         private Task senderTask;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Sender(ILogger<Sender> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -77,10 +69,10 @@ namespace RealtimeSender
                     ivuDatum: ivuDatum,
                     sessionStart: sessionStart);
 
-                cancellationToken.Register(() => StopTask());
+                cancellationToken.Register(StopTask);
 
                 senderTask = retryPolicy?.ExecuteAsync(
-                    action: (token) => RunSenderAsync(token),
+                    action: RunSenderAsync,
                     cancellationToken: cancellationToken);
             }
 
@@ -142,9 +134,7 @@ namespace RealtimeSender
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
                     sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: (exception, reconnection) => OnRetry(
-                        exception: exception,
-                        reconnection: reconnection));
+                    onRetry: OnRetry);
         }
 
         #endregion Public Methods
@@ -178,15 +168,16 @@ namespace RealtimeSender
 
                     if (currentMessage != default)
                     {
-                        var importInfo = new importRealTimeInfo(new RealTimeInfoTO[] { currentMessage });
+                        var importInfo = new importRealTimeInfo([currentMessage]);
                         var sender = channelFactory.Get();
 
                         var response = await sender.importRealTimeInfoAsync(importInfo);
-                        var result = response.importRealTimeInfoResponse1?.ToArray();
+                        var result = response.importRealTimeInfoResponse1?
+                            .Where(r => r.code != 0).ToArray();
 
-                        if (result?.Any() ?? false)
+                        if (result?.Length > 0)
                         {
-                            var relevantValiditation = result[0];
+                            var messages = result.Select(r => r.message).Merge();
 
                             logger.LogError(
                                 "Fehlermeldung zur Ist-Zeit-Nachricht von IVU.rail empfangen " +
@@ -194,7 +185,7 @@ namespace RealtimeSender
                                 currentMessage.tripNumber,
                                 currentMessage.stopArea,
                                 currentMessage.vehicles.FirstOrDefault()?.number,
-                                relevantValiditation.message);
+                                messages);
                         }
                         else
                         {

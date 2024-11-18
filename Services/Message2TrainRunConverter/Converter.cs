@@ -1,33 +1,23 @@
-﻿using Commons.Interfaces;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Commons.Interfaces;
 using Commons.Models;
 using EnumerableExtensions;
 using Message2TrainRunConverter.Extensions;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Message2TrainRunConverter
 {
-    public class Converter
+    public class Converter(IConfiguration config)
         : IMessage2TrainRunConverter
     {
         #region Private Fields
 
-        private readonly Func<TrainPathMessage, DateTime?> abfahrtGetter;
-        private readonly Func<TrainPathMessage, DateTime?> ankunftGetter;
+        private readonly Func<TrainPathMessage, DateTime?> abfahrtGetter = config.GetAbfahrtGetter();
+        private readonly Func<TrainPathMessage, DateTime?> ankunftGetter = config.GetAnkunftGetter();
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Converter(IConfiguration config)
-        {
-            abfahrtGetter = config.GetAbfahrtGetter();
-            ankunftGetter = config.GetAnkunftGetter();
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 

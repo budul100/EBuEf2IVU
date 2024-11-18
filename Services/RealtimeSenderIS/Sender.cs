@@ -1,10 +1,4 @@
-﻿using Commons.Interfaces;
-using Commons.Models;
-using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Retry;
-using RealtimeSenderIS.Converters;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,15 +6,22 @@ using System.Linq;
 using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Commons.Interfaces;
+using Commons.Models;
+using EnumerableExtensions;
+using Polly;
+using Polly.Retry;
+using RealtimeSenderIS.Converters;
 
 namespace RealtimeSenderIS
 {
-    public class Sender
+    public class Sender(ILogger<Sender> logger)
         : IRealtimeSenderIS
     {
         #region Private Fields
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
         private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new();
 
         private RealTimeInformationImportFacadeClient client;
@@ -29,15 +30,6 @@ namespace RealtimeSenderIS
         private Task senderTask;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Sender(ILogger<Sender> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -155,7 +147,7 @@ namespace RealtimeSenderIS
                         var response = await client.importRealTimeInfoAsync(importInfo);
                         var result = response.importRealTimeInfoResponse1?.ToArray();
 
-                        if (result?.Any() ?? false)
+                        if (result.AnyItem())
                         {
                             var relevantValiditation = result[0];
                             var relevantMessage = currentMessage;

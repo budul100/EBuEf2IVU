@@ -1,69 +1,75 @@
-﻿using Commons.Models;
-using Microsoft.Extensions.Logging;
-using RealtimeSender.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Commons.Models;
+using RealtimeSender.Extensions;
 
 namespace RealtimeSender.Converters
 {
-    internal class Message2RealtimeInfo
+    internal class Message2RealtimeInfo(ILogger logger, string division)
     {
         #region Private Fields
 
         private const string EnvironmentComputer = "COMPUTERNAME";
 
-        private readonly string deviceID;
-        private readonly string division;
-        private readonly ILogger logger;
+        private readonly string deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
 
-        private DateTime ivuDatum;
+        private DateTime? ivuDatum;
         private TimeSpan sessionStart;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Message2RealtimeInfo(ILogger logger, string division)
-        {
-            this.logger = logger;
-            this.division = division;
-
-            deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
         public RealTimeInfoTO Convert(VehicleAllocation allocation)
         {
-            var ivuTimestamp = ivuDatum.Add(sessionStart);
+            var result = default(RealTimeInfoTO);
 
-            var result = GetRealtimeInfo(
-                eventCode: RealtimeInfoConstants.EventCodeAllocation,
-                classifier: RealtimeInfoConstants.ClassifierActual,
-                tripNumber: allocation.Zugnummer,
-                timeStamp: ivuTimestamp,
-                stopArea: allocation.Betriebsstelle,
-                track: allocation.Gleis,
-                vehicles: allocation.Fahrzeuge);
+            if (ivuDatum.HasValue)
+            {
+                var ivuTimestamp = ivuDatum.Value.Add(sessionStart);
+
+                result = GetRealtimeInfo(
+                    eventCode: RealtimeInfoConstants.EventCodeAllocation,
+                    classifier: RealtimeInfoConstants.ClassifierActual,
+                    tripNumber: allocation.Zugnummer,
+                    timeStamp: ivuTimestamp,
+                    stopArea: allocation.Betriebsstelle,
+                    track: allocation.Gleis,
+                    vehicles: allocation.Fahrzeuge);
+            }
+            else
+            {
+                logger.LogWarning(
+                    message: "Der Konverter für Realtime-Messages wurde noch nicht initialisiert.");
+            }
 
             return result;
         }
 
         public RealTimeInfoTO Convert(TrainLeg leg)
         {
-            var ivuTimestamp = ivuDatum.Add(leg.IVUZeit);
+            var result = default(RealTimeInfoTO);
 
-            var result = GetRealtimeInfo(
-                eventCode: leg.GetEventcode(),
-                classifier: leg.GetClassifier(),
-                tripNumber: leg.Zugnummer,
-                timeStamp: ivuTimestamp,
-                stopArea: leg.IVUNetzpunkt,
-                track: leg.IVUGleis,
-                vehicles: leg.Fahrzeuge);
+            if (ivuDatum.HasValue)
+            {
+                var ivuTimestamp = ivuDatum.Value.Add(leg.IVUZeit);
+
+                result = GetRealtimeInfo(
+                    eventCode: leg.GetEventcode(),
+                    classifier: leg.GetClassifier(),
+                    tripNumber: leg.Zugnummer,
+                    timeStamp: ivuTimestamp,
+                    stopArea: leg.IVUNetzpunkt,
+                    track: leg.IVUGleis,
+                    vehicles: leg.Fahrzeuge);
+            }
+            else
+            {
+                logger.LogWarning(
+                    message: "Der Konverter für Realtime-Messages wurde noch nicht initialisiert.");
+            }
 
             return result;
         }

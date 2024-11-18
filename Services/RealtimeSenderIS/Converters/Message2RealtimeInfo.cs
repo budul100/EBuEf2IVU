@@ -1,38 +1,23 @@
-﻿using Commons.Models;
-using Microsoft.Extensions.Logging;
-using RealtimeSenderIS.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Commons.Models;
+using RealtimeSenderIS.Extensions;
 
 namespace RealtimeSenderIS.Converters
 {
-    internal class Message2RealtimeInfo
+    internal class Message2RealtimeInfo(ILogger logger, string division)
     {
         #region Private Fields
 
         private const string EnvironmentComputer = "COMPUTERNAME";
 
-        private readonly string deviceID;
-        private readonly string division;
-        private readonly ILogger logger;
-
+        private readonly string deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
         private DateTime ivuDatum;
         private TimeSpan sessionStart;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Message2RealtimeInfo(ILogger logger, string division)
-        {
-            this.logger = logger;
-            this.division = division;
-
-            deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 

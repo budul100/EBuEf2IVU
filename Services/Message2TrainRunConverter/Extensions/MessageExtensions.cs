@@ -1,5 +1,5 @@
-﻿using Commons.Models;
-using System;
+﻿using System;
+using Commons.Models;
 
 namespace Message2TrainRunConverter.Extensions
 {

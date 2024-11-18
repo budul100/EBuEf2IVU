@@ -40,14 +40,16 @@
 		<Port>20000</Port>
 		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The value of the settings file is used preferably.-->
 		<IsHttps>false</IsHttps>
-		<Username>ivu</Username>
-		<Password>ivu$admin</Password>
 		<Path>intf.crewontrip.impl/CrewOnTripWebFacadeBean</Path>
+		<Username>crewontrip</Username>
+		<Password>crewontrip</Password>
+		<!--Timeout is by default 60 secs-->
+		<!--<TimeoutInSecs>180</TimeoutInSecs>-->
 		<RetryTime>30</RetryTime>
 		<AbfrageIntervalSek>60</AbfrageIntervalSek>
 		<AbfrageVergangenheitMin>15</AbfrageVergangenheitMin>
 		<AbfrageZukunftMin>480</AbfrageZukunftMin>
-		<Division>LD</Division>
-		<PlanningLevel>DISPATCH</PlanningLevel>
+		<Division>EBUEF</Division>
+		<PlanningLevel>ACTUAL</PlanningLevel>
 	</CrewChecker>
 </Configuration>

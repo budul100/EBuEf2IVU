@@ -72,6 +72,7 @@ namespace EBuEf2IVUPathTests
             var eventCount = 0;
 
             var databaseConnectorMock = GetDatabaseConnectorMock(
+                sendTrainRuns: true,
                 trainRunsPlanCallback: () => eventCount++);
 
             var settingsPath = Path.GetFullPath(SettingsPath);
@@ -88,23 +89,47 @@ namespace EBuEf2IVUPathTests
             host.StartAsync(cancellationTokenSource.Token);
             Assert.That(eventCount, Is.EqualTo(0));
 
+            Thread.Sleep(500);
+
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.InPreparation));
             Assert.That(eventCount, Is.EqualTo(1));
 
+            Thread.Sleep(500);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.InPreparation));
+            Assert.That(eventCount, Is.EqualTo(1));
+
+            Thread.Sleep(500);
+
+            stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsEnded));
+            Assert.That(eventCount, Is.EqualTo(1));
+
+            Thread.Sleep(500);
+
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.InPreparation));
             Assert.That(eventCount, Is.EqualTo(2));
 
+            Thread.Sleep(500);
+
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
             Assert.That(eventCount, Is.EqualTo(2));
+
+            Thread.Sleep(500);
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsPaused));
             Assert.That(eventCount, Is.EqualTo(2));
 
+            Thread.Sleep(500);
+
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
             Assert.That(eventCount, Is.EqualTo(2));
 
+            Thread.Sleep(500);
+
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsEnded));
             Assert.That(eventCount, Is.EqualTo(2));
+
+            Thread.Sleep(500);
 
             stateHandlerMock.Raise(s => s.SessionChangedEvent += default, new StateChangedArgs(StateType.IsRunning));
             Assert.That(eventCount, Is.EqualTo(3));

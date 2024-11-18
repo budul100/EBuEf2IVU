@@ -14,6 +14,8 @@
 
         public int? Port { get; set; }
 
+        public int? TimeoutInSecs { get; set; }
+
         public string Username { get; set; }
 
         #endregion Public Properties

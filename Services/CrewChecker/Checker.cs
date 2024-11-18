@@ -15,12 +15,12 @@ using Polly.Retry;
 
 namespace CrewChecker
 {
-    public class Checker
+    public class Checker(ILogger<Checker> logger)
         : ICrewChecker
     {
         #region Private Fields
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
 
         private Factory<CrewOnTripPortTypeChannel> channelFactory;
         private string division;
@@ -28,15 +28,6 @@ namespace CrewChecker
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Checker(ILogger<Checker> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -110,9 +101,7 @@ namespace CrewChecker
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
                     sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: (exception, reconnection) => OnRetry(
-                        exception: exception,
-                        reconnection: reconnection));
+                    onRetry: OnRetry);
         }
 
         #endregion Public Methods
@@ -150,8 +139,7 @@ namespace CrewChecker
                 }
             }
 
-            return result
-                ?? Enumerable.Empty<CrewingElement>();
+            return result ?? [];
         }
 
         private exportCrewAssignmentsForTrips GetRequest(IEnumerable<string> tripNumbers, DateTime date)

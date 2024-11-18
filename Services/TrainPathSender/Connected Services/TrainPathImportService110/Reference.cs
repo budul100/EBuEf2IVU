@@ -9,8 +9,6 @@
 
 namespace TrainPathImportService110
 {
-    
-    
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -810,9 +808,20 @@ namespace TrainPathImportService110
         private string operationalWaitDurationField;
         
         private string operationalStopDurationField;
-        
+
+        [System.Xml.Serialization.XmlElementAttribute("commercialArrivalTime")]
+        public string commercialArrivalTimeText
+        {
+            get
+            {
+                return this.commercialArrivalTimeField.ToString("HH:mm:ss");
+            }
+            set { }
+        }
+
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(DataType="time")]
+        [System.Xml.Serialization.XmlIgnore]
         public System.DateTime commercialArrivalTime
         {
             get
@@ -827,7 +836,7 @@ namespace TrainPathImportService110
         
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool commercialArrivalTimeSpecified
+        public bool commercialArrivalTimeTextSpecified
         {
             get
             {
@@ -865,9 +874,20 @@ namespace TrainPathImportService110
                 this.commercialArrivalDayOffsetFieldSpecified = value;
             }
         }
-        
+
+        [System.Xml.Serialization.XmlElementAttribute("commercialDepartureTime")]
+        public string commercialDepartureTimeText
+        {
+            get
+            {
+                return this.commercialDepartureTimeField.ToString("HH:mm:ss");
+            }
+            set { }
+        }
+
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(DataType="time")]
+        [System.Xml.Serialization.XmlIgnore]
         public System.DateTime commercialDepartureTime
         {
             get
@@ -882,7 +902,7 @@ namespace TrainPathImportService110
         
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool commercialDepartureTimeSpecified
+        public bool commercialDepartureTimeTextSpecified
         {
             get
             {
@@ -920,9 +940,20 @@ namespace TrainPathImportService110
                 this.commercialDepartureDayOffsetFieldSpecified = value;
             }
         }
-        
+
+        [System.Xml.Serialization.XmlElementAttribute("operationalArrivalTime")]
+        public string operationalArrivalTimeText
+        {
+            get
+            {
+                return this.operationalArrivalTimeField.ToString("HH:mm:ss");
+            }
+            set { }
+        }
+
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(DataType="time")]
+        [System.Xml.Serialization.XmlIgnore]
         public System.DateTime operationalArrivalTime
         {
             get
@@ -937,7 +968,7 @@ namespace TrainPathImportService110
         
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool operationalArrivalTimeSpecified
+        public bool operationalArrivalTimeTextSpecified
         {
             get
             {
@@ -975,9 +1006,20 @@ namespace TrainPathImportService110
                 this.operationalArrivalDayOffsetFieldSpecified = value;
             }
         }
-        
+
+        [System.Xml.Serialization.XmlElementAttribute("operationalDepartureTime")]
+        public string operationalDepartureTimeText
+        {
+            get
+            {
+                return this.operationalDepartureTimeField.ToString("HH:mm:ss");
+            }
+            set { }
+        }
+
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(DataType="time")]
+        [System.Xml.Serialization.XmlIgnore]
         public System.DateTime operationalDepartureTime
         {
             get
@@ -992,7 +1034,7 @@ namespace TrainPathImportService110
         
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool operationalDepartureTimeSpecified
+        public bool operationalDepartureTimeTextSpecified
         {
             get
             {

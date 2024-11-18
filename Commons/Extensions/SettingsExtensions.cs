@@ -1,5 +1,5 @@
-﻿using Commons.Settings;
-using System;
+﻿using System;
+using Commons.Settings;
 
 namespace Commons.Extensions
 {

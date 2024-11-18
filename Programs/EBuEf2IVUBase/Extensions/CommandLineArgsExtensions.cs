@@ -1,8 +1,8 @@
-﻿using EBuEf2IVUBase.Settings;
-using StringExtensions;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using EBuEf2IVUBase.Settings;
+using StringExtensions;
 
 namespace EBuEf2IVUBase.Extensions
 {

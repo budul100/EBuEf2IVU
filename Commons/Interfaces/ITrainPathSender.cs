@@ -15,9 +15,10 @@ namespace Commons.Interfaces
         Task ExecuteAsync(DateTime ivuDatum, string sessionKey, CancellationToken cancellationToken);
 
         void Initialize(string host, int port, bool isHttps, string username, string password, string path,
-            int retryTime, string infrastructureManager, string orderingTransportationCompany, string stoppingReasonStop,
-            string stoppingReasonPass, string trainPathStateRun, string trainPathStateCancelled, string importProfile,
-            IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames, bool logRequests);
+            int retryTime, int? timeoutInSecs, string infrastructureManager, string orderingTransportationCompany,
+            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
+            string trainPathStateCancelled, string importProfile, IEnumerable<string> ignoreTrainTypes,
+            IEnumerable<string> locationShortnames, bool logRequests);
 
         #endregion Public Methods
     }

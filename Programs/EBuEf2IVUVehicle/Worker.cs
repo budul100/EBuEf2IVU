@@ -5,6 +5,7 @@ using Commons.Interfaces;
 using Commons.Models;
 using Commons.Settings;
 using EBuEf2IVUBase;
+using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -21,6 +22,8 @@ namespace EBuEf2IVUVehicle
 
         private const string MessageTypePositions = "Echtzeit-Positionen";
 
+        private static readonly object initializationLock = new();
+
         private readonly IMessage2LegConverter messageConverter;
         private readonly IMQTTReceiver mqttReceiver;
         private readonly IMulticastReceiver multicastReceiver;
@@ -29,7 +32,6 @@ namespace EBuEf2IVUVehicle
 
         private bool ignorePrognosis;
         private bool initalAllocationsSent;
-        private bool isSessionRunning;
         private bool useInterfaceServer;
 
         #endregion Private Fields
@@ -67,28 +69,38 @@ namespace EBuEf2IVUVehicle
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                _ = HandleSessionStateAsync(sessionStateHandler.StateType);
+                _ = HandleSessionStateAsync(
+                    stateType: sessionStateHandler.StateType);
 
-                var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
+                var sessionCancellationToken = GetSessionCancellationToken(
+                    workerCancellationToken: workerCancellationToken);
 
-                var receiverTask = positionReceiver.ExecuteAsync(sessionCancellationToken);
+                var receiverTask = positionReceiver.ExecuteAsync(
+                    cancellationToken: sessionCancellationToken);
+                var senderTask = default(Task);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
-                        if (isSessionRunning
-                            && sessionStateHandler.StateType != StateType.IsPaused)
+                        if (ebuefSession != default
+                            && ((sessionStateHandler?.StateType == StateType.InPreparation)
+                            || (sessionStateHandler?.StateType == StateType.IsRunning)))
                         {
-                            var senderTask = useInterfaceServer
-                                ? realtimeSenderIS.ExecuteAsync(
-                                    ivuDatum: ebuefSession.IVUDatum,
-                                    sessionStart: ebuefSession.SessionStart,
-                                    cancellationToken: sessionCancellationToken)
-                                : realtimeSender.ExecuteAsync(
+                            if (useInterfaceServer)
+                            {
+                                senderTask ??= realtimeSenderIS.ExecuteAsync(
                                     ivuDatum: ebuefSession.IVUDatum,
                                     sessionStart: ebuefSession.SessionStart,
                                     cancellationToken: sessionCancellationToken);
+                            }
+                            else
+                            {
+                                senderTask ??= realtimeSender.ExecuteAsync(
+                                    ivuDatum: ebuefSession.IVUDatum,
+                                    sessionStart: ebuefSession.SessionStart,
+                                    cancellationToken: sessionCancellationToken);
+                            }
 
                             await Task.WhenAny(
                                 receiverTask,
@@ -107,7 +119,6 @@ namespace EBuEf2IVUVehicle
                     { }
                 }
 
-                isSessionRunning = false;
                 initalAllocationsSent = false;
 
                 logger.LogInformation(
@@ -117,24 +128,17 @@ namespace EBuEf2IVUVehicle
 
         protected override async Task HandleSessionStateAsync(StateType stateType)
         {
-            if (stateType == StateType.IsEnded || stateType == StateType.IsPaused)
+            if (stateType == StateType.IsEnded)
             {
-                isSessionRunning = false;
-
-                if (stateType == StateType.IsEnded)
-                {
-                    initalAllocationsSent = false;
-                }
+                initalAllocationsSent = false;
             }
-            else if (stateType == StateType.IsRunning)
+            else if (stateType == StateType.InPreparation || stateType == StateType.IsRunning)
             {
                 await InitializeSessionAsync();
-                isSessionRunning = stateType == StateType.IsRunning;
 
-                if (!initalAllocationsSent)
+                lock (initializationLock)
                 {
-                    await SendInitialAllocationsAsync();
-                    initalAllocationsSent = true;
+                    SendInitialAllocations();
                 }
             }
         }
@@ -244,22 +248,26 @@ namespace EBuEf2IVUVehicle
                 }
                 else
                 {
-                    var trainLeg = messageConverter.Convert(message);
+                    var trainLeg = messageConverter.Convert(
+                        message: message);
 
                     if (trainLeg != default)
                     {
                         if (useInterfaceServer)
                         {
-                            realtimeSenderIS.Add(trainLeg);
+                            realtimeSenderIS.Add(
+                                trainLeg: trainLeg);
                         }
                         else
                         {
-                            realtimeSender.Add(trainLeg);
+                            realtimeSender.Add(
+                                trainLeg: trainLeg);
                         }
 
                         if (!trainLeg.IstPrognose)
                         {
-                            await databaseConnector.AddRealtimeAsync(trainLeg);
+                            await databaseConnector.AddRealtimeAsync(
+                                leg: trainLeg);
                         }
                     }
                     else
@@ -285,23 +293,42 @@ namespace EBuEf2IVUVehicle
             }
         }
 
-        private async Task SendInitialAllocationsAsync()
+        private void SendInitialAllocations()
         {
-            logger.LogDebug(
-                "Die initiale Fahrzeug-Grundaufstellung wird gesendet.");
-
-            var allocations = await databaseConnector.GetVehicleAllocationsAsync();
-
-            if (useInterfaceServer)
+            if (ebuefSession == default)
             {
-                realtimeSenderIS.Add(allocations);
+                logger.LogWarning(
+                    "Das initiale Sitzungsupdate wurde bisher nicht empfangen. " +
+                    "Daher kann keine Fahrzeug-Grundaufstellung gesendet werden.");
             }
-            else
+            else if (!initalAllocationsSent)
             {
-                realtimeSender.Add(allocations);
+                logger.LogDebug(
+                    "Die initiale Fahrzeug-Grundaufstellung wird gesendet.");
+
+                var allocations = Task.Run(databaseConnector.GetVehicleAllocationsAsync).Result;
+
+                if (allocations.AnyItem())
+                {
+                    if (useInterfaceServer)
+                    {
+                        realtimeSenderIS.Add(allocations);
+                    }
+                    else
+                    {
+                        realtimeSender.Add(allocations);
+                    }
+
+                    initalAllocationsSent = true;
+                }
+                else
+                {
+                    logger.LogInformation(
+                        "In der Grundaufstellung sind keine Fahrzeuge eingetragen.");
+                }
             }
         }
-
-        #endregion Private Methods
     }
+
+    #endregion Private Methods
 }

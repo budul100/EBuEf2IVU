@@ -21,7 +21,7 @@ using StringExtensions;
 
 namespace DatabaseConnector
 {
-    public class Connector
+    public class Connector(ILogger<Connector> logger)
         : IDatabaseConnector
     {
         #region Private Fields
@@ -29,22 +29,13 @@ namespace DatabaseConnector
         private const int IdSunday = 6;
         private const int SessionIdDefault = 0;
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
 
         private CancellationToken cancellationToken;
         private string connectionString;
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Connector(ILogger<Connector> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -62,7 +53,7 @@ namespace DatabaseConnector
         public Task<bool> GetEBuEfSessionActiveAsync()
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (queryCancellationToken) => QueryEBuEfSessionActiveAsync(queryCancellationToken),
+                action: QueryEBuEfSessionActiveAsync,
                 cancellationToken: cancellationToken);
 
             return result;
@@ -71,7 +62,7 @@ namespace DatabaseConnector
         public Task<EBuEfSession> GetEBuEfSessionAsync()
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (queryCancellationToken) => QueryEBuEfSessionAsync(queryCancellationToken),
+                action: QueryEBuEfSessionAsync,
                 cancellationToken: cancellationToken);
 
             return result;
@@ -139,7 +130,7 @@ namespace DatabaseConnector
         public Task<IEnumerable<VehicleAllocation>> GetVehicleAllocationsAsync()
         {
             var result = retryPolicy.ExecuteAsync(
-                action: (queryCancellationToken) => QueryVehicleAllocationsAsync(queryCancellationToken),
+                action: QueryVehicleAllocationsAsync,
                 cancellationToken: cancellationToken);
 
             return result;
@@ -158,9 +149,7 @@ namespace DatabaseConnector
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
                     sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: (exception, reconnection) => OnRetry(
-                        exception: exception,
-                        reconnection: reconnection));
+                    onRetry: OnRetry);
         }
 
         public Task SetCrewingsAsync(IEnumerable<CrewingElement> crewingElements)
@@ -248,11 +237,6 @@ namespace DatabaseConnector
 
                     yield return result;
                 }
-            }
-            else
-            {
-                logger.LogInformation(
-                    "In der Grundaufstellung sind keine Fahrzeuge eingetragen.");
             }
         }
 

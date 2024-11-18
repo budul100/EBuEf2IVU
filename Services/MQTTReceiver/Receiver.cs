@@ -22,10 +22,10 @@ namespace MQTTReceiver
         private readonly IMqttClient mqttClient;
         private readonly MqttFactory mqttFactory;
 
-        private string host;
+        private string address;
         private bool isDisposed;
         private string messageType;
-        private int? port;
+        private MqttClientOptions mqttClientOptions;
         private Task receiverTask;
         private AsyncRetryPolicy retryPolicy;
         private string topic;
@@ -79,10 +79,17 @@ namespace MQTTReceiver
 
         public void Initialize(string host, int? port, string topic, int retryTime, string messageType)
         {
-            this.host = host;
-            this.port = port;
             this.topic = topic;
             this.messageType = messageType;
+
+            address = port.HasValue
+                ? $"{host}:{port}"
+                : host;
+
+            mqttClientOptions = new MqttClientOptionsBuilder()
+                .WithTcpServer(
+                    host: host,
+                    port: port).Build();
 
             retryPolicy = Policy
                 .Handle<Exception>()
@@ -120,10 +127,6 @@ namespace MQTTReceiver
 
             if (exception.GetType() != typeof(OperationCanceledException))
             {
-                var address = port.HasValue
-                    ? $"{host}:{port}"
-                    : host;
-
                 logger.LogError(
                     exception,
                     "Fehler beim MQTT-Empfänger {address} (topic {topic}). {message}\r\n" +
@@ -142,11 +145,6 @@ namespace MQTTReceiver
 
         private async Task RunReceiverAsync(CancellationToken cancellationToken)
         {
-            var mqttClientOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer(
-                    host: host,
-                    port: port).Build();
-
             await mqttClient.ConnectAsync(
                 options: mqttClientOptions,
                 cancellationToken: cancellationToken);
@@ -158,10 +156,6 @@ namespace MQTTReceiver
             await mqttClient.SubscribeAsync(
                 options: mqttSubscribeOptions,
                 cancellationToken: cancellationToken);
-
-            var address = port.HasValue
-                ? $"{host}:{port}"
-                : host;
 
             logger.LogDebug(
                 "MQTT receiver is subscribed on {address} (topic {topic}) for messages of type {type}.",

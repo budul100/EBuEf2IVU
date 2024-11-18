@@ -1,6 +1,6 @@
-﻿using Commons.Converters;
+﻿using System;
+using Commons.Converters;
 using Newtonsoft.Json;
-using System;
 
 namespace Commons.Models
 {

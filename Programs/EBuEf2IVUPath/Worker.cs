@@ -23,13 +23,14 @@ namespace EBuEf2IVUPath
 
         private const string MessageTypePaths = "Zugtrassen";
 
+        private static readonly object initializationLock = new();
+
         private readonly IMessage2TrainRunConverter messageConverter;
         private readonly IMQTTReceiver mqttReceiver;
         private readonly IMulticastReceiver multicastReceiver;
         private readonly ITrainPathSender trainPathSender;
 
         private bool initalPathsSent;
-        private bool isSessionRunning;
 
         #endregion Private Fields
 
@@ -65,20 +66,27 @@ namespace EBuEf2IVUPath
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                _ = HandleSessionStateAsync(sessionStateHandler.StateType);
+                _ = HandleSessionStateAsync(
+                    stateType: sessionStateHandler.StateType);
 
-                var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
+                var sessionCancellationToken = GetSessionCancellationToken(
+                    workerCancellationToken: workerCancellationToken);
+
+                var receiverTask = default(Task);
+                var senderTask = default(Task);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
-                        if (isSessionRunning
-                            && sessionStateHandler.StateType != StateType.IsPaused)
+                        if (ebuefSession != default
+                            && ((sessionStateHandler?.StateType == StateType.InPreparation)
+                            || (sessionStateHandler?.StateType == StateType.IsRunning)))
                         {
-                            var receiverTask = pathReceiver.ExecuteAsync(sessionCancellationToken);
+                            receiverTask ??= pathReceiver.ExecuteAsync(
+                                cancellationToken: sessionCancellationToken);
 
-                            var senderTask = trainPathSender.ExecuteAsync(
+                            senderTask ??= trainPathSender.ExecuteAsync(
                                 ivuDatum: ebuefSession.IVUDatum,
                                 sessionKey: ebuefSession.SessionKey,
                                 cancellationToken: sessionCancellationToken);
@@ -100,7 +108,6 @@ namespace EBuEf2IVUPath
                     { }
                 }
 
-                isSessionRunning = false;
                 initalPathsSent = false;
 
                 logger.LogInformation(
@@ -110,24 +117,17 @@ namespace EBuEf2IVUPath
 
         protected override async Task HandleSessionStateAsync(StateType stateType)
         {
-            if (stateType == StateType.IsEnded || stateType == StateType.IsPaused)
+            if (stateType == StateType.IsEnded)
             {
-                isSessionRunning = false;
-
-                if (stateType == StateType.IsEnded)
-                {
-                    initalPathsSent = false;
-                }
+                initalPathsSent = false;
             }
             else if (stateType == StateType.InPreparation || stateType == StateType.IsRunning)
             {
                 await InitializeSessionAsync();
-                isSessionRunning = stateType == StateType.IsRunning;
 
-                if (stateType == StateType.InPreparation || !initalPathsSent)
+                lock (initializationLock)
                 {
-                    await SendInitialPathesAsync();
-                    initalPathsSent = true;
+                    SendInitialPathes();
                 }
             }
         }
@@ -142,7 +142,8 @@ namespace EBuEf2IVUPath
                 separator: Commons.Settings.TrainPathSender.SettingsSeparator,
                 options: StringSplitOptions.RemoveEmptyEntries);
 
-            var result = await databaseConnector.GetLocationShortnamesAsync(locationTypes);
+            var result = await databaseConnector.GetLocationShortnamesAsync(
+                locationTypes: locationTypes);
 
             if (result.AnyItem())
             {
@@ -222,6 +223,7 @@ namespace EBuEf2IVUPath
                 password: settings.Password,
                 path: settings.Path,
                 retryTime: settings.RetryTime,
+                timeoutInSecs: settings.TimeoutInSecs,
                 infrastructureManager: settings.InfrastructureManager,
                 orderingTransportationCompany: settings.OrderingTransportationCompany,
                 stoppingReasonStop: settings.StoppingReasonStop,
@@ -243,11 +245,13 @@ namespace EBuEf2IVUPath
             try
             {
                 var messages = JsonConvert.DeserializeObject<TrainPathMessage[]>(e.Content);
-                var trainRuns = messageConverter.Convert(messages);
+                var trainRuns = messageConverter.Convert(
+                    messages: messages);
 
                 if (trainRuns.AnyItem())
                 {
-                    trainPathSender.Add(trainRuns);
+                    trainPathSender.Add(
+                        trainRuns: trainRuns);
                 }
                 else
                 {
@@ -271,36 +275,39 @@ namespace EBuEf2IVUPath
             }
         }
 
-        private async Task SendInitialPathesAsync()
+        private void SendInitialPathes()
         {
-            logger.LogInformation(
-                "Die initialen Zugtrassen werden importiert.");
-
             if (ebuefSession == default)
             {
                 logger.LogWarning(
                     "Das initiale Sitzungsupdate wurde bisher nicht empfangen. " +
                     "Daher können keine Zugtrassen importiert werden.");
             }
-            else
+            else if (!initalPathsSent)
             {
+                logger.LogInformation(
+                    "Die initialen Zugtrassen werden importiert.");
+
                 var senderSettings = config
                     .GetSection(nameof(Commons.Settings.TrainPathSender))
                     .Get<Commons.Settings.TrainPathSender>();
 
-                var trainRuns = await databaseConnector.GetTrainRunsPlanAsync(
+                var trainRuns = Task.Run(() => databaseConnector.GetTrainRunsPlanAsync(
                     timetableId: ebuefSession.FahrplanId,
                     weekday: ebuefSession.Wochentag,
-                    preferPrognosis: senderSettings.PreferPrognosis);
+                    preferPrognosis: senderSettings.PreferPrognosis)).Result;
 
                 if (trainRuns.AnyItem())
                 {
-                    trainPathSender.Add(trainRuns);
+                    trainPathSender.Add(
+                        trainRuns: trainRuns);
+
+                    initalPathsSent = true;
                 }
                 else
                 {
-                    logger.LogDebug(
-                        "In der Datenbank wurden keine Zugtrassen gefunden.");
+                    logger.LogInformation(
+                        "In der Datenbank sind keine Züge eingetragen.");
                 }
             }
         }

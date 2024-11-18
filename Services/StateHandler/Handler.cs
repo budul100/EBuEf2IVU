@@ -1,13 +1,13 @@
-﻿using Commons.Enums;
-using Commons.EventsArgs;
-using Commons.Extensions;
-using Commons.Interfaces;
-using Microsoft.Extensions.Logging;
-using StateHandler.Extensions;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Commons.Enums;
+using Commons.EventsArgs;
+using Commons.Extensions;
+using Commons.Interfaces;
+using StateHandler.Extensions;
 
 namespace StateHandler
 {

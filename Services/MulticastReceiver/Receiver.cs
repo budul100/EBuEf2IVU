@@ -1,8 +1,3 @@
-using Commons.EventsArgs;
-using Commons.Interfaces;
-using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Retry;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -11,17 +6,22 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Commons.EventsArgs;
+using Commons.Interfaces;
+using Polly;
+using Polly.Retry;
 
 namespace MulticastReceiver
 {
-    public class Receiver
+    public class Receiver(ILogger<Receiver> logger)
         : IMulticastReceiver
     {
         #region Private Fields
 
         private const char EndChar = '\0';
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
 
         private string host;
         private string messageType;
@@ -30,15 +30,6 @@ namespace MulticastReceiver
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Receiver(ILogger<Receiver> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Events
 
@@ -154,7 +145,7 @@ namespace MulticastReceiver
             if (bytes?.Length > 0)
             {
                 var content = Encoding.ASCII.GetString(
-                    bytes: bytes.ToArray(),
+                    bytes: [.. bytes],
                     index: 0,
                     count: bytes.Length).TrimEnd(EndChar);
 

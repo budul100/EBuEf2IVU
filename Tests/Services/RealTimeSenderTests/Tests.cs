@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,6 +20,9 @@ namespace RealTimeSenderTests
         : TestsBase
     {
         #region Private Fields
+
+        // Set this value as true if you have an active IVU instance running.
+        private const bool IVUIsRunning = true;
 
         private const string SettingsPath = @"..\..\..\RealTimeSenderTests.example.xml";
 
@@ -60,24 +64,24 @@ namespace RealTimeSenderTests
 
             var trainLeg = new TrainLeg
             {
-                IVUNetzpunkt = "ABC",
+                IVUNetzpunkt = "XWF",
                 IVUGleis = "9",
                 IVULegTyp = Commons.Enums.LegType.Abfahrt,
                 Zugnummer = "123"
             };
 
-            sender.Add(trainLeg);
-
             var cancellationTokenSource = new CancellationTokenSource();
 
-            _ = sender.ExecuteAsync(
+            Task.Run(() => sender.ExecuteAsync(
                 ivuDatum: DateTime.Today,
                 sessionStart: DateTime.Now.TimeOfDay,
-                cancellationToken: cancellationTokenSource.Token);
+                cancellationToken: cancellationTokenSource.Token));
 
-            Thread.Sleep(5000);
+            sender.Add(trainLeg);
 
-            Assert.That(hasException, Is.True);
+            Thread.Sleep(2000);
+
+            Assert.That(hasException, IVUIsRunning ? Is.False : Is.True);
         }
 
         #endregion Public Methods

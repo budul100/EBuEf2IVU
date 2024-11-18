@@ -13,14 +13,12 @@ using EnumerableExtensions;
 
 namespace EBuEf2IVUCrew
 {
-    public class Worker
-        : WorkerBase
+    public class Worker : WorkerBase
     {
         #region Private Fields
 
         private readonly ICrewChecker crewChecker;
 
-        private bool isSessionRunning;
         private TimeSpan queryDurationFuture;
         private TimeSpan queryDurationPast;
         private TimeSpan serviceInterval;
@@ -32,7 +30,7 @@ namespace EBuEf2IVUCrew
         public Worker(IConfiguration config, IStateHandler sessionStateHandler, IDatabaseConnector databaseConnector,
             ICrewChecker crewChecker, ILogger<Worker> logger)
             : base(config: config, sessionStateHandler: sessionStateHandler, databaseConnector: databaseConnector,
-                  logger: logger, assembly: Assembly.GetExecutingAssembly())
+                logger: logger, assembly: Assembly.GetExecutingAssembly())
         {
             this.crewChecker = crewChecker;
         }
@@ -49,18 +47,20 @@ namespace EBuEf2IVUCrew
 
             while (!workerCancellationToken.IsCancellationRequested)
             {
-                _ = HandleSessionStateAsync(sessionStateHandler.StateType);
+                _ = HandleSessionStateAsync(
+                    stateType: sessionStateHandler.StateType);
 
-                var sessionCancellationToken = GetSessionCancellationToken(workerCancellationToken);
+                var sessionCancellationToken = GetSessionCancellationToken(
+                    workerCancellationToken: workerCancellationToken);
 
                 while (!sessionCancellationToken.IsCancellationRequested)
                 {
                     try
                     {
-                        if (isSessionRunning
-                            && sessionStateHandler.StateType != StateType.IsPaused)
+                        if (sessionStateHandler?.StateType == StateType.IsRunning)
                         {
-                            await CheckCrewsAsync(sessionCancellationToken);
+                            await CheckCrewsAsync(
+                                sessionCancellationToken: sessionCancellationToken);
 
                             await Task.Delay(
                                 delay: serviceInterval,
@@ -79,25 +79,18 @@ namespace EBuEf2IVUCrew
                     { }
                 }
 
-                isSessionRunning = false;
-
-                base.logger.LogInformation(
+                logger.LogInformation(
                     "EBuEf2IVUCrew wird gestoppt.");
             }
         }
 
         protected override async Task HandleSessionStateAsync(StateType stateType)
         {
-            if (stateType == StateType.IsEnded || stateType == StateType.IsPaused)
-            {
-                isSessionRunning = false;
-            }
-            else if (stateType == StateType.IsRunning)
+            if (stateType == StateType.IsRunning)
             {
                 await InitializeSessionAsync();
-                isSessionRunning = stateType == StateType.IsRunning;
 
-                base.logger.LogDebug(
+                logger.LogDebug(
                     "Die EBuEf-DB wird für den Crew-Check alle {interval} Sekunden " +
                     "nach Zügen im Zeitraum von -{minTime} und +{maxTime} abgefragt.",
                     serviceInterval.TotalSeconds,
@@ -123,7 +116,7 @@ namespace EBuEf2IVUCrew
                 minTime: minTime,
                 maxTime: maxTime);
 
-            base.logger.LogDebug(
+            logger.LogDebug(
                 "In der EBuEf-DB wurden {trainsCount} Züge für den Zeitraum zwischen {minTime} und {maxTime} gefunden.",
                 trainRuns.Count(),
                 minTime.ToString(@"hh\:mm"),
@@ -140,7 +133,7 @@ namespace EBuEf2IVUCrew
                     date: ivuDatum,
                     cancellationToken: sessionCancellationToken);
 
-                base.logger.LogDebug(
+                logger.LogDebug(
                     "In der IVU.rail wurden {crewingCount} Besatzungseinträge zu den Zügen gefunden: {crewingElements}",
                     crewingElements.Count(),
                     crewingElements.Merge());
@@ -148,14 +141,15 @@ namespace EBuEf2IVUCrew
                 if (crewingElements.Any()
                     && !sessionCancellationToken.IsCancellationRequested)
                 {
-                    await databaseConnector.SetCrewingsAsync(crewingElements);
+                    await databaseConnector.SetCrewingsAsync(
+                        crewingElements: crewingElements);
                 }
             }
         }
 
         private void InitializeCrewChecker()
         {
-            base.logger.LogInformation(
+            logger.LogInformation(
                 "IVU-Connector für EBuEf2IVUCrew wird gestartet.");
 
             var settings = config

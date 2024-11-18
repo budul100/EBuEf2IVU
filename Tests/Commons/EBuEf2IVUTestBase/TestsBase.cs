@@ -1,12 +1,12 @@
-﻿using Commons.Enums;
-using Commons.Interfaces;
-using Commons.Models;
-using Microsoft.Extensions.Logging;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Commons.Enums;
+using Commons.Interfaces;
+using Commons.Models;
+using Moq;
 
 namespace EBuEf2IVUTestBase
 {

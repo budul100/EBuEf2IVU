@@ -1,8 +1,8 @@
-﻿using Commons.Settings;
-using EBuEf2IVUVehicle.Settings;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
+using Commons.Settings;
+using EBuEf2IVUVehicle.Settings;
 
 namespace Message2LegConverter.Extensions
 {

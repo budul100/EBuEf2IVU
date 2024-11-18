@@ -44,9 +44,9 @@
 		<RetryTime>30</RetryTime>
 	</PositionsReceiver>
 	<RealtimeSender>
-		<UseInterfaceServer>true</UseInterfaceServer>
+		<UseInterfaceServer>false</UseInterfaceServer>
 		<!--The endpoint can also be defined by the environment variable IVU_IFSERVER_ENDPOINT. The value of the settings file is used preferably.-->
-		<Endpoint>http://host.docker.internal:8080</Endpoint>
+		<!--<Endpoint>http://host.docker.internal:8080</Endpoint>-->
 		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->
 		<Host>host.docker.internal</Host>
 		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The value of the settings file is used preferably.-->
@@ -54,11 +54,13 @@
 		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The value of the settings file is used preferably.-->
 		<IsHttps>false</IsHttps>
 		<Path>intf.realtime.standardimport.impl/RealtimeImportWebFacadeBean</Path>
-		<Username>ivu</Username>
-		<Password>ivu$admin</Password>
+		<Username>realtime</Username>
+		<Password>realtime</Password>
+		<!--Timeout is by default 60 secs-->
+		<!--<TimeoutInSecs>120</TimeoutInSecs>-->
+		<RetryTime>30</RetryTime>
 		<Division>EBUEF</Division>
 		<IgnorePrognosis>false</IgnorePrognosis>
-		<RetryTime>30</RetryTime>
 		<!--<DateMin>2000-01-01</DateMin>-->
 	</RealtimeSender>
 	<InfrastructureMappings>

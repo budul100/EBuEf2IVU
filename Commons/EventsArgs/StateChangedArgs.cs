@@ -1,23 +1,14 @@
-﻿using Commons.Enums;
-using System;
+﻿using System;
+using Commons.Enums;
 
 namespace Commons.EventsArgs
 {
-    public class StateChangedArgs
+    public class StateChangedArgs(StateType stateType)
         : EventArgs
     {
-        #region Public Constructors
-
-        public StateChangedArgs(StateType stateType)
-        {
-            StateType = stateType;
-        }
-
-        #endregion Public Constructors
-
         #region Public Properties
 
-        public StateType StateType { get; }
+        public StateType StateType { get; } = stateType;
 
         #endregion Public Properties
     }

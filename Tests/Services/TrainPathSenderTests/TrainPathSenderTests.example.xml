@@ -36,15 +36,17 @@
 	</TrainPathReceiver>
 	<TrainPathSender>
 		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->
-		<Host>ivu.ebuef</Host>
+		<Host>localhost</Host>
 		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The value of the settings file is used preferably.-->
-		<Port>20000</Port>
+		<Port>24100</Port>
 		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The value of the settings file is used preferably.-->
 		<IsHttps>false</IsHttps>
 		<Username>trainpath</Username>
 		<Password>trainpath</Password>
 		<Path>intf.trainpath.standardimport.impl/TrainPathImportWebFacadeBean</Path>
 		<RetryTime>30</RetryTime>
+		<!--Timeout is by default 60 secs-->
+		<TimeoutInSecs>120</TimeoutInSecs>
 		<IgnoreTrainTypes>RF</IgnoreTrainTypes>
 		<!-- Split multiple IgnoreTrainTypes with , -->
 		<ImportProfile>Standard Train Path Import</ImportProfile>

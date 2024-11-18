@@ -1,6 +1,6 @@
-﻿using Commons.Models;
+﻿using System;
 using Microsoft.Extensions.Configuration;
-using System;
+using Commons.Models;
 
 namespace Message2TrainRunConverter.Extensions
 {

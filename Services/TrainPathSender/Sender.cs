@@ -18,13 +18,12 @@ using TrainPathSender.Extensions;
 
 namespace TrainPathSender
 {
-    public class Sender
+    public class Sender(ILogger<Sender> logger)
         : ITrainPathSender
     {
         #region Private Fields
 
         private readonly ConcurrentQueue<IEnumerable<TrainRun>> importsQueue = new();
-        private readonly ILogger<Sender> logger;
 
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
         private TrainRun2ImportPaths converter;
@@ -32,17 +31,9 @@ namespace TrainPathSender
         private bool logRequests;
         private AsyncRetryPolicy retryPolicy;
         private Task senderTask;
+        private int? timeoutInSecs;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Sender(ILogger<Sender> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -66,10 +57,10 @@ namespace TrainPathSender
                     ivuDatum: ivuDatum,
                     sessionKey: sessionKey);
 
-                cancellationToken.Register(() => StopTask());
+                cancellationToken.Register(StopTask);
 
                 senderTask = retryPolicy?.ExecuteAsync(
-                    action: (token) => RunSenderAsync(token),
+                    action: RunSenderAsync,
                     cancellationToken: cancellationToken);
             }
 
@@ -77,12 +68,14 @@ namespace TrainPathSender
         }
 
         public void Initialize(string host, int port, bool isHttps, string username, string password, string path,
-            int retryTime, string infrastructureManager, string orderingTransportationCompany, string stoppingReasonStop,
-            string stoppingReasonPass, string trainPathStateRun, string trainPathStateCancelled, string importProfile,
-            IEnumerable<string> ignoreTrainTypes, IEnumerable<string> locationShortnames, bool logRequests)
+            int retryTime, int? timeoutInSecs, string infrastructureManager, string orderingTransportationCompany,
+            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
+            string trainPathStateCancelled, string importProfile, IEnumerable<string> ignoreTrainTypes,
+            IEnumerable<string> locationShortnames, bool logRequests)
         {
             this.ignoreTrainTypes = ignoreTrainTypes;
             this.logRequests = logRequests;
+            this.timeoutInSecs = timeoutInSecs;
 
             converter = new TrainRun2ImportPaths(
                 infrastructureManager: infrastructureManager,
@@ -113,9 +106,7 @@ namespace TrainPathSender
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(
                     sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: (exception, reconnection) => OnRetry(
-                        exception: exception,
-                        reconnection: reconnection));
+                    onRetry: OnRetry);
         }
 
         #endregion Public Methods
@@ -167,6 +158,15 @@ namespace TrainPathSender
                         }
 
                         using var channel = channelFactory.Get();
+
+                        if (timeoutInSecs.HasValue)
+                        {
+                            channel.OperationTimeout = new TimeSpan(
+                                hours: 0,
+                                minutes: 0,
+                                seconds: timeoutInSecs.Value);
+                        }
+
                         var response = await channel.importTrainPathsAsync(currentPaths);
 
                         if (response.trainPathImportResponse != default)
