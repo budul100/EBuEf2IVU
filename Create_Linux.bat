@@ -2,7 +2,7 @@
 
 SET PATH=%PATH%;.
 
-SET FRAMEWORK=net6.0
+SET FRAMEWORK=net8.0
 SET RUNTIME1=linux-x64
 SET RUNTIME2=linux-arm64
 SET RUNTIME3=linux-arm
@@ -14,6 +14,11 @@ SET SOURCEDIR1=.\bin\Release\%FRAMEWORK%\%RUNTIME1%
 SET SOURCEDIR2=.\bin\Release\%FRAMEWORK%\%RUNTIME2%
 SET SOURCEDIR3=.\bin\Release\%FRAMEWORK%\%RUNTIME3%
 SET DROPBOXDIR=%USERPROFILE%\Dropbox\Public\EBuEf
+
+echo.
+echo Please make sure that DNS in your WSL is working. Check file /etc/resolv.conf in case of issues.
+echo See also https://stackoverflow.com/questions/62314789/no-internet-connection-on-wsl-ubuntu-windows-subsystem-for-linux/67756837#67756837
+echo.
 
 echo.
 echo ##### Create EBuEf2IVU #####
