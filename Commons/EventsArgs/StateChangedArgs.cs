@@ -3,12 +3,21 @@ using Commons.Enums;
 
 namespace Commons.EventsArgs
 {
-    public class StateChangedArgs(StateType stateType)
+    public class StateChangedArgs
         : EventArgs
     {
+        #region Public Constructors
+
+        public StateChangedArgs(StateType stateType)
+        {
+            StateType = stateType;
+        }
+
+        #endregion Public Constructors
+
         #region Public Properties
 
-        public StateType StateType { get; } = stateType;
+        public StateType StateType { get; }
 
         #endregion Public Properties
     }

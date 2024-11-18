@@ -16,9 +16,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Programs\EBuEf2IVUBase\EBuEf2IVUBase.csproj" />
-		<ProjectReference Include="..\..\..\Services\DatabaseConnector\DatabaseConnector.csproj" />
-		<ProjectReference Include="..\..\..\Services\StateHandler\StateHandler.csproj" />
+	  <ProjectReference Include="..\..\..\Services\CrewChecker\CrewChecker.csproj" />
+	  <ProjectReference Include="..\..\Commons\EBuEf2IVUTestBase\EBuEf2IVUTestBase.csproj" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<Using Include="NUnit.Framework" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="CrewCheckerTests.example.xml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>

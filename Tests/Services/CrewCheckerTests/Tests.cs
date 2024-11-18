@@ -84,7 +84,7 @@ namespace CrewCheckerTests
                 retryTime: settings.RetryTime);
 
             Task.Run(() => checker.GetCrewingElementsAsync(
-                tripNumbers: ["15521", "ABC", "", default, "15521"],
+                tripNumbers: new string[] { "15521", "ABC", "", default, "15521" },
                 date: new DateTime(2024, 01, 11),
                 cancellationToken: cancellationTokenSource.Token));
 

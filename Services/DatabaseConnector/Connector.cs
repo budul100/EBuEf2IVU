@@ -21,7 +21,7 @@ using StringExtensions;
 
 namespace DatabaseConnector
 {
-    public class Connector(ILogger<Connector> logger)
+    public class Connector
         : IDatabaseConnector
     {
         #region Private Fields
@@ -29,13 +29,22 @@ namespace DatabaseConnector
         private const int IdSunday = 6;
         private const int SessionIdDefault = 0;
 
-        private readonly ILogger logger = logger;
+        private readonly ILogger logger;
 
         private CancellationToken cancellationToken;
         private string connectionString;
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
+
+        #region Public Constructors
+
+        public Connector(ILogger<Connector> logger)
+        {
+            this.logger = logger;
+        }
+
+        #endregion Public Constructors
 
         #region Public Methods
 

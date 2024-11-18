@@ -8,9 +8,9 @@
       "System.Collections.Generic.Dictionary`2"
     ],
     "namespaceMappings": [
-      "*, ServiceReference1"
+      "*, TrainPathImportService110"
     ],
-    "targetFramework": "net8.0",
+    "targetFramework": "net6.0",
     "typeReuseMode": "All"
   }
 }

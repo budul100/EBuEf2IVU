@@ -2,7 +2,9 @@
 
 SET PATH=%PATH%;.
 
-SET FRAMEWORK=net8.0
+REM Net 6.0 has to be used until https://github.com/quamotion/dotnet-packaging is updated for Net 8.0 or later
+
+SET FRAMEWORK=net6.0
 SET RUNTIME1=linux-x64
 SET RUNTIME2=linux-arm64
 SET RUNTIME3=linux-arm

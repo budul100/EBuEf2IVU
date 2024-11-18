@@ -18,7 +18,7 @@ namespace Commons.Settings
 
         public int RetryTime { get; set; }
 
-        [Obsolete($"This attribute has been replaced by the attribute {nameof(Host)}.")]
+        [Obsolete("This attribute has been replaced by the attribute " + nameof(Host) + ".")]
         public string Server
         {
             get { return Host; }

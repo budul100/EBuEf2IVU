@@ -135,10 +135,10 @@ namespace EBuEf2IVUCrew
 
                 logger.LogDebug(
                     "In der IVU.rail wurden {crewingCount} Besatzungseinträge zu den Zügen gefunden: {crewingElements}",
-                    crewingElements.Count(),
-                    crewingElements.Merge());
+                    crewingElements?.Count() ?? 0,
+                    crewingElements?.Merge());
 
-                if (crewingElements.Any()
+                if (crewingElements.AnyItem()
                     && !sessionCancellationToken.IsCancellationRequested)
                 {
                     await databaseConnector.SetCrewingsAsync(

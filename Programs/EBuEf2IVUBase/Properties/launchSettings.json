@@ -2,17 +2,17 @@
   "profiles": {
     "EBuEf2IVUCrew": {
       "commandName": "Executable",
-      "executablePath": "..\\..\\..\\..\\EBuEf2IVUCrew\\bin\\Debug\\net8.0\\EBuEf2IVUCrew.exe",
+      "executablePath": "..\\..\\..\\..\\EBuEf2IVUCrew\\bin\\Debug\\net6.0\\EBuEf2IVUCrew.exe",
       "commandLineArgs": "-s ..\\..\\..\\ebuef2ivucrew-settings.example.xml"
     },
     "EBuEf2IVUPath": {
       "commandName": "Executable",
-      "executablePath": "..\\..\\..\\..\\EBuEf2IVUPath\\bin\\Debug\\net8.0\\EBuEf2IVUPath.exe",
+      "executablePath": "..\\..\\..\\..\\EBuEf2IVUPath\\bin\\Debug\\net6.0\\EBuEf2IVUPath.exe",
       "commandLineArgs": "-s ..\\..\\..\\ebuef2ivupath-settings.example.xml"
     },
     "EBuEf2IVUVehicle": {
       "commandName": "Executable",
-      "executablePath": "..\\..\\..\\..\\EBuEf2IVUVehicle\\bin\\Debug\\net8.0\\EBuEf2IVUVehicle.exe",
+      "executablePath": "..\\..\\..\\..\\EBuEf2IVUVehicle\\bin\\Debug\\net6.0\\EBuEf2IVUVehicle.exe",
       "commandLineArgs": "-s ..\\..\\..\\ebuef2ivuvehicle-settings.example.xml"
     }
   }

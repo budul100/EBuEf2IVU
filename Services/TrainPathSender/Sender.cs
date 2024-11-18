@@ -18,13 +18,13 @@ using TrainPathSender.Extensions;
 
 namespace TrainPathSender
 {
-    public class Sender(ILogger<Sender> logger)
+    public class Sender
         : ITrainPathSender
     {
         #region Private Fields
 
         private readonly ConcurrentQueue<IEnumerable<TrainRun>> importsQueue = new();
-
+        private readonly ILogger<Sender> logger;
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
         private TrainRun2ImportPaths converter;
         private IEnumerable<string> ignoreTrainTypes;
@@ -34,6 +34,15 @@ namespace TrainPathSender
         private int? timeoutInSecs;
 
         #endregion Private Fields
+
+        #region Public Constructors
+
+        public Sender(ILogger<Sender> logger)
+        {
+            this.logger = logger;
+        }
+
+        #endregion Public Constructors
 
         #region Public Methods
 

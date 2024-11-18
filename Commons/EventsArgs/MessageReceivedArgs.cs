@@ -2,12 +2,21 @@ using System;
 
 namespace Commons.EventsArgs
 {
-    public class MessageReceivedArgs(string content)
+    public class MessageReceivedArgs
         : EventArgs
     {
+        #region Public Constructors
+
+        public MessageReceivedArgs(string content)
+        {
+            Content = content;
+        }
+
+        #endregion Public Constructors
+
         #region Public Properties
 
-        public string Content { get; } = content;
+        public string Content { get; }
 
         #endregion Public Properties
     }

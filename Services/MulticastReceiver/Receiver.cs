@@ -14,14 +14,14 @@ using Polly.Retry;
 
 namespace MulticastReceiver
 {
-    public class Receiver(ILogger<Receiver> logger)
+    public class Receiver
         : IMulticastReceiver
     {
         #region Private Fields
 
         private const char EndChar = '\0';
 
-        private readonly ILogger logger = logger;
+        private readonly ILogger logger;
 
         private string host;
         private string messageType;
@@ -30,6 +30,15 @@ namespace MulticastReceiver
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
+
+        #region Public Constructors
+
+        public Receiver(ILogger<Receiver> logger)
+        {
+            this.logger = logger;
+        }
+
+        #endregion Public Constructors
 
         #region Public Events
 
@@ -133,7 +142,7 @@ namespace MulticastReceiver
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var result = await udpClient.ReceiveAsync(cancellationToken);
+                var result = await udpClient.ReceiveAsync();
                 SendMessageReceived(result);
             }
         }
@@ -145,7 +154,7 @@ namespace MulticastReceiver
             if (bytes?.Length > 0)
             {
                 var content = Encoding.ASCII.GetString(
-                    bytes: [.. bytes],
+                    bytes: bytes.ToArray(),
                     index: 0,
                     count: bytes.Length).TrimEnd(EndChar);
 

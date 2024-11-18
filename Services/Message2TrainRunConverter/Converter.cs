@@ -9,15 +9,25 @@ using Message2TrainRunConverter.Extensions;
 
 namespace Message2TrainRunConverter
 {
-    public class Converter(IConfiguration config)
+    public class Converter
         : IMessage2TrainRunConverter
     {
         #region Private Fields
 
-        private readonly Func<TrainPathMessage, DateTime?> abfahrtGetter = config.GetAbfahrtGetter();
-        private readonly Func<TrainPathMessage, DateTime?> ankunftGetter = config.GetAnkunftGetter();
+        private readonly Func<TrainPathMessage, DateTime?> abfahrtGetter;
+        private readonly Func<TrainPathMessage, DateTime?> ankunftGetter;
 
         #endregion Private Fields
+
+        #region Public Constructors
+
+        public Converter(IConfiguration config)
+        {
+            abfahrtGetter = config.GetAbfahrtGetter();
+            ankunftGetter = config.GetAnkunftGetter();
+        }
+
+        #endregion Public Constructors
 
         #region Public Methods
 

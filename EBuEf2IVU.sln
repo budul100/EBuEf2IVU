@@ -72,7 +72,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTReceiverTests", "Tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnectorTests", "Tests\Services\DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{51CE733A-900C-4877-84BC-CD85C4913030}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrewCheckerTests", "Tests\CrewCheckerTests\CrewCheckerTests.csproj", "{A2A3FBB1-A2A1-4219-9844-4E60CE07A44E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrewCheckerTests", "Tests\Services\CrewCheckerTests\CrewCheckerTests.csproj", "{A2A3FBB1-A2A1-4219-9844-4E60CE07A44E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

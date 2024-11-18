@@ -16,12 +16,12 @@ using RealtimeSenderIS.Converters;
 
 namespace RealtimeSenderIS
 {
-    public class Sender(ILogger<Sender> logger)
+    public class Sender
         : IRealtimeSenderIS
     {
         #region Private Fields
 
-        private readonly ILogger logger = logger;
+        private readonly ILogger logger;
         private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new();
 
         private RealTimeInformationImportFacadeClient client;
@@ -30,6 +30,15 @@ namespace RealtimeSenderIS
         private Task senderTask;
 
         #endregion Private Fields
+
+        #region Public Constructors
+
+        public Sender(ILogger<Sender> logger)
+        {
+            this.logger = logger;
+        }
+
+        #endregion Public Constructors
 
         #region Public Methods
 

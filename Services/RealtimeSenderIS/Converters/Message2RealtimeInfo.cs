@@ -7,17 +7,29 @@ using RealtimeSenderIS.Extensions;
 
 namespace RealtimeSenderIS.Converters
 {
-    internal class Message2RealtimeInfo(ILogger logger, string division)
+    internal class Message2RealtimeInfo
     {
         #region Private Fields
 
         private const string EnvironmentComputer = "COMPUTERNAME";
 
         private readonly string deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
+        private readonly string division;
+        private readonly ILogger logger;
         private DateTime ivuDatum;
         private TimeSpan sessionStart;
 
         #endregion Private Fields
+
+        #region Public Constructors
+
+        public Message2RealtimeInfo(ILogger logger, string division)
+        {
+            this.logger = logger;
+            this.division = division;
+        }
+
+        #endregion Public Constructors
 
         #region Public Methods
 

@@ -16,12 +16,12 @@ using RealtimeSender.Converters;
 
 namespace RealtimeSender
 {
-    public class Sender(ILogger<Sender> logger)
+    public class Sender
         : IRealtimeSender
     {
         #region Private Fields
 
-        private readonly ILogger logger = logger;
+        private readonly ILogger logger;
         private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new();
 
         private Factory<RealTimeInformationImportFacadeChannel> channelFactory;
@@ -30,6 +30,15 @@ namespace RealtimeSender
         private Task senderTask;
 
         #endregion Private Fields
+
+        #region Public Constructors
+
+        public Sender(ILogger<Sender> logger)
+        {
+            this.logger = logger;
+        }
+
+        #endregion Public Constructors
 
         #region Public Methods
 
@@ -168,7 +177,7 @@ namespace RealtimeSender
 
                     if (currentMessage != default)
                     {
-                        var importInfo = new importRealTimeInfo([currentMessage]);
+                        var importInfo = new importRealTimeInfo(new RealTimeInfoTO[] { currentMessage });
                         var sender = channelFactory.Get();
 
                         var response = await sender.importRealTimeInfoAsync(importInfo);
