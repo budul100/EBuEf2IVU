@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<RuntimeIdentifiers>win-x64;linux-x64;linux-arm64;linux-arm</RuntimeIdentifiers>
 		<StartupObject>EBuEf2IVUVehicle.Program</StartupObject>
-		<AssemblyVersion>1.5.2</AssemblyVersion>
+		<AssemblyVersion>1.6.0</AssemblyVersion>
 		<FileVersion>$(AssemblyVersion)</FileVersion>
 		<Version>$(AssemblyVersion)</Version>
 	</PropertyGroup>
@@ -27,10 +27,6 @@
 
 	<ItemGroup>
 		<RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="budul.RegexExtensions" Version="1.5.1" />
 	</ItemGroup>
 
 	<ItemGroup>

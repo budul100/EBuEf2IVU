@@ -5,6 +5,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="budul.CredentialChannelFactory" Version="1.0.2" />
+		<PackageReference Include="budul.ConverterExtensions" Version="1.6.2" />
+		<PackageReference Include="budul.DateTimeExtensions" Version="1.17.1" />
+		<PackageReference Include="budul.EnumerableExtensions" Version="1.33.0" />
+		<PackageReference Include="budul.RegexExtensions" Version="1.5.1" />
+		<PackageReference Include="budul.StringExtensions" Version="1.18.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="9.0.0" />

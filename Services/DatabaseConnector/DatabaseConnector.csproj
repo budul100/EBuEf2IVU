@@ -6,9 +6,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="9.0.0" />
-		<PackageReference Include="budul.ConverterExtensions" Version="1.6.2" />
-		<PackageReference Include="budul.EnumerableExtensions" Version="1.33.0" />
-		<PackageReference Include="budul.StringExtensions" Version="1.18.2" />
 		<PackageReference Include="Epoch.net" Version="4.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
 		<PackageReference Include="Polly" Version="8.5.0" />
