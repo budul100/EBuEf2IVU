@@ -69,8 +69,8 @@ namespace CrewCheckerTests
                 seconds: 0);
 
             var appServerHost = settings.GetIVUAppServerHost();
-            var appServerPort = settings.GetIVUAppServerPort() ?? 0;
-            var isHttps = settings.GetIVUAppServerSecure() ?? false;
+            var appServerPort = settings.GetIVUAppServerPort();
+            var isHttps = settings.IsIVUAppServerHttps();
 
             checker.Initialize(
                 host: appServerHost,

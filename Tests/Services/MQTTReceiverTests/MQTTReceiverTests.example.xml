@@ -37,14 +37,14 @@
 	<RealtimeSender>
 		<UseInterfaceServer>false</UseInterfaceServer>
 
-		<!--The host can also be defined by the environment variable IVU_IFSERVER_ENDPOINT. The value of the settings file is used preferably.-->
+		<!--The host can also be defined by the environment variable IVU_IFSERVER_ENDPOINT. The environment variable value is used preferably.-->
 		<Endpoint>http://ivu.ebuef:8080</Endpoint>
 
-		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->
+		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The environment variable value is used preferably.-->
 		<Host>ivu.ebuef</Host>
-		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The value of the settings file is used preferably.-->
+		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The environment variable value is used preferably.-->
 		<Port>20000</Port>
-		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The value of the settings file is used preferably.-->
+		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The environment variable value is used preferably.-->
 		<IsHttps>false</IsHttps>
 		<Path>intf.realtime.standardimport.impl/RealtimeImportWebFacadeBean</Path>
 		<Username>ivu</Username>

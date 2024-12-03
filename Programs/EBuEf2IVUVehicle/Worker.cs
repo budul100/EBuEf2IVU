@@ -152,36 +152,38 @@ namespace EBuEf2IVUVehicle
             logger.LogInformation(
                 "Der Nachrichten-Empfänger von EBuEf2IVUVehicle wird gestartet.");
 
-            var settings = config
+            var receiverSettings = config
                 .GetSection(nameof(PositionsReceiver))
                 .Get<PositionsReceiver>();
 
-            var useMulticast = settings.GetEBuEfUseMC();
+            var useMulticast = receiverSettings.UseMulticast(PositionsReceiver.EnvironmentFormat);
 
             if (useMulticast)
             {
-                var host = settings.GetEBuEfHostMC();
-                var port = settings.GetEBuEfPort()
-                    ?? ConnectorEBuEfBase.MulticastPort;
+                var host = receiverSettings.GetMCHost(PositionsReceiver.EnvironmentMCHost);
+                var port = receiverSettings.GetMCPort(
+                    variableName: PositionsReceiver.EnvironmentMCPort,
+                    defaultPort: PositionsReceiver.MulticastPortDefault);
 
                 multicastReceiver.Initialize(
                     host: host,
                     port: port,
-                    retryTime: settings.RetryTime,
+                    retryTime: receiverSettings.RetryTime,
                     messageType: MessageTypePositions);
 
                 return multicastReceiver;
             }
             else
             {
-                var host = settings.GetEBuEfHostMQTT();
-                var port = settings.GetEBuEfPort();
+                var host = receiverSettings.GetMQTTHost(PositionsReceiver.EnvironmentMQTTHost);
+                var port = receiverSettings.GetMQTTPort(PositionsReceiver.EnvironmentMQTTPort);
+                var topic = receiverSettings.GetMQTTTopic(PositionsReceiver.EnvironmentMQTTTopic);
 
                 mqttReceiver.Initialize(
                     server: host,
                     port: port,
-                    topic: settings.Topic,
-                    retryTime: settings.RetryTime,
+                    topic: topic,
+                    retryTime: receiverSettings.RetryTime,
                     messageType: MessageTypePositions);
 
                 return mqttReceiver;
@@ -212,8 +214,8 @@ namespace EBuEf2IVUVehicle
             else
             {
                 var host = settings.GetIVUAppServerHost();
-                var port = settings.GetIVUAppServerPort() ?? 0;
-                var isHttps = settings.GetIVUAppServerSecure() ?? false;
+                var port = settings.GetIVUAppServerPort();
+                var isHttps = settings.IsIVUAppServerHttps();
 
                 realtimeSender.Initialize(
                     host: host,

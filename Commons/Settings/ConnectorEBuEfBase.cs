@@ -6,7 +6,7 @@ namespace Commons.Settings
     {
         #region Public Fields
 
-        public const int MulticastPort = 5355;
+        public const string FormatMulticast = "multicast";
 
         #endregion Public Fields
 

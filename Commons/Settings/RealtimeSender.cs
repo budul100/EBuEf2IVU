@@ -5,6 +5,12 @@ namespace Commons.Settings
     public class RealtimeSender
         : ConnectorIVUBase
     {
+        #region Public Fields
+
+        public const string EnvironmentIVUIFEndpoint = "IVU_IFSERVER_ENDPOINT";
+
+        #endregion Public Fields
+
         #region Public Properties
 
         public DateTime? DateMin { get; set; }

@@ -15,18 +15,18 @@
 		</WriteTo>
 	</Serilog>
 	<EBuEfDBConnector>
-		<!--The connection string can also be defined by the environment variables. The value of the settings file is used preferably.-->
+		<!--The connection string can also be defined by the environment variables. The environment variable value is used preferably.-->
 		<!--The variables are MYSQL_STD_HOST, MYSQL_STD_DBNAME, MYSQL_STD_USER, and MYSQL_STD_PASSWORD.-->
 		<ConnectionString>SERVER=db.ebuef;PORT=3306;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
 		<RetryTime>30</RetryTime>
 	</EBuEfDBConnector>
 	<StatusReceiver>
-		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT=mqtt/multicast. The value of the settings file is used preferably.-->
+		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT=mqtt/multicast. The environment variable value is used preferably.-->
 		<UseMulticast>true</UseMulticast>
-		<!--The multicast host can also be defined by the environment variable EBUEF_HOSTNAME. The value of the settings file is used preferably.-->
-		<!--The MQTT host can also be defined by the environment variable MQTT_BROKER_IP. The value of the settings file is used preferably.-->
+		<!--The multicast host for status messages can also be defined by the environment variable MC_HOST_STATUS. The environment variable value is used preferably.-->
+		<!--The MQTT broker for status messages can also be defined by the environment variable MQTT_BROKER_IP. The environment variable value is used preferably.-->
 		<Host>224.0.0.8</Host>
-		<!--The port can also be defined by the environment variable EBUEF_HOSTPORT. The value of the settings file is used preferably.-->
+		<!--The multicast port can also be defined by the environment variable MC_PORT_STATUS. The environment variable value is used preferably.-->
 		<!--<Port>4454</Port>-->
 		<Topic>mqtt4454</Topic>
 		<RetryTime>30</RetryTime>
@@ -34,11 +34,11 @@
 		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
 	</StatusReceiver>
 	<CrewChecker>
-		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->
+		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The environment variable value is used preferably.-->
 		<Host>localhost</Host>
-		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The value of the settings file is used preferably.-->
+		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The environment variable value is used preferably.-->
 		<Port>24100</Port>
-		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The value of the settings file is used preferably.-->
+		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The environment variable value is used preferably.-->
 		<IsHttps>false</IsHttps>
 		<Username>crewontrip</Username>
 		<Password>crewontrip</Password>

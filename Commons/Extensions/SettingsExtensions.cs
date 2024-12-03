@@ -1,160 +1,199 @@
 ﻿using System;
 using Commons.Settings;
+using StringExtensions;
 
 namespace Commons.Extensions
 {
     public static class SettingsExtensions
     {
-        #region Public Fields
-
-        public const string EnvironmentDBHost = "MYSQL_STD_HOST";
-        public const string EnvironmentDBName = "MYSQL_STD_DBNAME";
-        public const string EnvironmentDBPassword = "MYSQL_STD_PASSWORD";
-        public const string EnvironmentDBUser = "MYSQL_STD_USER";
-
-        public const string EnvironmentEBuEfFormat = "MESSAGE_FORMAT";
-        public const string EnvironmentEBuEfFormatMulticast = "multicast";
-        public const string EnvironmentEBuEfHostMC = "EBUEF_HOSTNAME";
-        public const string EnvironmentEBuEfHostMQTT = "MQTT_BROKER_IP";
-        public const string EnvironmentEBuEfPort = "EBUEF_HOSTPORT";
-
-        public const string EnvironmentIVUAppHost = "IVU_APPSERVER_HOST";
-        public const string EnvironmentIVUAppPort = "IVU_APPSERVER_PORT";
-        public const string EnvironmentIVUAppSecure = "IVU_APPSERVER_ISHTTPS";
-        public const string EnvironmentIVUIFEndpoint = "IVU_IFSERVER_ENDPOINT";
-
-        #endregion Public Fields
-
         #region Public Methods
 
         public static string GetDBConnectionString(this EBuEfDBConnector settings)
         {
-            var result = settings?.ConnectionString;
+            var result = default(string);
 
-            if (string.IsNullOrWhiteSpace(result))
+            if (!Environment.GetEnvironmentVariable(EBuEfDBConnector.EnvironmentDBHost).IsEmpty()
+                && !Environment.GetEnvironmentVariable(EBuEfDBConnector.EnvironmentDBName).IsEmpty()
+                && !Environment.GetEnvironmentVariable(EBuEfDBConnector.EnvironmentDBUser).IsEmpty()
+                && !Environment.GetEnvironmentVariable(EBuEfDBConnector.EnvironmentDBPassword).IsEmpty())
             {
-                var server = Environment.GetEnvironmentVariable(EnvironmentDBHost);
-                var database = Environment.GetEnvironmentVariable(EnvironmentDBName);
-                var uid = Environment.GetEnvironmentVariable(EnvironmentDBUser);
-                var password = Environment.GetEnvironmentVariable(EnvironmentDBPassword);
+                var server = Environment.GetEnvironmentVariable(EBuEfDBConnector.EnvironmentDBHost);
+                var database = Environment.GetEnvironmentVariable(EBuEfDBConnector.EnvironmentDBName);
+                var uid = Environment.GetEnvironmentVariable(EBuEfDBConnector.EnvironmentDBUser);
+                var password = Environment.GetEnvironmentVariable(EBuEfDBConnector.EnvironmentDBPassword);
 
                 result = $"SERVER={server};DATABASE={database};UID={uid};PASSWORD={password};SslMode=none";
             }
 
-            return result;
-        }
-
-        public static string GetEBuEfHostMC<T>(this T settings)
-            where T : ConnectorEBuEfBase
-        {
-            var result = settings?.Host;
-
-            if (string.IsNullOrWhiteSpace(result))
+            if (result.IsEmpty())
             {
-                result = Environment.GetEnvironmentVariable(EnvironmentEBuEfHostMC);
+                result = settings?.ConnectionString;
             }
 
             return result;
-        }
-
-        public static string GetEBuEfHostMQTT<T>(this T settings)
-            where T : ConnectorEBuEfBase
-        {
-            var result = settings?.Host;
-
-            if (string.IsNullOrWhiteSpace(result))
-            {
-                result = Environment.GetEnvironmentVariable(EnvironmentEBuEfHostMQTT);
-            }
-
-            return result;
-        }
-
-        public static int? GetEBuEfPort<T>(this T settings)
-            where T : ConnectorEBuEfBase
-        {
-            var result = settings?.Port;
-
-            if (!result.HasValue
-                && Int32.TryParse(
-                    s: Environment.GetEnvironmentVariable(EnvironmentEBuEfPort),
-                    result: out int value))
-            {
-                result = value;
-            }
-
-            return result;
-        }
-
-        public static bool GetEBuEfUseMC<T>(this T settings)
-            where T : ConnectorEBuEfBase
-        {
-            var result = settings?.UseMulticast;
-
-            if (!result.HasValue)
-            {
-                result = Environment.GetEnvironmentVariable(EnvironmentEBuEfFormat) ==
-                    Environment.GetEnvironmentVariable(EnvironmentEBuEfFormatMulticast);
-            }
-
-            return result ?? false;
         }
 
         public static string GetIVUAppServerHost<T>(this T settings)
             where T : ConnectorIVUBase
         {
-            var result = settings?.Host;
+            var result = Environment.GetEnvironmentVariable(ConnectorIVUBase.EnvironmentHost);
 
-            if (string.IsNullOrWhiteSpace(result))
+            if (result.IsEmpty())
             {
-                result = Environment.GetEnvironmentVariable(EnvironmentIVUAppHost);
+                result = settings?.Host;
             }
 
             return result;
         }
 
-        public static int? GetIVUAppServerPort<T>(this T settings)
+        public static int GetIVUAppServerPort<T>(this T settings)
             where T : ConnectorIVUBase
         {
-            var result = settings?.Port;
+            var result = default(int?);
 
-            if (!result.HasValue
-                && Int32.TryParse(
-                    s: Environment.GetEnvironmentVariable(EnvironmentIVUAppPort),
-                    result: out int value))
+            if (int.TryParse(
+                s: Environment.GetEnvironmentVariable(ConnectorIVUBase.EnvironmentPort),
+                result: out int value))
             {
                 result = value;
             }
 
-            return result;
-        }
-
-        public static bool? GetIVUAppServerSecure<T>(this T settings)
-            where T : ConnectorIVUBase
-        {
-            var result = settings?.IsHttps;
-
-            if (!result.HasValue
-                && bool.TryParse(
-                    value: Environment.GetEnvironmentVariable(EnvironmentIVUAppSecure),
-                    result: out bool value))
+            if (!result.HasValue)
             {
-                result = value;
+                result = settings?.Port;
             }
 
-            return result;
+            return result ?? ConnectorIVUBase.IVUAppServerPortDefault;
         }
 
         public static string GetIVUIFServerEndpoint(this RealtimeSender settings)
         {
-            var result = settings?.Endpoint;
+            var result = Environment.GetEnvironmentVariable(RealtimeSender.EnvironmentIVUIFEndpoint);
 
-            if (string.IsNullOrWhiteSpace(result))
+            if (result.IsEmpty())
             {
-                result = Environment.GetEnvironmentVariable(EnvironmentIVUIFEndpoint);
+                result = settings?.Endpoint;
             }
 
             return result;
+        }
+
+        public static string GetMCHost<T>(this T settings, string variableName)
+            where T : ConnectorEBuEfBase
+        {
+            var result = Environment.GetEnvironmentVariable(variableName);
+
+            if (result.IsEmpty())
+            {
+                result = settings?.Host;
+            }
+
+            return result;
+        }
+
+        public static int GetMCPort<T>(this T settings, string variableName, int defaultPort)
+            where T : ConnectorEBuEfBase
+        {
+            var result = default(int?);
+
+            if (int.TryParse(
+                s: Environment.GetEnvironmentVariable(variableName),
+                result: out int value))
+            {
+                result = value;
+            }
+
+            if (!result.HasValue)
+            {
+                result = settings?.Port;
+            }
+
+            return result ?? defaultPort;
+        }
+
+        public static string GetMQTTHost<T>(this T settings, string variableName)
+            where T : ConnectorEBuEfBase
+        {
+            var result = Environment.GetEnvironmentVariable(variableName);
+
+            if (result.IsEmpty())
+            {
+                result = settings?.Host;
+            }
+
+            return result;
+        }
+
+        public static int? GetMQTTPort<T>(this T settings, string variableName)
+            where T : ConnectorEBuEfBase
+        {
+            var result = default(int?);
+
+            if (int.TryParse(
+                s: Environment.GetEnvironmentVariable(variableName),
+                result: out int value))
+            {
+                result = value;
+            }
+
+            if (!result.HasValue)
+            {
+                result = settings?.Port;
+            }
+
+            return result;
+        }
+
+        public static string GetMQTTTopic<T>(this T settings, string variableName)
+            where T : ConnectorEBuEfBase
+        {
+            var result = Environment.GetEnvironmentVariable(variableName);
+
+            if (result.IsEmpty())
+            {
+                result = settings?.Topic;
+            }
+
+            return result;
+        }
+
+        public static bool IsIVUAppServerHttps<T>(this T settings)
+            where T : ConnectorIVUBase
+        {
+            var result = default(bool?);
+
+            if (bool.TryParse(
+                value: Environment.GetEnvironmentVariable(ConnectorIVUBase.EnvironmentIsHttps),
+                result: out bool value))
+            {
+                result = value;
+            }
+
+            if (!result.HasValue)
+            {
+                result = settings?.IsHttps;
+            }
+
+            return result ?? false;
+        }
+
+        public static bool UseMulticast<T>(this T settings, string variableName)
+            where T : ConnectorEBuEfBase
+        {
+            var result = default(bool?);
+
+            if (!Environment.GetEnvironmentVariable(variableName).IsEmpty())
+            {
+                result = Environment.GetEnvironmentVariable(variableName) ==
+                    ConnectorEBuEfBase.FormatMulticast;
+            }
+
+            if (!result.HasValue)
+            {
+                result = settings?.UseMulticast;
+            }
+
+            return result ?? false;
         }
 
         #endregion Public Methods

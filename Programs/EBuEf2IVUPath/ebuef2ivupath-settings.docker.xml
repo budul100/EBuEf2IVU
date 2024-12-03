@@ -15,40 +15,45 @@
 		</WriteTo>
 	</Serilog>
 	<EBuEfDBConnector>
-		<!--The connection string can also be defined by the environment variables. The value of the settings file is used preferably.-->
+		<!--The connection string can also be defined by the environment variables. The environment variable value is used preferably.-->
 		<!--The variables are MYSQL_STD_HOST, MYSQL_STD_DBNAME, MYSQL_STD_USER, and MYSQL_STD_PASSWORD.-->
 		<ConnectionString>SERVER=host.docker.internal;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
 		<RetryTime>30</RetryTime>
 	</EBuEfDBConnector>
 	<StatusReceiver>
-		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT=mqtt/multicast. The value of the settings file is used preferably.-->
+		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT_STATUS=mqtt/multicast. The environment variable value is used preferably.-->
 		<UseMulticast>false</UseMulticast>
-		<!--The multicast host can also be defined by the environment variable EBUEF_HOSTNAME. The value of the settings file is used preferably.-->
-		<!--The MQTT host can also be defined by the environment variable MQTT_BROKER_IP. The value of the settings file is used preferably.-->
+		<!--The multicast host for status messages can also be defined by the environment variable MC_HOST_STATUS. The environment variable value is used preferably.-->
+		<!--The MQTT broker for status messages can also be defined by the environment variable MQTT_BROKER_STATUS. The environment variable value is used preferably. If not defined, a default value is used.-->
 		<Host>224.0.0.8</Host>
-		<!--The port can also be defined by the environment variable EBUEF_HOSTPORT. The value of the settings file is used preferably.-->
+		<!--The multicast port for status messages can also be defined by the environment variable MC_PORT_STATUS. The environment variable value is used preferably.-->
+		<!--The MQTT broker port for status messages can also be defined by the environment variable MQTT_PORT_STATUS. The environment variable value is used preferably. If not defined, a default value is used.-->
 		<!--<Port>4454</Port>-->
+		<!--The MQTT topic for position messages can also be defined by the environment variable MQTT_TOPIC_STATUS. The environment variable value is used preferably.-->
 		<Topic>mqtt4454</Topic>
 		<RetryTime>30</RetryTime>
 		<StartPattern>ZN SET DISPATCH</StartPattern>
 		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
 	</StatusReceiver>
 	<TrainPathReceiver>
-		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT=mqtt/multicast. The value of the settings file is used preferably.-->
+		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT_PATH=mqtt/multicast. The environment variable value is used preferably.-->
 		<UseMulticast>false</UseMulticast>
-		<!--The host can also be defined by the environment variable EBUEF_HOSTNAME. The value of the settings file is used preferably.-->
+		<!--The multicast host for position messages can also be defined by the environment variable MC_HOST_PATH. The environment variable value is used preferably.-->
+		<!--The MQTT broker for position messages can also be defined by the environment variable MQTT_BROKER_PATH. The environment variable value is used preferably. If not defined, a default value is used.-->
 		<Host>224.0.0.9</Host>
-		<!--The port can also be defined by the environment variable EBUEF_HOSTPORT. The value of the settings file is used preferably.-->
-		<!--<Port>4455</Port>-->
+		<!--The multicast port for position messages can also be defined by the environment variable MC_PORT_PATH. The environment variable value is used preferably.-->
+		<!--The MQTT broker port for position messages can also be defined by the environment variable MQTT_PORT_PATH. The environment variable value is used preferably. If not defined, a default value is used.-->
+		<!--<Port>4453</Port>-->
+		<!--The MQTT topic for position messages can also be defined by the environment variable MQTT_TOPIC_PATH. The environment variable value is used preferably.-->
 		<Topic>mqtt4455</Topic>
 		<RetryTime>30</RetryTime>
 	</TrainPathReceiver>
 	<TrainPathSender>
-		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The value of the settings file is used preferably.-->
+		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The environment variable value is used preferably.-->
 		<Host>host.docker.internal</Host>
-		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The value of the settings file is used preferably.-->
+		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The environment variable value is used preferably.-->
 		<Port>20000</Port>
-		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The value of the settings file is used preferably.-->
+		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The environment variable value is used preferably.-->
 		<IsHttps>false</IsHttps>
 		<Path>intf.trainpath.standardimport.impl/TrainPathImportWebFacadeBean</Path>
 		<Username>trainpath</Username>

@@ -160,36 +160,38 @@ namespace EBuEf2IVUPath
             logger.LogInformation(
                 "Der Nachrichten-Empfänger von EBuEf2IVUPath wird gestartet.");
 
-            var settings = config
+            var receiverSettings = config
                 .GetSection(nameof(TrainPathReceiver))
                 .Get<TrainPathReceiver>();
 
-            var useMulticast = settings.GetEBuEfUseMC();
+            var useMulticast = receiverSettings.UseMulticast(TrainPathReceiver.EnvironmentFormat);
 
             if (useMulticast)
             {
-                var host = settings.GetEBuEfHostMC();
-                var port = settings.GetEBuEfPort()
-                    ?? ConnectorEBuEfBase.MulticastPort;
+                var host = receiverSettings.GetMCHost(TrainPathReceiver.EnvironmentMCHost);
+                var port = receiverSettings.GetMCPort(
+                    variableName: TrainPathReceiver.EnvironmentMCPort,
+                    defaultPort: TrainPathReceiver.MulticastPortDefault);
 
                 multicastReceiver.Initialize(
                     host: host,
                     port: port,
-                    retryTime: settings.RetryTime,
+                    retryTime: receiverSettings.RetryTime,
                     messageType: MessageTypePaths);
 
                 return multicastReceiver;
             }
             else
             {
-                var host = settings.GetEBuEfHostMQTT();
-                var port = settings.GetEBuEfPort();
+                var host = receiverSettings.GetMQTTHost(TrainPathReceiver.EnvironmentMQTTHost);
+                var port = receiverSettings.GetMQTTPort(TrainPathReceiver.EnvironmentMQTTPort);
+                var topic = receiverSettings.GetMQTTTopic(TrainPathReceiver.EnvironmentMQTTTopic);
 
                 mqttReceiver.Initialize(
                     server: host,
                     port: port,
-                    topic: settings.Topic,
-                    retryTime: settings.RetryTime,
+                    topic: topic,
+                    retryTime: receiverSettings.RetryTime,
                     messageType: MessageTypePaths);
 
                 return mqttReceiver;
@@ -212,8 +214,8 @@ namespace EBuEf2IVUPath
             var locationShortnames = await GetLocationShortnamesAsync(settings);
 
             var host = settings.GetIVUAppServerHost();
-            var port = settings.GetIVUAppServerPort() ?? 0;
-            var isHttps = settings.GetIVUAppServerSecure() ?? false;
+            var port = settings.GetIVUAppServerPort();
+            var isHttps = settings.IsIVUAppServerHttps();
 
             trainPathSender.Initialize(
                 host: host,

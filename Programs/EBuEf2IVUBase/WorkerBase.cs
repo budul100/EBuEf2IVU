@@ -80,48 +80,50 @@ namespace EBuEf2IVUBase
             logger.LogInformation(
                 "Die Datenbank-Verbindungen und der Session-State-Empfänger werden gestartet.");
 
-            var databaseConnectionSettings = config
+            var connectionSettings = config
                 .GetSection(nameof(EBuEfDBConnector))
                 .Get<EBuEfDBConnector>();
 
-            var connectionString = databaseConnectionSettings.GetDBConnectionString();
+            var connectionString = connectionSettings.GetDBConnectionString();
 
             databaseConnector.Initialize(
-                connectionString: databaseConnectionSettings.ConnectionString,
-                retryTime: databaseConnectionSettings.RetryTime,
+                connectionString: connectionSettings.ConnectionString,
+                retryTime: connectionSettings.RetryTime,
                 cancellationToken: cancellationToken);
 
-            var statusReceiverSettings = config
+            var receiverSettings = config
                 .GetSection(nameof(StatusReceiver))
                 .Get<StatusReceiver>();
 
-            var useMulticast = statusReceiverSettings.GetEBuEfUseMC();
+            var useMulticast = receiverSettings.UseMulticast(StatusReceiver.EnvironmentFormat);
 
             if (useMulticast)
             {
-                var host = statusReceiverSettings.GetEBuEfHostMC();
-                var port = statusReceiverSettings.GetEBuEfPort()
-                    ?? ConnectorEBuEfBase.MulticastPort;
+                var host = receiverSettings.GetMCHost(StatusReceiver.EnvironmentMCHost);
+                var port = receiverSettings.GetMCPort(
+                    variableName: StatusReceiver.EnvironmentMCPort,
+                    defaultPort: StatusReceiver.MulticastPortDefault);
 
                 sessionStateHandler.Initialize(
                     host: host,
                     port: port,
-                    retryTime: statusReceiverSettings.RetryTime,
-                    startPattern: statusReceiverSettings.StartPattern,
-                    statusPattern: statusReceiverSettings.StatusPattern);
+                    retryTime: receiverSettings.RetryTime,
+                    startPattern: receiverSettings.StartPattern,
+                    statusPattern: receiverSettings.StatusPattern);
             }
             else
             {
-                var host = statusReceiverSettings.GetEBuEfHostMQTT();
-                var port = statusReceiverSettings.GetEBuEfPort();
+                var host = receiverSettings.GetMQTTHost(StatusReceiver.EnvironmentMQTTHost);
+                var port = receiverSettings.GetMQTTPort(StatusReceiver.EnvironmentMQTTPort);
+                var topic = receiverSettings.GetMQTTTopic(StatusReceiver.EnvironmentMQTTTopic);
 
                 sessionStateHandler.Initialize(
                     server: host,
                     port: port,
-                    topic: statusReceiverSettings.Topic,
-                    retryTime: statusReceiverSettings.RetryTime,
-                    startPattern: statusReceiverSettings.StartPattern,
-                    statusPattern: statusReceiverSettings.StatusPattern);
+                    topic: topic,
+                    retryTime: receiverSettings.RetryTime,
+                    startPattern: receiverSettings.StartPattern,
+                    statusPattern: receiverSettings.StatusPattern);
             }
 
             await sessionStateHandler.ExecuteAsync(cancellationToken);
