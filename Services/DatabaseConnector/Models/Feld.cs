@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DatabaseConnector.Models
 {
-    [Table("gbt")]
+    [Table("zn_feld")]
     internal class Feld
     {
         #region Public Properties
@@ -12,7 +12,7 @@ namespace DatabaseConnector.Models
         [ForeignKey(nameof(ID))]
         public IEnumerable<AbschnittZuFeld> AbschnittZuFeld { get; set; }
 
-        [Column("betriebsstelle")]
+        [Column("fahrplanpunkt")]
         public string Betriebsstelle { get; set; }
 
         [Column("gleis")]
