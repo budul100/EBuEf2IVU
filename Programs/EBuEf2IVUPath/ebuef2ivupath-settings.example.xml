@@ -29,7 +29,7 @@
 		<!--The multicast port for status messages can also be defined by the environment variable MC_PORT_STATUS. The environment variable value is used preferably.-->
 		<!--The MQTT broker port for status messages can also be defined by the environment variable MQTT_PORT_STATUS. The environment variable value is used preferably. If not defined, a default value is used.-->
 		<!--<Port>4454</Port>-->
-		<!--The MQTT topic for position messages can also be defined by the environment variable MQTT_TOPIC_STATUS. The environment variable value is used preferably.-->
+		<!--The MQTT topic for status messages can also be defined by the environment variable MQTT_TOPIC_STATUS. The environment variable value is used preferably.-->
 		<Topic>mqtt4454</Topic>
 		<RetryTime>30</RetryTime>
 		<StartPattern>ZN SET DISPATCH</StartPattern>
@@ -38,13 +38,13 @@
 	<TrainPathReceiver>
 		<!--The message format can also be defined by the environment variable MESSAGE_FORMAT_PATH=mqtt/multicast. The environment variable value is used preferably.-->
 		<UseMulticast>false</UseMulticast>
-		<!--The multicast host for position messages can also be defined by the environment variable MC_HOST_PATH. The environment variable value is used preferably.-->
-		<!--The MQTT broker for position messages can also be defined by the environment variable MQTT_BROKER_PATH. The environment variable value is used preferably. If not defined, a default value is used.-->
+		<!--The multicast host for path messages can also be defined by the environment variable MC_HOST_PATH. The environment variable value is used preferably.-->
+		<!--The MQTT broker for path messages can also be defined by the environment variable MQTT_BROKER_PATH. The environment variable value is used preferably. If not defined, a default value is used.-->
 		<Host>localhost</Host>
-		<!--The multicast port for position messages can also be defined by the environment variable MC_PORT_PATH. The environment variable value is used preferably.-->
-		<!--The MQTT broker port for position messages can also be defined by the environment variable MQTT_PORT_PATH. The environment variable value is used preferably. If not defined, a default value is used.-->
+		<!--The multicast port for path messages can also be defined by the environment variable MC_PORT_PATH. The environment variable value is used preferably.-->
+		<!--The MQTT broker port for path messages can also be defined by the environment variable MQTT_PORT_PATH. The environment variable value is used preferably. If not defined, a default value is used.-->
 		<!--<Port>4453</Port>-->
-		<!--The MQTT topic for position messages can also be defined by the environment variable MQTT_TOPIC_PATH. The environment variable value is used preferably.-->
+		<!--The MQTT topic for path messages can also be defined by the environment variable MQTT_TOPIC_PATH. The environment variable value is used preferably.-->
 		<Topic>mqtt4455</Topic>
 		<RetryTime>30</RetryTime>
 	</TrainPathReceiver>
