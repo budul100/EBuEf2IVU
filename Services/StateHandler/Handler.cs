@@ -129,7 +129,7 @@ namespace StateHandler
 
                 if (sessionStatus == default)
                 {
-                    logger.LogError(
+                    logger.LogInformation(
                         "Unbekannte Status-Nachricht empfangen: {content}",
                         e.Content);
                 }
