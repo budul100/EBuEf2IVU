@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Commons.Models;
+﻿using Commons.Models;
 using DatabaseConnector.Models;
 using EnumerableExtensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DatabaseConnector.Extensions
 {
@@ -108,6 +108,7 @@ namespace DatabaseConnector.Extensions
                     {
                         Abfahrt = relevant.GetAbfahrt(),
                         Bemerkungen = relevant.Zug.Bemerkungen,
+                        IstGeaendert = false,
                         Positions = positions,
                         Zuggattung = relevant.Zug.Zuggattung.Kurzname,
                         ZugId = relevant.ZugID,

@@ -11,6 +11,8 @@ namespace Commons.Models
 
         public string Bemerkungen { get; set; }
 
+        public bool IstGeaendert { get; set; }
+
         public IEnumerable<TrainPosition> Positions { get; set; }
 
         public string Zuggattung { get; set; }

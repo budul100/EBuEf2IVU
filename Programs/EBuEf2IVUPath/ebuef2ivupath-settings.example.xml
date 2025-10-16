@@ -73,6 +73,7 @@
 		<StoppingReasonPass>Pass</StoppingReasonPass>
 		<StoppingReasonStop>Stop</StoppingReasonStop>
 		<TrainPathStateRun>REQUESTED</TrainPathStateRun>
+		<TrainPathStateAltered>ALTERED</TrainPathStateAltered>
 		<TrainPathStateCancelled>CANCELLED</TrainPathStateCancelled>
 	</TrainPathSender>
 </Configuration>

@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.Extensions;
 using Commons.Interfaces;
@@ -12,7 +5,14 @@ using Commons.Models;
 using Commons.Settings;
 using EBuEf2IVUBase;
 using EnumerableExtensions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EBuEf2IVUPath
 {
@@ -231,6 +231,7 @@ namespace EBuEf2IVUPath
                 stoppingReasonStop: settings.StoppingReasonStop,
                 stoppingReasonPass: settings.StoppingReasonPass,
                 trainPathStateRun: settings.TrainPathStateRun,
+                trainPathStateAltered: settings.TrainPathStateAltered,
                 trainPathStateCancelled: settings.TrainPathStateCancelled,
                 importProfile: settings.ImportProfile,
                 ignoreTrainTypes: ignoreTrainTypes,

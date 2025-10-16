@@ -33,6 +33,8 @@
 
         public string TrainPathStateCancelled { get; set; }
 
+        public string TrainPathStateAltered { get; set; }
+
         public string TrainPathStateRun { get; set; }
 
         #endregion Public Properties

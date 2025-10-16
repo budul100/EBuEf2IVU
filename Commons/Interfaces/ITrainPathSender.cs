@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Commons.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Commons.Models;
 
 namespace Commons.Interfaces
 {
@@ -16,7 +16,7 @@ namespace Commons.Interfaces
 
         void Initialize(string host, int port, bool isHttps, string username, string password, string path,
             int retryTime, int? timeoutInSecs, string infrastructureManager, string orderingTransportationCompany,
-            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
+            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun, string trainPathStateAltered,
             string trainPathStateCancelled, string importProfile, IEnumerable<string> ignoreTrainTypes,
             IEnumerable<string> locationShortnames, bool logRequests);
 

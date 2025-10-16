@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
-using Commons.Interfaces;
+﻿using Commons.Interfaces;
 using Commons.Models;
 using EnumerableExtensions;
 using Message2TrainRunConverter.Extensions;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Message2TrainRunConverter
 {
@@ -87,6 +87,7 @@ namespace Message2TrainRunConverter
                 result = new TrainRun
                 {
                     Abfahrt = positions[0].Abfahrt?.TimeOfDay,
+                    IstGeaendert = true,
                     Positions = positions,
                     Zuggattung = relevantMessage.Zuggattung,
                     ZugId = relevantMessage.ZugId,

@@ -75,6 +75,7 @@ namespace TrainPathSenderTests
                 stoppingReasonStop: senderSettings.StoppingReasonStop,
                 stoppingReasonPass: senderSettings.StoppingReasonPass,
                 trainPathStateRun: senderSettings.TrainPathStateRun,
+                trainPathStateAltered: senderSettings.TrainPathStateAltered,
                 trainPathStateCancelled: senderSettings.TrainPathStateCancelled,
                 importProfile: senderSettings.ImportProfile,
                 ignoreTrainTypes: ignoreTrainTypes,

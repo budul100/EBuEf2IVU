@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Commons.Interfaces;
+using Commons.Models;
+using CredentialChannelFactory;
+using EnumerableExtensions;
+using Microsoft.Extensions.Logging;
+using Polly;
+using Polly.Retry;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Commons.Interfaces;
-using Commons.Models;
-using CredentialChannelFactory;
-using EnumerableExtensions;
-using Polly;
-using Polly.Retry;
 using TrainPathImportService110;
 using TrainPathSender.Converters;
 using TrainPathSender.Extensions;
@@ -78,7 +78,7 @@ namespace TrainPathSender
 
         public void Initialize(string host, int port, bool isHttps, string username, string password, string path,
             int retryTime, int? timeoutInSecs, string infrastructureManager, string orderingTransportationCompany,
-            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun,
+            string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun, string trainPathStateAltered,
             string trainPathStateCancelled, string importProfile, IEnumerable<string> ignoreTrainTypes,
             IEnumerable<string> locationShortnames, bool logRequests)
         {
@@ -92,6 +92,7 @@ namespace TrainPathSender
                 stoppingReasonStop: stoppingReasonStop,
                 stoppingReasonPass: stoppingReasonPass,
                 trainPathStateRun: trainPathStateRun.GetTrainPathState(),
+                trainPathStateAltered: trainPathStateAltered.GetTrainPathState(),
                 trainPathStateCancelled: trainPathStateCancelled.GetTrainPathState(),
                 importProfile: importProfile,
                 locationShortnames: locationShortnames);

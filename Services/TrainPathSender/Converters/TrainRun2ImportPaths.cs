@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Commons.Models;
+using EnumerableExtensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Commons.Models;
-using EnumerableExtensions;
 using TrainPathImportService110;
 using TrainPathSender.Extensions;
 
@@ -20,6 +20,8 @@ namespace TrainPathSender.Converters
         private readonly string stoppingReasonStop;
         private readonly State trainPathStateCancelled;
         private readonly State trainPathStateRun;
+        private readonly State trainPathStateAltered;
+
         private string sessionKey;
         private TimetableVersion timetableVersion;
 
@@ -28,14 +30,15 @@ namespace TrainPathSender.Converters
         #region Public Constructors
 
         public TrainRun2ImportPaths(string infrastructureManager, string orderingTransportationCompany,
-            string stoppingReasonStop, string stoppingReasonPass, State trainPathStateRun, State trainPathStateCancelled,
-            string importProfile, IEnumerable<string> locationShortnames)
+            string stoppingReasonStop, string stoppingReasonPass, State trainPathStateRun, State trainPathStateAltered,
+            State trainPathStateCancelled, string importProfile, IEnumerable<string> locationShortnames)
         {
             this.infrastructureManager = infrastructureManager;
             this.orderingTransportationCompany = orderingTransportationCompany;
             this.stoppingReasonStop = stoppingReasonStop;
             this.stoppingReasonPass = stoppingReasonPass;
             this.trainPathStateRun = trainPathStateRun;
+            this.trainPathStateAltered = trainPathStateAltered;
             this.trainPathStateCancelled = trainPathStateCancelled;
             this.importProfile = importProfile;
             this.locationShortnames = locationShortnames;
@@ -224,7 +227,7 @@ namespace TrainPathSender.Converters
                 var trainPathItinerary = GetTrainPathStops(trainRun).ToArray();
 
                 var state = trainPathItinerary.Any(i => i.running)
-                    ? trainPathStateRun
+                    ? (trainRun.IstGeaendert ? trainPathStateAltered : trainPathStateRun)
                     : trainPathStateCancelled;
 
                 var result = new TrainPathVariant
