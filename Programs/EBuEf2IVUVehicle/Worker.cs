@@ -4,7 +4,6 @@ using Commons.Extensions;
 using Commons.Interfaces;
 using Commons.Models;
 using Commons.Settings;
-using EBuEf2IVUBase;
 using EnumerableExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -16,7 +15,7 @@ using System.Threading.Tasks;
 namespace EBuEf2IVUVehicle
 {
     public class Worker
-        : WorkerBase
+        : EBuEf2IVUBase.Worker
     {
         #region Private Fields
 

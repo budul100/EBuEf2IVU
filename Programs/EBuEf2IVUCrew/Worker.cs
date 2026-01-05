@@ -8,12 +8,12 @@ using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.Extensions;
 using Commons.Interfaces;
-using EBuEf2IVUBase;
 using EnumerableExtensions;
 
 namespace EBuEf2IVUCrew
 {
-    public class Worker : WorkerBase
+    public class Worker 
+        : EBuEf2IVUBase.Worker
     {
         #region Private Fields
 

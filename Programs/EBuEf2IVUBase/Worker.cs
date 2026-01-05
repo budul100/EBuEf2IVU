@@ -14,7 +14,7 @@ using Commons.Settings;
 
 namespace EBuEf2IVUBase
 {
-    public abstract class WorkerBase
+    public abstract class Worker
         : BackgroundService
     {
         #region Protected Fields
@@ -40,7 +40,7 @@ namespace EBuEf2IVUBase
 
         #region Protected Constructors
 
-        protected WorkerBase(IConfiguration config, IStateHandler sessionStateHandler,
+        protected Worker(IConfiguration config, IStateHandler sessionStateHandler,
             IDatabaseConnector databaseConnector, ILogger logger, Assembly assembly)
         {
             var assemblyInfo = assembly.GetName();
