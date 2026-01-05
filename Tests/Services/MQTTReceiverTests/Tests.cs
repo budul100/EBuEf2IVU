@@ -63,10 +63,16 @@ namespace MQTTReceiverTests
                 .Build();
 
             const string payload = "testmessage";
-            var hasReceived = false;
+            var messageReceivedTcs = new TaskCompletionSource<bool>();
 
             var receiver = host.Services.GetService<IMQTTReceiver>();
-            receiver.MessageReceivedEvent += (s, e) => hasReceived = e.Content == payload;
+            receiver.MessageReceivedEvent += (s, e) =>
+            {
+                if (e.Content == payload)
+                {
+                    messageReceivedTcs.TrySetResult(true);
+                }
+            };
 
             receiver.Initialize(
                 server: MqttServer,
@@ -75,22 +81,38 @@ namespace MQTTReceiverTests
                 retryTime: 30,
                 messageType: default);
 
+            using var cts = new CancellationTokenSource();
+            var receiverTask = receiver.ExecuteAsync(cts.Token);
+
+            // Warte, bis der Receiver wirklich bereit ist
+            await Task.Delay(2000);
+
             var applicationMessage = new MqttApplicationMessageBuilder()
                 .WithTopic(MqttTopic)
                 .WithPayload(payload)
                 .Build();
 
-            var receiverTask = receiver.ExecuteAsync(CancellationToken.None);
-
-            Thread.Sleep(5000);
-
             await client.PublishAsync(applicationMessage, CancellationToken.None);
+
+            // Warte auf die Message mit Timeout
+            var hasReceived = await Task.WhenAny(
+                messageReceivedTcs.Task,
+                Task.Delay(5000)
+                                                ) == messageReceivedTcs.Task && messageReceivedTcs.Task.Result;
 
             await client.DisconnectAsync();
 
-            await server.StopAsync();
+            // Beende den Receiver ordnungsgem‰ﬂ
+            cts.Cancel();
 
-            await receiverTask;
+            try
+            {
+                await Task.WhenAny(receiverTask, Task.Delay(2000));
+            }
+            catch
+            { }
+
+            await server.StopAsync();
 
             using (Assert.EnterMultipleScope())
             {

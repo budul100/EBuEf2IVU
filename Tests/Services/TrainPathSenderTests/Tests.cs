@@ -105,6 +105,7 @@ namespace TrainPathSenderTests
                 cancellationToken: new CancellationToken());
 
             var query = databaseConnector.GetEBuEfSessionAsync();
+
             query.Wait();
 
             var trainRuns = databaseConnector.GetTrainRunsPlanAsync(

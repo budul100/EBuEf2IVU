@@ -1,19 +1,11 @@
-using DatabaseConnector.Models;
 using Microsoft.EntityFrameworkCore;
+using DatabaseConnector.Models;
 
 namespace DatabaseConnector.Contexts
 {
-    internal class HaltDispoContext
-        : BaseContext
+    internal class HaltDispoContext(string connectionString)
+        : BaseContext(connectionString)
     {
-        #region Public Constructors
-
-        public HaltDispoContext(string connectionString)
-            : base(connectionString)
-        { }
-
-        #endregion Public Constructors
-
         #region Public Properties
 
         public DbSet<HaltDispo> Halte { get; set; }

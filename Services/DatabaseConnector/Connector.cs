@@ -1,3 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Commons.Enums;
 using Commons.Interfaces;
 using Commons.Models;
@@ -7,21 +15,13 @@ using DatabaseConnector.Extensions;
 using DatabaseConnector.Models;
 using EnumerableExtensions;
 using Epoch.net;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
 using StringExtensions;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DatabaseConnector
 {
-    public class Connector
+    public class Connector(ILogger<Connector> logger)
         : IDatabaseConnector
     {
         #region Private Fields
@@ -29,22 +29,13 @@ namespace DatabaseConnector
         private const int IdSunday = 6;
         private const int SessionIdDefault = 0;
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
 
         private CancellationToken cancellationToken;
         private string connectionString;
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Connector(ILogger<Connector> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 

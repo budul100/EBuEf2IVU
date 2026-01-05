@@ -1,27 +1,12 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using System;
 
 namespace DatabaseConnector.Contexts
 {
-    internal abstract class BaseContext
+    internal abstract class BaseContext(string connectionString)
         : DbContext
     {
-        #region Private Fields
-
-        private readonly string connectionString;
-
-        #endregion Private Fields
-
-        #region Protected Constructors
-
-        protected BaseContext(string connectionString)
-        {
-            this.connectionString = connectionString;
-        }
-
-        #endregion Protected Constructors
-
         #region Protected Methods
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

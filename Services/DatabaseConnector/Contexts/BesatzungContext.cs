@@ -1,19 +1,11 @@
-﻿using DatabaseConnector.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using DatabaseConnector.Models;
 
 namespace DatabaseConnector.Contexts
 {
-    internal class BesatzungContext
-        : BaseContext
+    internal class BesatzungContext(string connectionString)
+        : BaseContext(connectionString)
     {
-        #region Public Constructors
-
-        public BesatzungContext(string connectionString)
-            : base(connectionString)
-        { }
-
-        #endregion Public Constructors
-
         #region Public Properties
 
         public DbSet<Besatzung> Besatzungen { get; set; }

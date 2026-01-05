@@ -1,19 +1,11 @@
-﻿using DatabaseConnector.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using DatabaseConnector.Models;
 
 namespace DatabaseConnector.Contexts
 {
-    internal class FahrplanpunktContext
-        : BaseContext
+    internal class FahrplanpunktContext(string connectionString)
+        : BaseContext(connectionString)
     {
-        #region Public Constructors
-
-        public FahrplanpunktContext(string connectionString)
-            : base(connectionString)
-        { }
-
-        #endregion Public Constructors
-
         #region Public Properties
 
         public DbSet<Fahrplanpunkt> Fahrplanpunkte { get; set; }

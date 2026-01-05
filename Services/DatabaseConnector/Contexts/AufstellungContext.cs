@@ -1,19 +1,11 @@
-using DatabaseConnector.Models;
 using Microsoft.EntityFrameworkCore;
+using DatabaseConnector.Models;
 
 namespace DatabaseConnector.Contexts
 {
-    internal class AufstellungContext
-        : BaseContext
+    internal class AufstellungContext(string connectionString)
+        : BaseContext(connectionString)
     {
-        #region Public Constructors
-
-        public AufstellungContext(string connectionString)
-            : base(connectionString)
-        { }
-
-        #endregion Public Constructors
-
         #region Public Properties
 
         public DbSet<Aufstellung> Aufstellungen { get; set; }

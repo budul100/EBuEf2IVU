@@ -1,19 +1,11 @@
-﻿using DatabaseConnector.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using DatabaseConnector.Models;
 
 namespace DatabaseConnector.Contexts
 {
-    internal class ZugGattungContext
-        : BaseContext
+    internal class ZugGattungContext(string connectionString)
+        : BaseContext(connectionString)
     {
-        #region Public Constructors
-
-        public ZugGattungContext(string connectionString)
-            : base(connectionString)
-        { }
-
-        #endregion Public Constructors
-
         #region Public Properties
 
         public DbSet<Zuggattung> Zuggattungen { get; set; }

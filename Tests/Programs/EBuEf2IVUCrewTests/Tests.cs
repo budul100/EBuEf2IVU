@@ -23,7 +23,7 @@ namespace EBuEf2IVUCrewTests
         #region Public Methods
 
         [Test]
-        public void CheckCrewsOnRunningSessions()
+        public async Task CheckCrewsOnRunningSessions()
         {
             var wasCalled = false;
 
@@ -43,10 +43,23 @@ namespace EBuEf2IVUCrewTests
                 .ConfigureServices(services => ConfigureServices(services, databaseConnectorMock, stateHandlerMock, crewCheckerMock))
                 .Build();
 
-            var cancellationTokenSource = new CancellationTokenSource();
-            host.StartAsync(cancellationTokenSource.Token);
+            using var cancellationTokenSource = new CancellationTokenSource();
 
-            Assert.That(wasCalled, Is.True);
+            try
+            {
+                await host.StartAsync(cancellationTokenSource.Token);
+
+                // Warte auf die asynchrone Initialisierung
+                await Task.Delay(1000);
+
+                Assert.That(wasCalled, Is.True);
+            }
+            finally
+            {
+                cancellationTokenSource.Cancel();
+                await host.StopAsync(CancellationToken.None);
+                host.Dispose();
+            }
         }
 
         [Test]

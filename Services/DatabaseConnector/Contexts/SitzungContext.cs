@@ -1,19 +1,11 @@
-﻿using DatabaseConnector.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using DatabaseConnector.Models;
 
 namespace DatabaseConnector.Contexts
 {
-    internal class SitzungContext
-        : BaseContext
+    internal class SitzungContext(string connectionString)
+        : BaseContext(connectionString)
     {
-        #region Public Constructors
-
-        public SitzungContext(string connectionString)
-            : base(connectionString)
-        { }
-
-        #endregion Public Constructors
-
         #region Public Properties
 
         public DbSet<Sitzung> Sitzungen { get; set; }

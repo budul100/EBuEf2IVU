@@ -32,8 +32,8 @@ namespace CrewChecker
 
         #region Public Methods
 
-        public Task<IEnumerable<CrewingElement>> GetCrewingElementsAsync(IEnumerable<string> tripNumbers, DateTime date,
-            CancellationToken cancellationToken)
+        public Task<IEnumerable<CrewingElement>> GetCrewingElementsAsync(IEnumerable<string> tripNumbers,
+            DateTime date, CancellationToken cancellationToken)
         {
             var result = retryPolicy.ExecuteAsync(
                 action: _ => GetCrewsForTrips(

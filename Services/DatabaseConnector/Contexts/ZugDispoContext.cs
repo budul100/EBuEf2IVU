@@ -1,19 +1,11 @@
-﻿using DatabaseConnector.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using DatabaseConnector.Models;
 
 namespace DatabaseConnector.Contexts
 {
-    internal class ZugDispoContext
-        : BaseContext
+    internal class ZugDispoContext(string connectionString)
+        : BaseContext(connectionString)
     {
-        #region Public Constructors
-
-        public ZugDispoContext(string connectionString)
-            : base(connectionString)
-        { }
-
-        #endregion Public Constructors
-
         #region Public Properties
 
         public DbSet<ZugDispo> Zuege { get; set; }
