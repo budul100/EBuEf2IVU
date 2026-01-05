@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Commons.Interfaces;
 using Commons.Models;
 using CredentialChannelFactory;
+using CredentialChannelFactory.Endpoint;
 using CrewChecker.Extensions;
 using EnumerableExtensions;
 using Polly;
@@ -15,12 +16,12 @@ using Polly.Retry;
 
 namespace CrewChecker
 {
-    public class Checker
+    public class Checker(ILogger<Checker> logger)
         : ICrewChecker
     {
         #region Private Fields
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
 
         private Factory<CrewOnTripPortTypeChannel> channelFactory;
         private string division;
@@ -28,15 +29,6 @@ namespace CrewChecker
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Checker(ILogger<Checker> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -93,14 +85,16 @@ namespace CrewChecker
             this.division = division;
             this.planningLevel = planningLevel;
 
-            channelFactory = new Factory<CrewOnTripPortTypeChannel>(
+            var endpoint = new WcfEndpoint(
                 host: host,
                 port: port,
                 path: path,
+                isHttps: isHttps);
+
+            channelFactory = new Factory<CrewOnTripPortTypeChannel>(
+                endpoint: endpoint,
                 userName: username,
-                password: password,
-                isHttps: isHttps,
-                notIgnoreCertificateErrors: true);
+                password: password);
 
             logger.LogDebug(
                 "Die Crew-on-trip-Anfragen werden gesendet an: {uri}",

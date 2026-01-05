@@ -9,7 +9,6 @@ using Commons.Interfaces;
 using EBuEf2IVUTestBase;
 using Moq;
 using MQTTnet;
-using MQTTnet.Client;
 using MQTTnet.Server;
 using MQTTReceiver;
 
@@ -31,22 +30,24 @@ namespace MQTTReceiverTests
         [Test]
         public async Task SendMessage()
         {
-            var mqttFactory = new MqttFactory();
+            var serverFactory = new MqttServerFactory();
 
             var serverOptions = new MqttServerOptionsBuilder()
                 .WithDefaultEndpoint()
                 .Build();
 
-            using var server = mqttFactory.CreateMqttServer(serverOptions);
+            using var server = serverFactory.CreateMqttServer(serverOptions);
 
             await server.StartAsync();
 
-            using var sender = mqttFactory.CreateMqttClient();
+            var clientFactory = new MqttClientFactory();
+
+            using var client = clientFactory.CreateMqttClient();
 
             var senderOptions = new MqttClientOptionsBuilder()
                 .WithTcpServer(MqttServer).Build();
 
-            await sender.ConnectAsync(senderOptions, CancellationToken.None);
+            await client.ConnectAsync(senderOptions, CancellationToken.None);
 
             var hasException = false;
 
@@ -79,18 +80,23 @@ namespace MQTTReceiverTests
                 .WithPayload(payload)
                 .Build();
 
-            Task.Run(() => receiver.ExecuteAsync(CancellationToken.None));
+            var receiverTask = receiver.ExecuteAsync(CancellationToken.None);
 
             Thread.Sleep(5000);
 
-            await sender.PublishAsync(applicationMessage, CancellationToken.None);
+            await client.PublishAsync(applicationMessage, CancellationToken.None);
 
-            await sender.DisconnectAsync();
+            await client.DisconnectAsync();
 
             await server.StopAsync();
 
-            Assert.That(hasException, Is.False);
-            Assert.That(hasReceived, Is.True);
+            await receiverTask;
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(hasException, Is.False);
+                Assert.That(hasReceived, Is.True);
+            }
         }
 
         #endregion Public Methods

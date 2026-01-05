@@ -28,6 +28,12 @@ namespace DatabaseConnectorTests
 
         #region Public Methods
 
+        [TearDown]
+        public void Cleanup()
+        {
+            cancellationTokenSource?.Dispose();
+        }
+
         [Test]
         public void CreateCrewingElements()
         {
@@ -68,7 +74,7 @@ namespace DatabaseConnectorTests
                 ZugnummerVorgaenger = "101"
             };
 
-            Task.Run(() => connector.SetCrewingsAsync(new CrewingElement[] { crewingElement })).Wait();
+            Task.Run(() => connector.SetCrewingsAsync([crewingElement])).Wait();
 
             Assert.That(hasException, Is.False);
         }

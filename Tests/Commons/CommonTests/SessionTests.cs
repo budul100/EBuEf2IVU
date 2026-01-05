@@ -29,6 +29,12 @@ namespace CommonTests
 
         #region Public Methods
 
+        [TearDown]
+        public void Cleanup()
+        {
+            cancellationTokenSource?.Dispose();
+        }
+
         [Test]
         public void GetSessionData()
         {
@@ -55,9 +61,12 @@ namespace CommonTests
 
             // The values must possibly adjusted if a new database was imported
 
-            Assert.That(query.Result.IVUDatum, Is.EqualTo(query.Result.IVUDatum.Date));
-            Assert.That(query.Result.Wochentag, Is.EqualTo(DayOfWeek.Friday));
-            Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(10, 0, 0).Add(curOffset).Subtract(expOffset)));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(query.Result.IVUDatum, Is.EqualTo(query.Result.IVUDatum.Date));
+                Assert.That(query.Result.Wochentag, Is.EqualTo(DayOfWeek.Friday));
+                Assert.That(query.Result.SessionStart, Is.EqualTo(new TimeSpan(10, 0, 0).Add(curOffset).Subtract(expOffset)));
+            }
         }
 
         [Test]
@@ -85,7 +94,10 @@ namespace CommonTests
 
             Task.WaitAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
-            Assert.That(wasCalled, Is.False);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(wasCalled, Is.False);
+            }
         }
 
         [Test]
@@ -125,7 +137,10 @@ namespace CommonTests
             multicastReceiverMock.Raise(r => r.MessageReceivedEvent += null, new MessageReceivedArgs("SESSION NEW STATUS 1"));
             multicastReceiverMock.Raise(r => r.MessageReceivedEvent += null, new MessageReceivedArgs("SESSION NEW STATUS 1"));
 
-            Assert.That(eventsSend, Is.EqualTo(2));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(eventsSend, Is.EqualTo(2));
+            }
         }
 
         [Test]
@@ -155,7 +170,10 @@ namespace CommonTests
 
             Task.WhenAny(sessionStateHandler.ExecuteAsync(cancellationTokenSource.Token));
 
-            Assert.That(wasCalled, Is.True);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(wasCalled, Is.True);
+            }
         }
 
         [SetUp]

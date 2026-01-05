@@ -28,13 +28,19 @@ namespace TrainPathSenderTests
 
         #region Public Methods
 
+        [TearDown]
+        public void Cleanup()
+        {
+            loggerFactory?.Dispose();
+        }
+
         [Test]
         public void ConvertTrainPathMessages()
         {
             var content = File.ReadAllText("TrainPathMessages.json");
             var messages = JsonConvert.DeserializeObject<TrainPathMessage[]>(content);
 
-            Assert.That(messages.Length > 0, Is.True);
+            Assert.That(messages, Is.Not.Empty);
         }
 
         [SetUp]

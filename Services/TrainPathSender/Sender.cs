@@ -1,30 +1,31 @@
-﻿using Commons.Interfaces;
-using Commons.Models;
-using CredentialChannelFactory;
-using EnumerableExtensions;
-using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Retry;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Commons.Interfaces;
+using Commons.Models;
+using CredentialChannelFactory;
+using CredentialChannelFactory.Endpoint;
+using EnumerableExtensions;
+using Polly;
+using Polly.Retry;
 using TrainPathImportService110;
 using TrainPathSender.Converters;
 using TrainPathSender.Extensions;
 
 namespace TrainPathSender
 {
-    public class Sender
+    public class Sender(ILogger<Sender> logger)
         : ITrainPathSender
     {
         #region Private Fields
 
         private readonly ConcurrentQueue<IEnumerable<TrainRun>> importsQueue = new();
-        private readonly ILogger<Sender> logger;
+
         private Factory<TrainPathImportWebFacadeChannel> channelFactory;
         private TrainRun2ImportPaths converter;
         private IEnumerable<string> ignoreTrainTypes;
@@ -34,15 +35,6 @@ namespace TrainPathSender
         private int? timeoutInSecs;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Sender(ILogger<Sender> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -97,14 +89,16 @@ namespace TrainPathSender
                 importProfile: importProfile,
                 locationShortnames: locationShortnames);
 
-            channelFactory = new Factory<TrainPathImportWebFacadeChannel>(
+            var endpoint = new WcfEndpoint(
                 host: host,
                 port: port,
                 path: path,
+                isHttps: isHttps);
+
+            channelFactory = new Factory<TrainPathImportWebFacadeChannel>(
+                endpoint: endpoint,
                 userName: username,
-                password: password,
-                isHttps: isHttps,
-                notIgnoreCertificateErrors: true);
+                password: password);
 
             logger.LogDebug(
                 "Zugtrassen werden gesendet an {host}:{port}/{path}.",

@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Commons.EventsArgs;
 using Commons.Interfaces;
 using MQTTnet;
-using MQTTnet.Client;
 using Polly;
 using Polly.Retry;
+using StringExtensions;
 
 namespace MQTTReceiver
 {
@@ -20,7 +19,7 @@ namespace MQTTReceiver
 
         private readonly ILogger<Receiver> logger;
         private readonly IMqttClient mqttClient;
-        private readonly MqttFactory mqttFactory;
+        private readonly MqttClientFactory mqttFactory;
 
         private string address;
         private bool isDisposed;
@@ -38,7 +37,7 @@ namespace MQTTReceiver
         {
             this.logger = logger;
 
-            mqttFactory = new MqttFactory();
+            mqttFactory = new MqttClientFactory();
 
             mqttClient = mqttFactory.CreateMqttClient();
             mqttClient.ApplicationMessageReceivedAsync += e => Task.Run(() => SendMessageReceived(e.ApplicationMessage));
@@ -166,16 +165,13 @@ namespace MQTTReceiver
 
         private void SendMessageReceived(MqttApplicationMessage message)
         {
-            if (message?.PayloadSegment.Array?.Length > 0)
-            {
-                var content = Encoding.ASCII.GetString(message.PayloadSegment.Array);
+            var content = message?.ConvertPayloadToString();
 
-                if (!string.IsNullOrWhiteSpace(content))
-                {
-                    MessageReceivedEvent?.Invoke(
-                        sender: this,
-                        e: new MessageReceivedArgs(content));
-                }
+            if (!content.IsEmpty())
+            {
+                MessageReceivedEvent?.Invoke(
+                    sender: this,
+                    e: new MessageReceivedArgs(content));
             }
         }
 

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Commons.Interfaces;
 using Commons.Models;
 using CredentialChannelFactory;
+using CredentialChannelFactory.Endpoint;
 using EnumerableExtensions;
 using Polly;
 using Polly.Retry;
@@ -16,12 +17,12 @@ using RealtimeSender.Converters;
 
 namespace RealtimeSender
 {
-    public class Sender
+    public class Sender(ILogger<Sender> logger)
         : IRealtimeSender
     {
         #region Private Fields
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
         private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new();
 
         private Factory<RealTimeInformationImportFacadeChannel> channelFactory;
@@ -30,15 +31,6 @@ namespace RealtimeSender
         private Task senderTask;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Sender(ILogger<Sender> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -130,14 +122,16 @@ namespace RealtimeSender
                 logger: logger,
                 division: division);
 
-            channelFactory = new Factory<RealTimeInformationImportFacadeChannel>(
+            var endpoint = new WcfEndpoint(
                 host: host,
                 port: port,
                 path: path,
+                isHttps: isHttps);
+
+            channelFactory = new Factory<RealTimeInformationImportFacadeChannel>(
+                endpoint: endpoint,
                 userName: username,
-                password: password,
-                isHttps: isHttps,
-                notIgnoreCertificateErrors: true);
+                password: password);
 
             retryPolicy = Policy
                 .Handle<Exception>()
@@ -177,7 +171,7 @@ namespace RealtimeSender
 
                     if (currentMessage != default)
                     {
-                        var importInfo = new importRealTimeInfo(new RealTimeInfoTO[] { currentMessage });
+                        var importInfo = new importRealTimeInfo([currentMessage]);
                         var sender = channelFactory.Get();
 
                         var response = await sender.importRealTimeInfoAsync(importInfo);
