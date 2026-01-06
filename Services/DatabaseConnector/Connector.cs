@@ -6,20 +6,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Commons.Enums;
-using Commons.Interfaces;
-using Commons.Models;
 using ConverterExtensions;
-using DatabaseConnector.Contexts;
-using DatabaseConnector.Extensions;
-using DatabaseConnector.Models;
+using EBuEf2IVU.Services.DatabaseConnector.Contexts;
+using EBuEf2IVU.Services.DatabaseConnector.Extensions;
+using EBuEf2IVU.Services.DatabaseConnector.Models;
+using EBuEf2IVU.Shareds.Commons.Enums;
+using EBuEf2IVU.Shareds.Commons.Interfaces;
+using EBuEf2IVU.Shareds.Commons.Models;
 using EnumerableExtensions;
 using Epoch.net;
 using Polly;
 using Polly.Retry;
 using StringExtensions;
 
-namespace DatabaseConnector
+namespace EBuEf2IVU.Services.DatabaseConnector
 {
     public class Connector(ILogger<Connector> logger)
         : IDatabaseConnector
@@ -136,7 +136,7 @@ namespace DatabaseConnector
             return result;
         }
 
-        public void Initialize(string connectionString, int retryTime, CancellationToken cancellationToken)
+        public void Initialize(string connectionString, int? retryTime, CancellationToken cancellationToken)
         {
             this.connectionString = connectionString;
             this.cancellationToken = cancellationToken;
@@ -145,11 +145,20 @@ namespace DatabaseConnector
                 "Die Datenbank wird wie folgt aufgerufen: {connectionString}",
                 connectionString);
 
-            retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: OnRetry);
+            if (retryTime.HasValue)
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryForeverAsync(
+                        sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime.Value),
+                        onRetry: OnRetry);
+            }
+            else
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .RetryAsync(0);
+            }
         }
 
         public Task SetCrewingsAsync(IEnumerable<CrewingElement> crewingElements)
@@ -389,8 +398,8 @@ namespace DatabaseConnector
                     halte = await context.Halte
                         .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
                         .Where(h => h.AbfahrtIst.HasValue || h.AbfahrtSoll.HasValue || h.AbfahrtPlan.HasValue)
-                        .Where(h => ((h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) >= minTime)
-                            && ((h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) <= maxTime))
+                        .Where(h => (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) >= minTime
+                            && (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) <= maxTime)
                         .ToArrayAsync(queryCancellationToken);
                 }
                 else
@@ -398,8 +407,8 @@ namespace DatabaseConnector
                     halte = await context.Halte
                         .Include(h => h.Zug).ThenInclude(z => z.Zuggattung)
                         .Where(h => h.AbfahrtIst.HasValue || h.AbfahrtSoll.HasValue || h.AbfahrtPlan.HasValue)
-                        .Where(h => ((h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) >= minTime)
-                            || ((h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) <= maxTime))
+                        .Where(h => (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) >= minTime
+                            || (h.AbfahrtIst ?? h.AbfahrtSoll ?? h.AbfahrtPlan) <= maxTime)
                         .ToArrayAsync(queryCancellationToken);
                 }
 
@@ -448,7 +457,7 @@ namespace DatabaseConnector
                 await using var context = new HaltPlanContext(connectionString);
 
                 var weekdayId = weekday != DayOfWeek.Sunday
-                    ? ((int)weekday) - 1
+                    ? (int)weekday - 1
                     : IdSunday;
 
                 var allHalte = await context.Halte
@@ -469,7 +478,7 @@ namespace DatabaseConnector
 
         private async Task<int?> QueryTrainTypeId(string zuggattung, CancellationToken queryCancellationToken)
         {
-            var result = default(Zuggattung);
+            var result = default(ZugGattung);
 
             if (!zuggattung.IsEmpty())
             {

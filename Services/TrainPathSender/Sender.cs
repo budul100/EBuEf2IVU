@@ -6,18 +6,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Commons.Interfaces;
-using Commons.Models;
 using CredentialChannelFactory;
 using CredentialChannelFactory.Endpoint;
+using EBuEf2IVU.Services.TrainPathSender.Converters;
+using EBuEf2IVU.Services.TrainPathSender.Extensions;
+using EBuEf2IVU.Shareds.Commons.Interfaces;
+using EBuEf2IVU.Shareds.Commons.Models;
 using EnumerableExtensions;
 using Polly;
 using Polly.Retry;
 using TrainPathImportService110;
-using TrainPathSender.Converters;
-using TrainPathSender.Extensions;
 
-namespace TrainPathSender
+namespace EBuEf2IVU.Services.TrainPathSender
 {
     public class Sender(ILogger<Sender> logger)
         : ITrainPathSender
@@ -69,7 +69,7 @@ namespace TrainPathSender
         }
 
         public void Initialize(string host, int port, bool isHttps, string username, string password, string path,
-            int retryTime, int? timeoutInSecs, string infrastructureManager, string orderingTransportationCompany,
+            int? retryTime, int? timeoutInSecs, string infrastructureManager, string orderingTransportationCompany,
             string stoppingReasonStop, string stoppingReasonPass, string trainPathStateRun, string trainPathStateAltered,
             string trainPathStateCancelled, string importProfile, IEnumerable<string> ignoreTrainTypes,
             IEnumerable<string> locationShortnames, bool logRequests)
@@ -106,11 +106,20 @@ namespace TrainPathSender
                 port,
                 path);
 
-            retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: OnRetry);
+            if (retryTime.HasValue)
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryForeverAsync(
+                        sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime.Value),
+                        onRetry: OnRetry);
+            }
+            else
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .RetryAsync(0);
+            }
         }
 
         #endregion Public Methods
@@ -140,7 +149,7 @@ namespace TrainPathSender
             {
                 if (!importsQueue.IsEmpty)
                 {
-                    importsQueue.TryPeek(out IEnumerable<TrainRun> currentImport);
+                    importsQueue.TryPeek(out var currentImport);
 
                     var currentPaths = converter.Convert(currentImport);
 

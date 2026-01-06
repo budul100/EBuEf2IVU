@@ -7,21 +7,21 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Commons.EventsArgs;
-using Commons.Interfaces;
+using EBuEf2IVU.Shareds.Commons.EventsArgs;
+using EBuEf2IVU.Shareds.Commons.Interfaces;
 using Polly;
 using Polly.Retry;
 
-namespace MulticastReceiver
+namespace EBuEf2IVU.Services.MulticastReceiver
 {
-    public class Receiver
+    public class Receiver(ILogger<Receiver> logger)
         : IMulticastReceiver
     {
         #region Private Fields
 
         private const char EndChar = '\0';
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
 
         private string host;
         private string messageType;
@@ -30,15 +30,6 @@ namespace MulticastReceiver
         private AsyncRetryPolicy retryPolicy;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Receiver(ILogger<Receiver> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Events
 
@@ -62,17 +53,26 @@ namespace MulticastReceiver
             return receiverTask;
         }
 
-        public void Initialize(string host, int port, int retryTime, string messageType)
+        public void Initialize(string host, int port, int? retryTime, string messageType)
         {
             this.host = host;
             this.port = port;
             this.messageType = messageType;
 
-            retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: OnRetry);
+            if (retryTime.HasValue)
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryForeverAsync(
+                        sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime.Value),
+                        onRetry: OnRetry);
+            }
+            else
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .RetryAsync(0);
+            }
         }
 
         #endregion Public Methods
@@ -142,19 +142,20 @@ namespace MulticastReceiver
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var result = await udpClient.ReceiveAsync();
+                var result = await udpClient.ReceiveAsync(cancellationToken);
+
                 SendMessageReceived(result);
             }
         }
 
         private void SendMessageReceived(UdpReceiveResult result)
         {
-            var bytes = result.Buffer;
+            var bytes = result.Buffer?.ToArray();
 
             if (bytes?.Length > 0)
             {
                 var content = Encoding.ASCII.GetString(
-                    bytes: bytes.ToArray(),
+                    bytes: bytes,
                     index: 0,
                     count: bytes.Length).TrimEnd(EndChar);
 

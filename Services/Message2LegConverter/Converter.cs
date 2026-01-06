@@ -3,38 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Commons.Enums;
-using Commons.Interfaces;
-using Commons.Models;
 using ConverterExtensions;
-using EBuEf2IVUVehicle.Settings;
+using EBuEf2IVU.Services.Message2LegConverter.Extensions;
+using EBuEf2IVU.Services.Message2LegConverter.Settings;
+using EBuEf2IVU.Shareds.Commons.Enums;
+using EBuEf2IVU.Shareds.Commons.Interfaces;
+using EBuEf2IVU.Shareds.Commons.Models;
 using EnumerableExtensions;
-using Message2LegConverter.Extensions;
 using RegexExtensions;
 
-namespace Message2LegConverter
+namespace EBuEf2IVU.Services.Message2LegConverter
 {
-    public class Converter
+    public class Converter(IConfiguration config, ILogger<Converter> logger)
         : IMessage2LegConverter
     {
         #region Private Fields
 
-        private readonly DateTime? dateMin;
-        private readonly IEnumerable<InfrastructureMapping> infrastructureMappings;
-        private readonly ILogger logger;
+        private readonly DateTime? dateMin = config.GetDateMin();
+        private readonly IEnumerable<InfrastructureMapping> infrastructureMappings = config.GetInfrastructureMappings();
+        private readonly ILogger logger = logger;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Converter(IConfiguration config, ILogger<Converter> logger)
-        {
-            dateMin = config.GetDateMin();
-            infrastructureMappings = config.GetInfrastructureMappings();
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -55,9 +44,9 @@ namespace Message2LegConverter
 
                     if (mapping != default)
                     {
-                        if ((message.SignalTyp == SignalType.ESig && mapping.IVUTrainPositionType != LegType.Ankunft)
-                            || (message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != LegType.Abfahrt)
-                            || (message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != LegType.Durchfahrt))
+                        if (message.SignalTyp == SignalType.ESig && mapping.IVUTrainPositionType != LegType.Ankunft
+                            || message.SignalTyp == SignalType.ASig && mapping.IVUTrainPositionType != LegType.Abfahrt
+                            || message.SignalTyp == SignalType.BkSig && mapping.IVUTrainPositionType != LegType.Durchfahrt)
                         {
                             logger.LogWarning(
                                 "Der IVUTrainPositionType des Mappings {mappingType} entspricht nicht " +

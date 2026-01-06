@@ -1,4 +1,4 @@
-﻿namespace RealtimeSenderIS.Extensions
+﻿namespace EBuEf2IVU.Services.RealtimeSenderIS.Extensions
 {
     internal static class RealtimeInfoConstants
     {

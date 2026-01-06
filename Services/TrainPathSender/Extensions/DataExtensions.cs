@@ -1,9 +1,8 @@
 ﻿using System;
-using Commons.Models;
-using EnumerableExtensions;
+using EBuEf2IVU.Shareds.Commons.Models;
 using TrainPathImportService110;
 
-namespace TrainPathSender.Extensions
+namespace EBuEf2IVU.Services.TrainPathSender.Extensions
 {
     internal static class DataExtensions
     {

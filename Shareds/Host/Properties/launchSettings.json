@@ -1,0 +1,52 @@
+{
+  "profiles": {
+    "Crew - Windows": {
+      "commandName": "Project",
+      "commandLineArgs": "crew -s ..\\..\\..\\Settings\\settings.crew.local.xml"
+    },
+    "Crew - WSL": {
+      "commandName": "WSL2",
+      "commandLineArgs": "crew -s ../../../Settings/settings.crew.local.xml",
+      "distributionName": ""
+    },
+    "Crew - Docker": {
+      "commandName": "Docker",
+      "environmentVariables": {
+        "EBUEF2IVU_SERVICE": "crew",
+        "EBUEF2IVU_SETTINGS": "../../../Settings/settings.crew.docker.xml"
+      }
+    },
+    "Path - Windows": {
+      "commandName": "Project",
+      "commandLineArgs": "path -s ..\\..\\..\\Settings\\settings.path.local.xml"
+    },
+    "Path - WSL": {
+      "commandName": "WSL2",
+      "commandLineArgs": "path -s ../../../Settings/settings.path.local.xml",
+      "distributionName": ""
+    },
+    "Path - Docker": {
+      "commandName": "Docker",
+      "environmentVariables": {
+        "EBUEF2IVU_SERVICE": "path",
+        "EBUEF2IVU_SETTINGS": "../../../Settings/settings.path.docker.xml"
+      }
+    },
+    "Vehicle - Windows": {
+      "commandName": "Project",
+      "commandLineArgs": "vehicle -s ..\\..\\..\\Settings\\settings.vehicle.local.xml"
+    },
+    "Vehicle - WSL": {
+      "commandName": "WSL2",
+      "commandLineArgs": "vehicle -s ../../../Settings/settings.vehicle.local.xml",
+      "distributionName": ""
+    },
+    "Vehicle - Docker": {
+      "commandName": "Docker",
+      "environmentVariables": {
+        "EBUEF2IVU_SERVICE": "vehicle",
+        "EBUEF2IVU_SETTINGS": "../../../Settings/settings.vehicle.docker.xml"
+      }
+    }
+  }
+}

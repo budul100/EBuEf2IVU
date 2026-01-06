@@ -6,16 +6,17 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Commons.Interfaces;
-using Commons.Models;
 using CredentialChannelFactory;
 using CredentialChannelFactory.Endpoint;
+using EBuEf2IVU.Services.RealtimeSender.Converters;
+using EBuEf2IVU.Shareds.Commons.Interfaces;
+using EBuEf2IVU.Shareds.Commons.Models;
 using EnumerableExtensions;
 using Polly;
 using Polly.Retry;
-using RealtimeSender.Converters;
+using RealtimeSender;
 
-namespace RealtimeSender
+namespace EBuEf2IVU.Services.RealtimeSender
 {
     public class Sender(ILogger<Sender> logger)
         : IRealtimeSender
@@ -81,7 +82,7 @@ namespace RealtimeSender
         }
 
         public void Initialize(string host, int port, bool isHttps, string username, string password,
-            string path, string division, int retryTime)
+            string path, string division, int? retryTime)
         {
             if (string.IsNullOrWhiteSpace(host))
             {
@@ -133,11 +134,20 @@ namespace RealtimeSender
                 userName: username,
                 password: password);
 
-            retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: OnRetry);
+            if (retryTime.HasValue)
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryForeverAsync(
+                        sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime.Value),
+                        onRetry: OnRetry);
+            }
+            else
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .RetryAsync(0);
+            }
         }
 
         #endregion Public Methods
@@ -167,7 +177,7 @@ namespace RealtimeSender
             {
                 if (!messagesQueue.IsEmpty)
                 {
-                    messagesQueue.TryPeek(out RealTimeInfoTO currentMessage);
+                    messagesQueue.TryPeek(out var currentMessage);
 
                     if (currentMessage != default)
                     {

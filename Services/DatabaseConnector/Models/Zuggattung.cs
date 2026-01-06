@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DatabaseConnector.Models
+namespace EBuEf2IVU.Services.DatabaseConnector.Models
 {
     [Table("zuege_zuggattungen")]
-    internal class Zuggattung
+    internal class ZugGattung
     {
         #region Public Properties
 

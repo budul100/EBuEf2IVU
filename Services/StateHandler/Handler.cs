@@ -3,13 +3,13 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Commons.Enums;
-using Commons.EventsArgs;
-using Commons.Extensions;
-using Commons.Interfaces;
-using StateHandler.Extensions;
+using EBuEf2IVU.Services.StateHandler.Extensions;
+using EBuEf2IVU.Shareds.Commons.Enums;
+using EBuEf2IVU.Shareds.Commons.EventsArgs;
+using EBuEf2IVU.Shareds.Commons.Extensions;
+using EBuEf2IVU.Shareds.Commons.Interfaces;
 
-namespace StateHandler
+namespace EBuEf2IVU.Services.StateHandler
 {
     public class Handler
         : IStateHandler
@@ -64,10 +64,13 @@ namespace StateHandler
         {
             await SetSessionStatusInitally();
 
-            await messageReceiver.ExecuteAsync(cancellationToken);
+            if (messageReceiver != default)
+            {
+                await messageReceiver.ExecuteAsync(cancellationToken);
+            }
         }
 
-        public void Initialize(string server, int? port, string topic, int retryTime, string sessionStartPattern,
+        public void Initialize(string server, int? port, string topic, int? retryTime, string sessionStartPattern,
             string sessionStatusPattern)
         {
             mqttReceiver.Initialize(
@@ -83,7 +86,7 @@ namespace StateHandler
             sessionStatusRegex = sessionStatusPattern.GetSessionStatusRegex();
         }
 
-        public void Initialize(string host, int port, int retryTime, string sessionStartPattern,
+        public void Initialize(string host, int port, int? retryTime, string sessionStartPattern,
             string sessionStatusPattern)
         {
             multicastReceiver.Initialize(

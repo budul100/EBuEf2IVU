@@ -1,7 +1,7 @@
 ﻿using System;
-using Commons.Models;
+using EBuEf2IVU.Shareds.Commons.Models;
 
-namespace Message2TrainRunConverter.Extensions
+namespace EBuEf2IVU.Services.Message2TrainRunConverter.Extensions
 {
     internal static class MessageExtensions
     {

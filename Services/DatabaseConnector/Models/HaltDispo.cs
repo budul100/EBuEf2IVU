@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DatabaseConnector.Models
+namespace EBuEf2IVU.Services.DatabaseConnector.Models
 {
     [Table("fahrplan_sessionfahrplan")]
     internal class HaltDispo

@@ -2,7 +2,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
-namespace DatabaseConnector.Contexts
+namespace EBuEf2IVU.Services.DatabaseConnector.Contexts
 {
     internal abstract class BaseContext(string connectionString)
         : DbContext

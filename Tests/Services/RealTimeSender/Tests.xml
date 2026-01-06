@@ -1,0 +1,664 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<Serilog>
+		<MinimumLevel>Debug</MinimumLevel>
+		<!--<WriteTo name="Console">
+	  <Args>
+		<theme>Serilog.Sinks.SystemConsole.Themes.SystemConsoleTheme::Literate, Serilog.Sinks.Console</theme>
+	  </Args>
+	</WriteTo>-->
+		<WriteTo name="File">
+			<Args>
+				<path>/var/log/ebuef2ivu/ebuef2ivuvehicle.log</path>
+				<rollingInterval>Day</rollingInterval>
+			</Args>
+		</WriteTo>
+	</Serilog>
+	<EBuEfDBConnector>
+		<ConnectionString>SERVER=db.ebuef;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
+	</EBuEfDBConnector>
+	<StatusReceiver>
+		<UseMulticast>false</UseMulticast>
+		<Server>224.0.0.8</Server>
+		<!--<Port>4454</Port>-->
+		<Topic>mqtt4454</Topic>
+		<StartPattern>ZN SET DISPATCH</StartPattern>
+		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
+	</StatusReceiver>
+	<PositionsReceiver>
+		<UseMulticast>false</UseMulticast>
+		<Server>224.0.0.7</Server>
+		<!--<Port>4453</Port>-->
+		<Topic>mqtt4453</Topic>
+	</PositionsReceiver>
+	<RealtimeSender>
+		<UseInterfaceServer>false</UseInterfaceServer>
+
+		<!--The host can also be defined by the environment variable IVU_IFSERVER_ENDPOINT. The environment variable value is used preferably.-->
+		<!--<Endpoint>http://ivu.ebuef:8080</Endpoint>-->
+
+		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The environment variable value is used preferably.-->
+		<Host>localhost</Host>
+		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The environment variable value is used preferably.-->
+		<Port>24100</Port>
+		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The environment variable value is used preferably.-->
+		<IsHttps>false</IsHttps>
+		<Path>intf.realtime.standardimport.impl/RealtimeImportWebFacadeBean</Path>
+		<Username>ivu</Username>
+		<Password>ivu$admin</Password>
+
+		<Division>EBUEF</Division>
+		<IgnorePrognosis>false</IgnorePrognosis>
+		<DateMin>2000-01-01</DateMin>
+	</RealtimeSender>
+	<InfrastructureMappings>
+		<InfrastructureMapping name="XAB_A">
+			<EBuEfNachBetriebsstelle>XAB</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XAB</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XAB_A</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XAB_P">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XAB</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XAB</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XAB_P</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XAP">
+			<EBuEfNachBetriebsstelle>XAP</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>0</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XAP</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>0</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XAP</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XBG_A">
+			<EBuEfNachBetriebsstelle>XBG</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XBG</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XBG_A</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XBG_F">
+			<EBuEfNachBetriebsstelle>XBG</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XBG</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XBG_F</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XBG_N">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XBG</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XBG</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XBG_N</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XBG_P">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XBG</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XBG</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XBG_P</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XBL_A">
+			<EBuEfNachBetriebsstelle>XBL</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XBL</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XBL_A</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XBL_P">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XBL</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XBL</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XBL_P</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XCE_A">
+			<EBuEfNachBetriebsstelle>XCE</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XCE</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XCE_A</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XCE_F">
+			<EBuEfNachBetriebsstelle>XCE</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XCE</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XCE_F</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XCE_N">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XCE</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XCE</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XCE_N</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XCE_P">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XCE</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XCE</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XCE_P</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XDE_A">
+			<EBuEfNachBetriebsstelle>XDE</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XDE</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XDE_A</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XDE_F">
+			<EBuEfNachBetriebsstelle>XDE</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XDE</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XDE_F</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XDE_N">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XDE</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XDE</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XDE_N</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XDE_P">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XDE</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XDE</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XDE_P</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XDR_A">
+			<EBuEfNachBetriebsstelle>XDR</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XDR</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XDR_A</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XDR_F">
+			<EBuEfNachBetriebsstelle>XDR</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XDR</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XDR_F</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XDR_G">
+			<EBuEfNachBetriebsstelle>XDR</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XDR</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XDR_G</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XDR_N">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XDR</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XDR</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XDR_N</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XDR_P">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XDR</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XDR</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XDR_P</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XLG_13">
+			<EBuEfNachBetriebsstelle>XLG</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XLG</IVUNetzpunkt>
+			<IVUTrainPositionType>Durchfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XLG_13</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XLG_4">
+			<EBuEfNachBetriebsstelle>XLG</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XLG</IVUNetzpunkt>
+			<IVUTrainPositionType>Durchfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XLG_4</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XLG_8">
+			<EBuEfNachBetriebsstelle>XLG</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XLG</IVUNetzpunkt>
+			<IVUTrainPositionType>Durchfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XLG_8</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XPN_A">
+			<EBuEfNachBetriebsstelle>XPN</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XPN</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XPN_A</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XPN_B">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XPN</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XPN</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XPN_B</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XPN_C">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XPN</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XPN</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XPN_C</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XPN_D">
+			<EBuEfNachBetriebsstelle>XPN</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XPN</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XPN_D</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XSBK1">
+			<EBuEfNachBetriebsstelle>XSBK1</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<MessageBetriebsstelle>XSBK1</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XSBK2">
+			<EBuEfNachBetriebsstelle>XSBK2</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<MessageBetriebsstelle>XSBK2</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XSBK3">
+			<EBuEfNachBetriebsstelle>XSBK3</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<MessageBetriebsstelle>XSBK3</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XSBK4">
+			<EBuEfNachBetriebsstelle>XSBK4</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<MessageBetriebsstelle>XSBK4</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XSC_F">
+			<EBuEfNachBetriebsstelle>XSC</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XSC</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XSC_F</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XSC_N">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XSC</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XSC</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XSC_N</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XTS_11">
+			<EBuEfNachBetriebsstelle>XTS</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XTS</IVUNetzpunkt>
+			<IVUTrainPositionType>Durchfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XTS_11</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XTS_12">
+			<EBuEfNachBetriebsstelle>XTS</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XTS</IVUNetzpunkt>
+			<IVUTrainPositionType>Durchfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XTS_12</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XTS_13">
+			<EBuEfNachBetriebsstelle>XTS</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XTS</IVUNetzpunkt>
+			<IVUTrainPositionType>Durchfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XTS_13</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XWF_A">
+			<EBuEfNachBetriebsstelle>XWF</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XWF</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XWF_A</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XWF_B">
+			<EBuEfNachBetriebsstelle>XWF</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XWF</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XWF_B</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XWF_F">
+			<EBuEfNachBetriebsstelle>XWF</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XWF</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XWF_F</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XWF_N">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XWF</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XWF</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XWF_N</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XWF_P">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XWF</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XWF</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XWF_P</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XWS">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XWS</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XWS</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XWS</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XZO_A">
+			<EBuEfNachBetriebsstelle>XZO</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XZO</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XZO_A</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XZO_F">
+			<EBuEfNachBetriebsstelle>XZO</EBuEfNachBetriebsstelle>
+			<EBuEfNachVerschiebungSekunden>7</EBuEfNachVerschiebungSekunden>
+			<EBuEfVonBetriebsstelle />
+			<EBuEfVonVerschiebungSekunden />
+			<IVUGleis />
+			<IVUNetzpunkt>XZO</IVUNetzpunkt>
+			<IVUTrainPositionType>Ankunft</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>7</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XZO_F</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XZO_N">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XZO</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XZO</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XZO_N</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+		<InfrastructureMapping name="XZO_P">
+			<EBuEfNachBetriebsstelle />
+			<EBuEfNachVerschiebungSekunden />
+			<EBuEfVonBetriebsstelle>XZO</EBuEfVonBetriebsstelle>
+			<EBuEfVonVerschiebungSekunden>5</EBuEfVonVerschiebungSekunden>
+			<IVUGleis />
+			<IVUNetzpunkt>XZO</IVUNetzpunkt>
+			<IVUTrainPositionType>Abfahrt</IVUTrainPositionType>
+			<IVUVerschiebungSekunden>5</IVUVerschiebungSekunden>
+			<MessageBetriebsstelle>XZO_P</MessageBetriebsstelle>
+			<MessageEndGleis />
+			<MessageStartGleis />
+		</InfrastructureMapping>
+	</InfrastructureMappings>
+</Configuration>

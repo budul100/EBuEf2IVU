@@ -3,14 +3,14 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Commons.EventsArgs;
-using Commons.Interfaces;
+using EBuEf2IVU.Shareds.Commons.EventsArgs;
+using EBuEf2IVU.Shareds.Commons.Interfaces;
 using MQTTnet;
 using Polly;
 using Polly.Retry;
 using StringExtensions;
 
-namespace MQTTReceiver
+namespace EBuEf2IVU.Services.MQTTReceiver
 {
     public class Receiver
         : IMQTTReceiver, IDisposable
@@ -76,7 +76,7 @@ namespace MQTTReceiver
             return receiverTask;
         }
 
-        public void Initialize(string host, int? port, string topic, int retryTime, string messageType)
+        public void Initialize(string host, int? port, string topic, int? retryTime, string messageType)
         {
             this.topic = topic;
             this.messageType = messageType;
@@ -90,11 +90,20 @@ namespace MQTTReceiver
                     host: host,
                     port: port).Build();
 
-            retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: OnRetry);
+            if (retryTime.HasValue)
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryForeverAsync(
+                        sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime.Value),
+                        onRetry: OnRetry);
+            }
+            else
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .RetryAsync(0);
+            }
         }
 
         #endregion Public Methods

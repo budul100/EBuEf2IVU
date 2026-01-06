@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DatabaseConnector.Extensions
+namespace EBuEf2IVU.Services.DatabaseConnector.Extensions
 {
     internal static class QueryExtensions
     {

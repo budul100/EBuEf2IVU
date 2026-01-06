@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using DatabaseConnector.Models;
+using EBuEf2IVU.Services.DatabaseConnector.Models;
 
-namespace DatabaseConnector.Contexts
+namespace EBuEf2IVU.Services.DatabaseConnector.Contexts
 {
     internal class HaltPlanContext(string connectionString)
         : BaseContext(connectionString)

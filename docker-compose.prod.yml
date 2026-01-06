@@ -1,0 +1,21 @@
+# Produktions-Konfiguration (überschreibt die Basis)
+version: '3.8'
+
+services:
+  ebuef2ivu-crew:
+    image: git.tu-berlin.de:5000/ebuef/ebueftools/ebuef2ivu:latest
+    environment:
+      - EBUEF2IVU_SERVICE=crew
+      - EBUEF2IVU_SETTINGS=/app/Settings/settings.crew.docker.xml
+
+  ebuef2ivu-path:
+    image: git.tu-berlin.de:5000/ebuef/ebueftools/ebuef2ivu:latest
+    environment:
+      - EBUEF2IVU_SERVICE=path
+      - EBUEF2IVU_SETTINGS=/app/Settings/settings.path.docker.xml
+
+  ebuef2ivu-vehicle:
+    image: git.tu-berlin.de:5000/ebuef/ebueftools/ebuef2ivu:latest
+    environment:
+      - EBUEF2IVU_SERVICE=vehicle
+      - EBUEF2IVU_SETTINGS=/app/Settings/settings.vehicle.docker.xml

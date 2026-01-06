@@ -1,11 +1,11 @@
-﻿using Commons.Models;
-using DatabaseConnector.Models;
-using EnumerableExtensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using EBuEf2IVU.Services.DatabaseConnector.Models;
+using EBuEf2IVU.Shareds.Commons.Models;
+using EnumerableExtensions;
 
-namespace DatabaseConnector.Extensions
+namespace EBuEf2IVU.Services.DatabaseConnector.Extensions
 {
     internal static class HaltExtensions
     {
@@ -98,8 +98,7 @@ namespace DatabaseConnector.Extensions
                     var ordered = halteGroup
                         .OrderBy(h => h.SortierZeit).ToArray();
 
-                    var positions = GetTrainPositions(
-                        halte: ordered,
+                    var positions = ordered.GetTrainPositions(
                         preferPrognosis: preferPrognosis).ToArray();
 
                     var relevant = ordered[0];

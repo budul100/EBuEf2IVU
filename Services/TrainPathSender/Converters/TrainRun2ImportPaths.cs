@@ -1,50 +1,23 @@
-﻿using Commons.Models;
-using EnumerableExtensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using EBuEf2IVU.Services.TrainPathSender.Extensions;
+using EBuEf2IVU.Shareds.Commons.Models;
+using EnumerableExtensions;
 using TrainPathImportService110;
-using TrainPathSender.Extensions;
 
-namespace TrainPathSender.Converters
+namespace EBuEf2IVU.Services.TrainPathSender.Converters
 {
-    internal class TrainRun2ImportPaths
+    internal class TrainRun2ImportPaths(string infrastructureManager, string orderingTransportationCompany,
+        string stoppingReasonStop, string stoppingReasonPass, State trainPathStateRun, State trainPathStateAltered,
+        State trainPathStateCancelled, string importProfile, IEnumerable<string> locationShortnames)
     {
         #region Private Fields
-
-        private readonly string importProfile;
-        private readonly string infrastructureManager;
-        private readonly IEnumerable<string> locationShortnames;
-        private readonly string orderingTransportationCompany;
-        private readonly string stoppingReasonPass;
-        private readonly string stoppingReasonStop;
-        private readonly State trainPathStateCancelled;
-        private readonly State trainPathStateRun;
-        private readonly State trainPathStateAltered;
 
         private string sessionKey;
         private TimetableVersion timetableVersion;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public TrainRun2ImportPaths(string infrastructureManager, string orderingTransportationCompany,
-            string stoppingReasonStop, string stoppingReasonPass, State trainPathStateRun, State trainPathStateAltered,
-            State trainPathStateCancelled, string importProfile, IEnumerable<string> locationShortnames)
-        {
-            this.infrastructureManager = infrastructureManager;
-            this.orderingTransportationCompany = orderingTransportationCompany;
-            this.stoppingReasonStop = stoppingReasonStop;
-            this.stoppingReasonPass = stoppingReasonPass;
-            this.trainPathStateRun = trainPathStateRun;
-            this.trainPathStateAltered = trainPathStateAltered;
-            this.trainPathStateCancelled = trainPathStateCancelled;
-            this.importProfile = importProfile;
-            this.locationShortnames = locationShortnames;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -227,7 +200,7 @@ namespace TrainPathSender.Converters
                 var trainPathItinerary = GetTrainPathStops(trainRun).ToArray();
 
                 var state = trainPathItinerary.Any(i => i.running)
-                    ? (trainRun.IstGeaendert ? trainPathStateAltered : trainPathStateRun)
+                    ? trainRun.IstGeaendert ? trainPathStateAltered : trainPathStateRun
                     : trainPathStateCancelled;
 
                 var result = new TrainPathVariant

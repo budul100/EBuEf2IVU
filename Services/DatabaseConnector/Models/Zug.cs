@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DatabaseConnector.Models
+namespace EBuEf2IVU.Services.DatabaseConnector.Models
 {
     internal abstract class Zug
     {
@@ -18,7 +18,7 @@ namespace DatabaseConnector.Models
         public int ID { get; set; }
 
         [ForeignKey(nameof(ZuggattungId))]
-        public Zuggattung Zuggattung { get; set; }
+        public ZugGattung Zuggattung { get; set; }
 
         [Column("zuggattung_id")]
         public int ZuggattungId { get; set; }

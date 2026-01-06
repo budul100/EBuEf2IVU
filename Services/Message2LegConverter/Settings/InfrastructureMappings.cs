@@ -1,4 +1,4 @@
-namespace EBuEf2IVUVehicle.Settings
+namespace EBuEf2IVU.Services.Message2LegConverter.Settings
 {
     internal class InfrastructureMappings
     {

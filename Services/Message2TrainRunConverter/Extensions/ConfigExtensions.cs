@@ -1,8 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
-using Commons.Models;
+using EBuEf2IVU.Shareds.Commons.Models;
+using EBuEf2IVU.Shareds.Commons.Settings;
 
-namespace Message2TrainRunConverter.Extensions
+namespace EBuEf2IVU.Services.Message2TrainRunConverter.Extensions
 {
     internal static class ConfigExtensions
     {
@@ -11,11 +12,11 @@ namespace Message2TrainRunConverter.Extensions
         public static Func<TrainPathMessage, DateTime?> GetAbfahrtGetter(this IConfiguration config)
         {
             var senderSettings = config
-                .GetSection(nameof(Commons.Settings.TrainPathSender))
-                .Get<Commons.Settings.TrainPathSender>();
+                .GetSection(nameof(TrainPathSender))
+                .Get<TrainPathSender>();
 
             var result = senderSettings.PreferPrognosis
-                ? (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtPrognose ?? m.AbfahrtSoll ?? m.AbfahrtPlan)
+                ? (m => m.AbfahrtPrognose ?? m.AbfahrtSoll ?? m.AbfahrtPlan)
                 : (Func<TrainPathMessage, DateTime?>)(m => m.AbfahrtSoll ?? m.AbfahrtPlan);
 
             return result;
@@ -24,11 +25,11 @@ namespace Message2TrainRunConverter.Extensions
         public static Func<TrainPathMessage, DateTime?> GetAnkunftGetter(this IConfiguration config)
         {
             var senderSettings = config
-                .GetSection(nameof(Commons.Settings.TrainPathSender))
-                .Get<Commons.Settings.TrainPathSender>();
+                .GetSection(nameof(TrainPathSender))
+                .Get<TrainPathSender>();
 
             var result = senderSettings.PreferPrognosis
-                ? (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftPrognose ?? m.AnkunftSoll ?? m.AnkunftPlan)
+                ? (m => m.AnkunftPrognose ?? m.AnkunftSoll ?? m.AnkunftPlan)
                 : (Func<TrainPathMessage, DateTime?>)(m => m.AnkunftSoll ?? m.AnkunftPlan);
 
             return result;

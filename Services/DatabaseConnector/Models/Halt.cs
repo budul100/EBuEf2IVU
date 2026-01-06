@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DatabaseConnector.Models
+namespace EBuEf2IVU.Services.DatabaseConnector.Models
 {
     internal abstract class Halt<T>
         where T : Zug

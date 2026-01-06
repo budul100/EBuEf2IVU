@@ -5,16 +5,17 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Commons.Interfaces;
-using Commons.Models;
 using CredentialChannelFactory;
 using CredentialChannelFactory.Endpoint;
-using CrewChecker.Extensions;
+using CrewChecker;
+using EBuEf2IVU.Services.CrewChecker.Extensions;
+using EBuEf2IVU.Shareds.Commons.Interfaces;
+using EBuEf2IVU.Shareds.Commons.Models;
 using EnumerableExtensions;
 using Polly;
 using Polly.Retry;
 
-namespace CrewChecker
+namespace EBuEf2IVU.Services.CrewChecker
 {
     public class Checker(ILogger<Checker> logger)
         : ICrewChecker
@@ -45,7 +46,7 @@ namespace CrewChecker
         }
 
         public void Initialize(string host, int port, bool isHttps, string username, string password, string path,
-            string division, string planningLevel, int retryTime)
+            string division, string planningLevel, int? retryTime)
         {
             if (string.IsNullOrWhiteSpace(host))
             {
@@ -100,11 +101,20 @@ namespace CrewChecker
                 "Die Crew-on-trip-Anfragen werden gesendet an: {uri}",
                 channelFactory.Uri.AbsoluteUri);
 
-            retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: OnRetry);
+            if (retryTime.HasValue)
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryForeverAsync(
+                        sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime.Value),
+                        onRetry: OnRetry);
+            }
+            else
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .RetryAsync(0);
+            }
         }
 
         #endregion Public Methods

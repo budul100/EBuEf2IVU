@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Commons.Enums;
-using Commons.Models;
+using EBuEf2IVU.Shareds.Commons.Enums;
+using EBuEf2IVU.Shareds.Commons.Models;
+using RealtimeSenderIS;
 
-namespace RealtimeSenderIS.Extensions
+namespace EBuEf2IVU.Services.RealtimeSenderIS.Extensions
 {
     internal static class SenderExtensions
     {
@@ -48,7 +49,7 @@ namespace RealtimeSenderIS.Extensions
             {
                 var position = 0;
 
-                foreach (string vehicle in vehicles)
+                foreach (var vehicle in vehicles)
                 {
                     if (!string.IsNullOrEmpty(vehicle))
                     {

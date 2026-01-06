@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
-using Commons.Settings;
-using EBuEf2IVUVehicle.Settings;
+using EBuEf2IVU.Services.Message2LegConverter.Settings;
+using EBuEf2IVU.Shareds.Commons.Settings;
 
-namespace Message2LegConverter.Extensions
+namespace EBuEf2IVU.Services.Message2LegConverter.Extensions
 {
     internal static class ConfigExtensions
     {

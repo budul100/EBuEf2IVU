@@ -7,21 +7,22 @@ using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Commons.Interfaces;
-using Commons.Models;
+using EBuEf2IVU.Services.RealtimeSenderIS.Converters;
+using EBuEf2IVU.Shareds.Commons.Interfaces;
+using EBuEf2IVU.Shareds.Commons.Models;
 using EnumerableExtensions;
 using Polly;
 using Polly.Retry;
-using RealtimeSenderIS.Converters;
+using RealtimeSenderIS;
 
-namespace RealtimeSenderIS
+namespace EBuEf2IVU.Services.RealtimeSenderIS
 {
-    public class Sender
+    public class Sender(ILogger<Sender> logger)
         : IRealtimeSenderIS
     {
         #region Private Fields
 
-        private readonly ILogger logger;
+        private readonly ILogger logger = logger;
         private readonly ConcurrentQueue<RealTimeInfoTO> messagesQueue = new();
 
         private RealTimeInformationImportFacadeClient client;
@@ -30,15 +31,6 @@ namespace RealtimeSenderIS
         private Task senderTask;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Sender(ILogger<Sender> logger)
-        {
-            this.logger = logger;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
@@ -78,17 +70,17 @@ namespace RealtimeSenderIS
                     ivuDatum: ivuDatum,
                     sessionStart: sessionStart);
 
-                cancellationToken.Register(() => StopTask());
+                cancellationToken.Register(StopTask);
 
                 senderTask = retryPolicy?.ExecuteAsync(
-                    action: (token) => RunSenderAsync(token),
+                    action: RunSenderAsync,
                     cancellationToken: cancellationToken);
             }
 
             return senderTask;
         }
 
-        public void Initialize(string endpoint, string division, int retryTime)
+        public void Initialize(string endpoint, string division, int? retryTime)
         {
             if (string.IsNullOrWhiteSpace(endpoint))
             {
@@ -111,13 +103,20 @@ namespace RealtimeSenderIS
             client = new RealTimeInformationImportFacadeClient();
             client.Endpoint.Address = new EndpointAddress(endpoint);
 
-            retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(
-                    sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime),
-                    onRetry: (exception, reconnection) => OnRetry(
-                        exception: exception,
-                        reconnection: reconnection));
+            if (retryTime.HasValue)
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryForeverAsync(
+                        sleepDurationProvider: _ => TimeSpan.FromSeconds(retryTime.Value),
+                        onRetry: OnRetry);
+            }
+            else
+            {
+                retryPolicy = Policy
+                    .Handle<Exception>()
+                    .RetryAsync(0);
+            }
         }
 
         #endregion Public Methods
@@ -147,7 +146,7 @@ namespace RealtimeSenderIS
             {
                 if (!messagesQueue.IsEmpty)
                 {
-                    messagesQueue.TryPeek(out RealTimeInfoTO currentMessage);
+                    messagesQueue.TryPeek(out var currentMessage);
 
                     if (currentMessage != default)
                     {

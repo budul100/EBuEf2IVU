@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace StateHandler.Extensions
+namespace EBuEf2IVU.Services.StateHandler.Extensions
 {
     internal static class PatternExtensions
     {

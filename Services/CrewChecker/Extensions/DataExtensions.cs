@@ -1,9 +1,10 @@
-﻿using Commons.Models;
-using EnumerableExtensions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using CrewChecker;
+using EBuEf2IVU.Shareds.Commons.Models;
+using EnumerableExtensions;
 
-namespace CrewChecker.Extensions
+namespace EBuEf2IVU.Services.CrewChecker.Extensions
 {
     internal static class DataExtensions
     {

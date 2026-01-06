@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using DatabaseConnector.Models;
+using EBuEf2IVU.Services.DatabaseConnector.Models;
 
-namespace DatabaseConnector.Contexts
+namespace EBuEf2IVU.Services.DatabaseConnector.Contexts
 {
     internal class FahrplanpunktContext(string connectionString)
         : BaseContext(connectionString)
     {
         #region Public Properties
 
-        public DbSet<Fahrplanpunkt> Fahrplanpunkte { get; set; }
+        public DbSet<FahrplanPunkt> Fahrplanpunkte { get; set; }
 
         #endregion Public Properties
     }

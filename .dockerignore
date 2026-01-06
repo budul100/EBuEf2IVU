@@ -1,0 +1,19 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+docker-compose*.yml
+**/Dockerfile
+.dockerignore
+
+# Logs & temp
+**/*.log
+**/temp/

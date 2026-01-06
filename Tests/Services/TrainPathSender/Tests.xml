@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<Serilog>
+		<MinimumLevel>Debug</MinimumLevel>
+		<!--<WriteTo name="Console">
+	  <Args>
+		<theme>Serilog.Sinks.SystemConsole.Themes.SystemConsoleTheme::Literate, Serilog.Sinks.Console</theme>
+	  </Args>
+	</WriteTo>-->
+		<WriteTo name="File">
+			<Args>
+				<path>/var/log/ebuef2ivu/ebuef2ivupath.log</path>
+				<rollingInterval>Day</rollingInterval>
+			</Args>
+		</WriteTo>
+	</Serilog>
+	<EBuEfDBConnector>
+		<ConnectionString>SERVER=db.ebuef;DATABASE=ebuef_fahrplan;UID=ebuef2ivucore;PASSWORD=uKQAx5hS2RxDs7oU;SslMode=none;</ConnectionString>
+	</EBuEfDBConnector>
+	<StatusReceiver>
+		<UseMulticast>false</UseMulticast>
+		<Server>224.0.0.8</Server>
+		<!--<Port>4454</Port>-->
+		<Topic>mqtt4454</Topic>
+		<StartPattern>ZN SET DISPATCH</StartPattern>
+		<StatusPattern>SESSION NEW STATUS $</StatusPattern>
+	</StatusReceiver>
+	<TrainPathReceiver>
+		<UseMulticast>false</UseMulticast>
+		<Server>224.0.0.9</Server>
+		<!--<Port>4455</Port>-->
+		<Topic>mqtt4455</Topic>
+	</TrainPathReceiver>
+	<TrainPathSender>
+		<!--The host can also be defined by the environment variable IVU_APPSERVER_HOST. The environment variable value is used preferably.-->
+		<Host>localhost</Host>
+		<!--The port can also be defined by the environment variable IVU_APPSERVER_PORT. The environment variable value is used preferably.-->
+		<Port>24100</Port>
+		<!--The value can also be defined by the environment variable IVU_APPSERVER_ISHTTPS. The environment variable value is used preferably.-->
+		<IsHttps>false</IsHttps>
+		<Username>trainpath</Username>
+		<Password>trainpath</Password>
+		<Path>intf.trainpath.standardimport.impl/TrainPathImportWebFacadeBean</Path>
+		<!--Timeout is by default 60 secs-->
+		<TimeoutInSecs>120</TimeoutInSecs>
+		<IgnoreTrainTypes>RF</IgnoreTrainTypes>
+		<!-- Split multiple IgnoreTrainTypes with , -->
+		<ImportProfile>Standard Train Path Import</ImportProfile>
+		<InfrastructureManager>EBuEf</InfrastructureManager>
+		<LocationTypes>zfs,zms</LocationTypes>
+		<!-- Split multiple LocationTypes with , -->
+		<LogRequests>true</LogRequests>
+		<OrderingTransportationCompany>EBuEf</OrderingTransportationCompany>
+		<PreferPrognosis>false</PreferPrognosis>
+		<StoppingReasonPass>Pass</StoppingReasonPass>
+		<StoppingReasonStop>Stop</StoppingReasonStop>
+		<TrainPathStateRun>REQUESTED</TrainPathStateRun>
+		<TrainPathStateAltered>ALTERED</TrainPathStateAltered>
+		<TrainPathStateCancelled>CANCELLED</TrainPathStateCancelled>
+	</TrainPathSender>
+</Configuration>

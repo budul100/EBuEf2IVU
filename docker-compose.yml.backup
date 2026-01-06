@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  ebuef2ivu-crew:
+    build:
+      context: .
+      dockerfile: Shareds/Host/Dockerfile
+    image: ebuef2ivu:2.0.8
+    container_name: ebuef2ivu-crew
+    environment:
+      - EBUEF2IVU_SERVICE=crew
+      - EBUEF2IVU_SETTINGS=/app/Settings/settings.crew.docker.xml
+    volumes:
+      - ./Shareds/Host/Settings:/app/Settings:ro
+    restart: unless-stopped
+    networks:
+      - ebuef2ivu-network
+
+  ebuef2ivu-path:
+    build:
+      context: .
+      dockerfile: Shareds/Host/Dockerfile
+    image: ebuef2ivu:2.0.8
+    container_name: ebuef2ivu-path
+    environment:
+      - EBUEF2IVU_SERVICE=path
+      - EBUEF2IVU_SETTINGS=/app/Settings/settings.path.docker.xml
+    volumes:
+      - ./Shareds/Host/Settings:/app/Settings:ro
+    restart: unless-stopped
+    networks:
+      - ebuef2ivu-network
+
+  ebuef2ivu-vehicle:
+    build:
+      context: .
+      dockerfile: Shareds/Host/Dockerfile
+    image: ebuef2ivu:2.0.8
+    container_name: ebuef2ivu-vehicle
+    environment:
+      - EBUEF2IVU_SERVICE=vehicle
+      - EBUEF2IVU_SETTINGS=/app/Settings/settings.vehicle.docker.xml
+    volumes:
+      - ./Shareds/Host/Settings:/app/Settings:ro
+    restart: unless-stopped
+    networks:
+      - ebuef2ivu-network
+
+networks:
+  ebuef2ivu-network:
+    driver: bridge

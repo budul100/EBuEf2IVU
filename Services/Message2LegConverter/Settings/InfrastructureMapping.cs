@@ -1,6 +1,6 @@
-using Commons.Enums;
+using EBuEf2IVU.Shareds.Commons.Enums;
 
-namespace EBuEf2IVUVehicle.Settings
+namespace EBuEf2IVU.Services.Message2LegConverter.Settings
 {
     internal class InfrastructureMapping
     {

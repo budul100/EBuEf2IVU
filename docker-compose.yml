@@ -1,23 +1,51 @@
-version: '3.3'
+version: '3.8'
 
 services:
-    crew:
-        network_mode: host
-        volumes:
-            - '/mnt/c/Users/mgr/Entwicklung/EBuEf2IVU/Programs/EBuEf2IVUCrew/ebuef2ivucrew-settings.docker.xml:/ebuef2ivucrew-settings.xml'
-        command: '-s /ebuef2ivucrew-settings.xml'
-        image: ebuef2ivucrew
+  ebuef2ivu-crew:
+    build:
+      context: .
+      dockerfile: Shareds/Host/Dockerfile
+    image: ebuef2ivu:2.0.9
+    container_name: ebuef2ivu-crew
+    environment:
+      - EBUEF2IVU_SERVICE=crew
+      - EBUEF2IVU_SETTINGS=/app/Settings/settings.crew.docker.xml
+    volumes:
+      - ./Shareds/Host/Settings:/app/Settings:ro
+    restart: unless-stopped
+    networks:
+      - ebuef2ivu-network
 
-    path:
-        network_mode: host
-        volumes:
-            - '/mnt/c/Users/mgr/Entwicklung/EBuEf2IVU/Programs/EBuEf2IVUPath/ebuef2ivupath-settings.docker.xml:/ebuef2ivupath-settings.xml'
-        command: '-s /ebuef2ivupath-settings.xml'
-        image: ebuef2ivupath
+  ebuef2ivu-path:
+    build:
+      context: .
+      dockerfile: Shareds/Host/Dockerfile
+    image: ebuef2ivu:2.0.9
+    container_name: ebuef2ivu-path
+    environment:
+      - EBUEF2IVU_SERVICE=path
+      - EBUEF2IVU_SETTINGS=/app/Settings/settings.path.docker.xml
+    volumes:
+      - ./Shareds/Host/Settings:/app/Settings:ro
+    restart: unless-stopped
+    networks:
+      - ebuef2ivu-network
 
-    vehicle:
-        network_mode: host
-        volumes:
-            - '/mnt/c/Users/mgr/Entwicklung/EBuEf2IVU/Programs/EBuEf2IVUVehicle/ebuef2ivuvehicle-settings.docker.xml:/ebuef2ivuvehicle-settings.xml'
-        command: '-s /ebuef2ivuvehicle-settings.xml'
-        image: ebuef2ivuvehicle
+  ebuef2ivu-vehicle:
+    build:
+      context: .
+      dockerfile: Shareds/Host/Dockerfile
+    image: ebuef2ivu:2.0.9
+    container_name: ebuef2ivu-vehicle
+    environment:
+      - EBUEF2IVU_SERVICE=vehicle
+      - EBUEF2IVU_SETTINGS=/app/Settings/settings.vehicle.docker.xml
+    volumes:
+      - ./Shareds/Host/Settings:/app/Settings:ro
+    restart: unless-stopped
+    networks:
+      - ebuef2ivu-network
+
+networks:
+  ebuef2ivu-network:
+    driver: bridge

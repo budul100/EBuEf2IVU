@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace TrainPathSender.Extensions
+namespace EBuEf2IVU.Services.TrainPathSender.Extensions
 {
     internal static class SerializerExtensions
     {

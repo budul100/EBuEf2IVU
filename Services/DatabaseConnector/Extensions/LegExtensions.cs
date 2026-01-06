@@ -1,7 +1,7 @@
-﻿using Commons.Models;
-using ConverterExtensions;
+﻿using ConverterExtensions;
+using EBuEf2IVU.Shareds.Commons.Models;
 
-namespace DatabaseConnector.Extensions
+namespace EBuEf2IVU.Services.DatabaseConnector.Extensions
 {
     internal static class LegExtensions
     {

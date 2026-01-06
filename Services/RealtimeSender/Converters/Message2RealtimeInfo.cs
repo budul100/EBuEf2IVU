@@ -2,34 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Commons.Models;
-using RealtimeSender.Extensions;
+using RealtimeSender;
+using EBuEf2IVU.Services.RealtimeSender.Extensions;
+using EBuEf2IVU.Shareds.Commons.Models;
 
-namespace RealtimeSender.Converters
+namespace EBuEf2IVU.Services.RealtimeSender.Converters
 {
-    internal class Message2RealtimeInfo
+    internal class Message2RealtimeInfo(ILogger logger, string division)
     {
         #region Private Fields
 
         private const string EnvironmentComputer = "COMPUTERNAME";
 
         private readonly string deviceID = Environment.GetEnvironmentVariable(EnvironmentComputer);
-        private readonly string division;
-        private readonly ILogger logger;
+
         private DateTime? ivuDatum;
         private TimeSpan sessionStart;
 
         #endregion Private Fields
-
-        #region Public Constructors
-
-        public Message2RealtimeInfo(ILogger logger, string division)
-        {
-            this.logger = logger;
-            this.division = division;
-        }
-
-        #endregion Public Constructors
 
         #region Public Methods
 
