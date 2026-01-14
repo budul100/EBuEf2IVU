@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using CredentialChannelFactory;
+using CredentialChannelFactory.Configuration;
 using CredentialChannelFactory.Endpoint;
 using EBuEf2IVU.Services.RealtimeSender.Converters;
 using EBuEf2IVU.Shareds.Commons.Interfaces;
@@ -129,10 +130,16 @@ namespace EBuEf2IVU.Services.RealtimeSender
                 path: path,
                 isHttps: isHttps);
 
+            var configuration = new WcfConfiguration
+            {
+                IgnoreCertificateErrors = true
+            };
+
             channelFactory = new Factory<RealTimeInformationImportFacadeChannel>(
                 endpoint: endpoint,
                 userName: username,
-                password: password);
+                password: password,
+                configuration: configuration);
 
             if (retryTime.HasValue)
             {

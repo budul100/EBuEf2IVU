@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using CredentialChannelFactory;
+using CredentialChannelFactory.Configuration;
 using CredentialChannelFactory.Endpoint;
 using EBuEf2IVU.Services.TrainPathSender.Converters;
 using EBuEf2IVU.Services.TrainPathSender.Extensions;
@@ -95,10 +96,16 @@ namespace EBuEf2IVU.Services.TrainPathSender
                 path: path,
                 isHttps: isHttps);
 
+            var configuration = new WcfConfiguration
+            {
+                IgnoreCertificateErrors = true
+            };
+
             channelFactory = new Factory<TrainPathImportWebFacadeChannel>(
                 endpoint: endpoint,
                 userName: username,
-                password: password);
+                password: password,
+                configuration: configuration);
 
             logger.LogDebug(
                 "Zugtrassen werden gesendet an {host}:{port}/{path}.",
