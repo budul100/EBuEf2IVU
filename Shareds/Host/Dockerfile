@@ -2,6 +2,7 @@
 
 # Diese Stufe wird verwendet, wenn sie von VS im Schnellmodus ausgeführt wird (Standardeinstellung für Debugkonfiguration).
 FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
+USER root
 WORKDIR /app
 
 # Diese Stufe wird zum Erstellen des Dienstprojekts verwendet.
@@ -55,6 +56,10 @@ COPY --from=publish /app/publish .
 
 # Kopiere Settings-Dateien ins Image
 COPY --from=build /src/Shareds/Host/Settings ./Settings
+
+# Kopiere und installiere das Wurzelzertifikat
+COPY --from=build /src/Shareds/Host/Certificates/ebuef-ca.crt /usr/local/share/ca-certificates/
+RUN update-ca-certificates
 
 # Erstelle non-root User für Sicherheit
 RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
